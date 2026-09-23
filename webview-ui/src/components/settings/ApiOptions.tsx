@@ -444,7 +444,7 @@ const ApiOptions = ({
 		}
 
 		return options
-	}, [organizationAllowList, apiConfiguration.apiProvider, fromWelcomeView])
+	}, [organizationAllowList, apiConfiguration.apiProvider])
 
 	return (
 		<div className="flex flex-col gap-3">

@@ -1,22 +1,12 @@
-import React from "react"
-import { ListChecks, LayoutList, Settings, CheckCheck, X } from "lucide-react"
+import { useCallback } from "react"
 
 import { vscode } from "@/utils/vscode"
-
 import { cn } from "@/lib/utils"
-
 import { useExtensionState } from "@/context/ExtensionStateContext"
-
-import { useAppTranslation } from "@/i18n/TranslationContext"
-
+import { StandardTooltip } from "@/components/ui"
 import { useAutoApprovalToggles } from "@/hooks/useAutoApprovalToggles"
 import { useAutoApprovalState } from "@/hooks/useAutoApprovalState"
-
-import { useRooPortal } from "@/components/ui/hooks/useRooPortal"
-
-import { Popover, PopoverContent, PopoverTrigger, StandardTooltip, ToggleSwitch, Button } from "@/components/ui"
-
-import { AutoApproveSetting, autoApproveSettingsConfig } from "../settings/AutoApproveToggle"
+import { autoApproveSettingsConfig } from "../settings/AutoApproveToggle"
 
 interface AutoApproveDropdownProps {
 	disabled?: boolean
@@ -24,10 +14,6 @@ interface AutoApproveDropdownProps {
 }
 
 export const AutoApproveDropdown = ({ disabled = false, triggerClassName = "" }: AutoApproveDropdownProps) => {
-	const [open, setOpen] = React.useState(false)
-	const portalContainer = useRooPortal("roo-portal")
-	const { t } = useAppTranslation()
-
 	const {
 		autoApprovalEnabled,
 		setAutoApprovalEnabled,
@@ -41,241 +27,72 @@ export const AutoApproveDropdown = ({ disabled = false, triggerClassName = "" }:
 	} = useExtensionState()
 
 	const toggles = useAutoApprovalToggles()
-
-	const onAutoApproveToggle = React.useCallback(
-		(key: AutoApproveSetting, value: boolean) => {
-			vscode.postMessage({ type: "updateSettings", updatedSettings: { [key]: value } })
-
-			switch (key) {
-				case "alwaysAllowReadOnly":
-					setAlwaysAllowReadOnly(value)
-					break
-				case "alwaysAllowWrite":
-					setAlwaysAllowWrite(value)
-					break
-				case "alwaysAllowExecute":
-					setAlwaysAllowExecute(value)
-					break
-				case "alwaysAllowMcp":
-					setAlwaysAllowMcp(value)
-					break
-				case "alwaysAllowModeSwitch":
-					setAlwaysAllowModeSwitch(value)
-					break
-				case "alwaysAllowSubtasks":
-					setAlwaysAllowSubtasks(value)
-					break
-				case "alwaysAllowFollowupQuestions":
-					setAlwaysAllowFollowupQuestions(value)
-					break
-			}
-
-			// If enabling any option, ensure autoApprovalEnabled is true.
-			if (value && !autoApprovalEnabled) {
-				setAutoApprovalEnabled(true)
-				vscode.postMessage({ type: "autoApprovalEnabled", bool: true })
-			}
-		},
-		[
-			autoApprovalEnabled,
-			setAlwaysAllowReadOnly,
-			setAlwaysAllowWrite,
-			setAlwaysAllowExecute,
-			setAlwaysAllowMcp,
-			setAlwaysAllowModeSwitch,
-			setAlwaysAllowSubtasks,
-			setAlwaysAllowFollowupQuestions,
-			setAutoApprovalEnabled,
-		],
-	)
-
-	const handleSelectAll = React.useCallback(() => {
-		// Enable all options
-		Object.keys(autoApproveSettingsConfig).forEach((key) => {
-			onAutoApproveToggle(key as AutoApproveSetting, true)
-		})
-		// Enable master auto-approval
-		if (!autoApprovalEnabled) {
-			setAutoApprovalEnabled(true)
-			vscode.postMessage({ type: "autoApprovalEnabled", bool: true })
-		}
-	}, [onAutoApproveToggle, autoApprovalEnabled, setAutoApprovalEnabled])
-
-	const handleSelectNone = React.useCallback(() => {
-		// Disable all options
-		Object.keys(autoApproveSettingsConfig).forEach((key) => {
-			onAutoApproveToggle(key as AutoApproveSetting, false)
-		})
-	}, [onAutoApproveToggle])
-
-	const handleOpenSettings = React.useCallback(
-		() =>
-			window.postMessage({ type: "action", action: "settingsButtonClicked", values: { section: "autoApprove" } }),
-		[],
-	)
-
-	// Handle the main auto-approval toggle
-	const handleAutoApprovalToggle = React.useCallback(() => {
-		const newValue = !(autoApprovalEnabled ?? false)
-		setAutoApprovalEnabled(newValue)
-		vscode.postMessage({ type: "autoApprovalEnabled", bool: newValue })
-	}, [autoApprovalEnabled, setAutoApprovalEnabled])
-
-	// Calculate enabled and total counts as separate properties
-	const settingsArray = Object.values(autoApproveSettingsConfig)
-
-	const enabledCount = React.useMemo(() => {
-		return Object.values(toggles).filter((value) => !!value).length
-	}, [toggles])
-
-	const totalCount = React.useMemo(() => {
-		return Object.keys(toggles).length
-	}, [toggles])
-
 	const { effectiveAutoApprovalEnabled } = useAutoApprovalState(toggles, autoApprovalEnabled)
 
-	const tooltipText =
-		!effectiveAutoApprovalEnabled || enabledCount === 0
-			? t("chat:autoApprove.tooltipManage")
-			: t("chat:autoApprove.tooltipStatus", {
-					toggles: settingsArray
-						.filter((setting) => toggles[setting.key])
-						.map((setting) => t(setting.labelKey))
-						.join(", "),
-				})
+	const isYoloOn = !!effectiveAutoApprovalEnabled
+
+	const handleToggleYolo = useCallback(() => {
+		const nextState = !isYoloOn
+
+		// Master toggle
+		setAutoApprovalEnabled(nextState)
+		vscode.postMessage({ type: "autoApprovalEnabled", bool: nextState })
+
+		// Toggle all permissions together for YOLO mode
+		const settingsUpdate: Record<string, boolean> = {}
+		Object.keys(autoApproveSettingsConfig).forEach((key) => {
+			settingsUpdate[key] = nextState
+		})
+
+		vscode.postMessage({ type: "updateSettings", updatedSettings: settingsUpdate })
+
+		setAlwaysAllowReadOnly(nextState)
+		setAlwaysAllowWrite(nextState)
+		setAlwaysAllowExecute(nextState)
+		setAlwaysAllowMcp(nextState)
+		setAlwaysAllowModeSwitch(nextState)
+		setAlwaysAllowSubtasks(nextState)
+		setAlwaysAllowFollowupQuestions(nextState)
+	}, [
+		isYoloOn,
+		setAutoApprovalEnabled,
+		setAlwaysAllowReadOnly,
+		setAlwaysAllowWrite,
+		setAlwaysAllowExecute,
+		setAlwaysAllowMcp,
+		setAlwaysAllowModeSwitch,
+		setAlwaysAllowSubtasks,
+		setAlwaysAllowFollowupQuestions,
+	])
 
 	return (
-		<Popover open={open} onOpenChange={setOpen} data-testid="auto-approve-dropdown-root">
-			<StandardTooltip content={tooltipText}>
-				<PopoverTrigger
-					disabled={disabled}
-					data-testid="auto-approve-dropdown-trigger"
+		<StandardTooltip
+			content={
+				isYoloOn
+					? "YOLO Mode: ON (Semua tindakan diizinkan otomatis)"
+					: "YOLO Mode: OFF (Memerlukan konfirmasi manual)"
+			}>
+			<button
+				type="button"
+				onClick={handleToggleYolo}
+				disabled={disabled}
+				data-testid="auto-approve-dropdown-trigger"
+				className={cn(
+					"inline-flex items-center gap-1.5 relative whitespace-nowrap px-2.5 py-1 text-xs font-semibold rounded-full select-none cursor-pointer transition-all duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-500",
+					isYoloOn
+						? "bg-amber-500/15 border border-amber-500/40 text-amber-300 shadow-sm shadow-amber-500/20 hover:bg-amber-500/25 active:scale-95"
+						: "bg-white/[0.04] border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/[0.08] hover:border-white/20 active:scale-95",
+					disabled && "opacity-50 cursor-not-allowed",
+					triggerClassName,
+				)}>
+				<span
 					className={cn(
-						"inline-flex items-center relative whitespace-nowrap px-2.5 py-1 text-xs font-medium rounded-full",
-						effectiveAutoApprovalEnabled
-							? "bg-emerald-950/60 border border-emerald-500/40 text-emerald-300"
-							: "bg-white/[0.04] border border-white/10 text-slate-400",
-						"transition-all duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500",
-						"max-[300px]:shrink-0",
-						disabled
-							? "opacity-50 cursor-not-allowed"
-							: "hover:bg-white/[0.08] hover:border-white/20 cursor-pointer",
-						triggerClassName,
-					)}>
-					<span className="hidden min-[300px]:inline truncate min-w-0">
-						{!effectiveAutoApprovalEnabled
-							? "Auto: Off"
-							: enabledCount === totalCount
-								? "Auto: All"
-								: `Auto: ${enabledCount}`}
-					</span>
-					<span className="inline min-[300px]:hidden min-w-0">
-						{!effectiveAutoApprovalEnabled
-							? "Off"
-							: enabledCount === totalCount
-								? "All"
-								: enabledCount}
-					</span>
-				</PopoverTrigger>
-			</StandardTooltip>
-			<PopoverContent
-				align="start"
-				sideOffset={4}
-				container={portalContainer}
-				className="p-0 overflow-hidden w-[min(440px,calc(100vw-2rem))]"
-				onOpenAutoFocus={(e) => e.preventDefault()}>
-				<div className="flex flex-col w-full">
-					{/* Header with description */}
-					<div className="p-3 border-b border-vscode-dropdown-border">
-						<div className="flex items-center justify-between gap-1 pr-1 pb-2">
-							<h4 className="m-0 font-bold text-base text-vscode-foreground">
-								{t("chat:autoApprove.title")}
-							</h4>
-							<Settings
-								className="inline mb-0.5 mr-1 size-4 cursor-pointer"
-								onClick={handleOpenSettings}
-							/>
-						</div>
-						<p className="m-0 text-xs text-vscode-descriptionForeground">
-							{t("chat:autoApprove.description")}
-						</p>
-					</div>
-					<div className="grid grid-cols-1 min-[340px]:grid-cols-2 gap-x-2 gap-y-2 p-3">
-						{settingsArray.map(({ key, labelKey, descriptionKey, icon }) => {
-							const isEnabled = toggles[key]
-							return (
-								<StandardTooltip key={key} content={t(descriptionKey)}>
-									<Button
-										variant={isEnabled ? "primary" : "secondary"}
-										onClick={() => onAutoApproveToggle(key, !isEnabled)}
-										className={cn(
-											"flex items-center gap-2 px-2 py-2 text-sm text-left justify-start h-auto",
-											"transition-all duration-150",
-											!effectiveAutoApprovalEnabled &&
-												"opacity-50 cursor-not-allowed hover:opacity-50",
-											!isEnabled && "bg-vscode-button-background/15",
-										)}
-										disabled={!effectiveAutoApprovalEnabled}
-										data-testid={`auto-approve-${key}`}>
-										<span className={`codicon codicon-${icon} text-sm flex-shrink-0`} />
-										<span className="flex-1 truncate">{t(labelKey)}</span>
-									</Button>
-								</StandardTooltip>
-							)
-						})}
-					</div>
-
-					{/* Bottom bar with Select All/None buttons */}
-					<div className="flex flex-row items-center justify-between px-2 py-2 border-t border-vscode-dropdown-border">
-						<div className="flex flex-row gap-1">
-							<Button
-								variant="ghost"
-								size="sm"
-								aria-label={t("chat:autoApprove.selectAll")}
-								onClick={handleSelectAll}
-								disabled={!effectiveAutoApprovalEnabled}
-								className={cn(
-									"gap-1 px-2 py-1 text-base font-bold h-auto",
-									!effectiveAutoApprovalEnabled && "opacity-50 hover:opacity-50 cursor-not-allowed",
-								)}>
-								<ListChecks className="w-3.5 h-3.5" />
-								<span>{t("chat:autoApprove.all")}</span>
-							</Button>
-							<Button
-								variant="ghost"
-								size="sm"
-								aria-label={t("chat:autoApprove.selectNone")}
-								onClick={handleSelectNone}
-								disabled={!effectiveAutoApprovalEnabled}
-								className={cn(
-									"gap-1 px-2 py-1 text-base font-bold h-auto",
-									!effectiveAutoApprovalEnabled && "opacity-50 hover:opacity-50 cursor-not-allowed",
-								)}>
-								<LayoutList className="w-3.5 h-3.5" />
-								<span>{t("chat:autoApprove.none")}</span>
-							</Button>
-						</div>
-
-						<label
-							className="flex items-center gap-2 pr-2 cursor-pointer"
-							onClick={(e) => {
-								// Prevent label click when clicking on the toggle switch itself
-								if ((e.target as HTMLElement).closest('[role="switch"]')) {
-									e.preventDefault()
-									return
-								}
-								handleAutoApprovalToggle()
-							}}>
-							<ToggleSwitch
-								checked={effectiveAutoApprovalEnabled}
-								aria-label="Toggle auto-approval"
-								onChange={handleAutoApprovalToggle}
-							/>
-							<span className={cn("text-sm font-bold select-none")}>Enabled</span>
-						</label>
-					</div>
-				</div>
-			</PopoverContent>
-		</Popover>
+						"size-1.5 rounded-full shrink-0 transition-colors",
+						isYoloOn ? "bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.9)] animate-pulse" : "bg-slate-500",
+					)}
+				/>
+				<span className="font-mono tracking-tight">{isYoloOn ? "YOLO: On" : "YOLO: Off"}</span>
+			</button>
+		</StandardTooltip>
 	)
 }

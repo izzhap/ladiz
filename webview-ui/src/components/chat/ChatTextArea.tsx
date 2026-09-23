@@ -27,7 +27,6 @@ import { StandardTooltip } from "@src/components/ui"
 import Thumbnails from "../common/Thumbnails"
 import { ModeSelector } from "./ModeSelector"
 import { ModelSelector } from "./ModelSelector"
-import { ApiConfigSelector } from "./ApiConfigSelector"
 import { AutoApproveDropdown } from "./AutoApproveDropdown"
 import { MAX_IMAGES_PER_MESSAGE } from "./ChatView"
 import ContextMenu from "./ContextMenu"
@@ -63,7 +62,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		{
 			inputValue,
 			setInputValue,
-			selectApiConfigDisabled,
+			selectApiConfigDisabled: _selectApiConfigDisabled,
 			placeholderText,
 			selectedImages,
 			setSelectedImages,
@@ -86,28 +85,14 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		const {
 			filePaths,
 			openedTabs,
-			currentApiConfigName,
-			listApiConfigMeta,
 			customModes,
 			customModePrompts,
 			cwd,
-			pinnedApiConfigs,
-			togglePinnedApiConfig,
 			taskHistory,
 			clineMessages,
 			commands,
 			enterBehavior,
-			lockApiConfigAcrossModes,
 		} = useExtensionState()
-
-		// Find the ID and display text for the currently selected API configuration.
-		const { currentConfigId, displayName } = useMemo(() => {
-			const currentConfig = listApiConfigMeta?.find((config) => config.name === currentApiConfigName)
-			return {
-				currentConfigId: currentConfig?.id || "",
-				displayName: currentApiConfigName || "", // Use the name directly for display.
-			}
-		}, [listApiConfigMeta, currentApiConfigName])
 
 		const [gitCommits, setGitCommits] = useState<any[]>([])
 		const [showDropdown, setShowDropdown] = useState(false)
@@ -935,16 +920,6 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			[setMode],
 		)
 
-		// Helper function to handle API config change
-		const handleApiConfigChange = useCallback((value: string) => {
-			vscode.postMessage({ type: "loadApiConfigurationById", text: value })
-		}, [])
-
-		const handleToggleLockApiConfig = useCallback(() => {
-			const newValue = !lockApiConfigAcrossModes
-			vscode.postMessage({ type: "lockApiConfigAcrossModes", bool: newValue })
-		}, [lockApiConfigAcrossModes])
-
 		return (
 			<div
 				className={cn(
@@ -1102,9 +1077,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 										: isDraggingOver
 											? "border-2 border-dashed border-blue-500"
 											: "border border-white/10",
-									isDraggingOver
-										? "bg-blue-950/30"
-										: "bg-[#0b0e17]/80",
+									isDraggingOver ? "bg-blue-950/30" : "bg-[#0b0e17]/80",
 									"transition-all duration-150 ease-in-out",
 									"min-h-[94px]",
 									"box-border",

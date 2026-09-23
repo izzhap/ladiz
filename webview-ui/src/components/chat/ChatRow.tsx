@@ -42,6 +42,8 @@ import { FollowUpSuggest } from "./FollowUpSuggest"
 import { BatchFilePermission } from "./BatchFilePermission"
 import { BatchDiffApproval } from "./BatchDiffApproval"
 import { ProgressIndicator } from "./ProgressIndicator"
+import { ApiRequestLoading } from "./ApiRequestLoading"
+import { LadizAnimatedLogo } from "./LadizAnimatedLogo"
 import { Markdown } from "./Markdown"
 import { CommandExecution } from "./CommandExecution"
 import { CommandExecutionError } from "./CommandExecutionError"
@@ -309,9 +311,7 @@ export const ChatRowContent = ({
 				]
 			case "completion_result":
 				return [
-					<span
-						className="codicon codicon-check"
-						style={{ color: successColor, marginBottom: "-1.5px" }}></span>,
+					<span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] inline-block shrink-0"></span>,
 					<span style={{ color: successColor, fontWeight: "bold" }}>{t("chat:taskCompleted")}</span>,
 				]
 			case "api_req_rate_limit_wait":
@@ -1059,9 +1059,9 @@ export const ChatRowContent = ({
 					return (
 						<>
 							<div
-								className={`group text-xs transition-all duration-300 rounded-xl px-3 py-2 ${
+								className={`group text-xs transition-all duration-300 rounded-lg px-2.5 py-1 ${
 									isApiRequestInProgress
-										? "bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-blue-950/40 border border-blue-500/30 shadow-lg shadow-blue-500/10 opacity-100 animate-pulse"
+										? "bg-blue-950/30 border border-blue-500/25 opacity-100"
 										: "opacity-40 hover:opacity-100 bg-white/[0.02] border border-white/5"
 								}`}
 								style={{
@@ -1073,10 +1073,14 @@ export const ChatRowContent = ({
 											: 0,
 									justifyContent: "space-between",
 								}}>
-								<div style={{ display: "flex", alignItems: "center", gap: "10px", flexGrow: 1 }}>
-									{icon}
-									{title}
-								</div>
+								{isApiRequestInProgress ? (
+									<ApiRequestLoading />
+								) : (
+									<div style={{ display: "flex", alignItems: "center", gap: "10px", flexGrow: 1 }}>
+										{icon}
+										{title}
+									</div>
+								)}
 								{cost !== null && cost !== undefined && cost > 0 && (
 									<div className="text-[10px] font-mono text-cyan-300 bg-blue-500/10 border border-blue-400/20 px-2 py-0.5 rounded-full">
 										${Number(cost || 0)?.toFixed(4)}
@@ -1172,7 +1176,7 @@ export const ChatRowContent = ({
 								justifyContent: "space-between",
 							}}>
 							<div style={{ display: "flex", alignItems: "center", gap: "10px", flexGrow: 1 }}>
-								<ProgressIndicator />
+								<LadizAnimatedLogo className="size-4.5" />
 								<span style={{ color: normalColor }}>{t("chat:apiRequest.rateLimitWait")}</span>
 							</div>
 							<span className="text-xs font-light text-vscode-descriptionForeground">{waitSeconds}s</span>
@@ -1323,14 +1327,17 @@ export const ChatRowContent = ({
 					)
 				case "completion_result":
 					return (
-						<div className="group">
-							<div style={headerStyle}>
-								{icon}
-								{title}
-								<div style={{ flexGrow: 1 }} />
+						<div className="group relative my-2 overflow-hidden rounded-xl border border-emerald-500/25 bg-gradient-to-b from-emerald-950/20 via-slate-900/40 to-slate-950/30 p-3.5 shadow-sm">
+							<div className="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-emerald-500/15">
+								<div className="flex items-center gap-2">
+									<span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] shrink-0" />
+									<span className="text-xs font-semibold tracking-wider text-emerald-300 uppercase font-mono">
+										{t("chat:taskCompleted")}
+									</span>
+								</div>
 								<OpenMarkdownPreviewButton markdown={message.text} />
 							</div>
-							<div className="border-l border-green-600/30 ml-2 pl-4 pb-1">
+							<div className="text-xs leading-relaxed text-slate-200">
 								<Markdown markdown={message.text} />
 							</div>
 						</div>
@@ -1653,14 +1660,17 @@ export const ChatRowContent = ({
 				case "completion_result":
 					if (message.text) {
 						return (
-							<div className="group">
-								<div style={headerStyle}>
-									{icon}
-									{title}
-									<div style={{ flexGrow: 1 }} />
+							<div className="group relative my-2 overflow-hidden rounded-xl border border-emerald-500/25 bg-gradient-to-b from-emerald-950/20 via-slate-900/40 to-slate-950/30 p-3.5 shadow-sm">
+								<div className="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-emerald-500/15">
+									<div className="flex items-center gap-2">
+										<span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] shrink-0" />
+										<span className="text-xs font-semibold tracking-wider text-emerald-300 uppercase font-mono">
+											{t("chat:taskCompleted")}
+										</span>
+									</div>
 									<OpenMarkdownPreviewButton markdown={message.text} />
 								</div>
-								<div style={{ color: "var(--vscode-charts-green)", paddingTop: 10 }}>
+								<div className="text-xs leading-relaxed text-slate-200">
 									<Markdown markdown={message.text} partial={message.partial} />
 								</div>
 							</div>

@@ -1056,18 +1056,20 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			}
 			break
 		}
-		case "requestOpenAiModels":
-			if (message?.values?.baseUrl && message?.values?.apiKey) {
-				const openAiModels = await getOpenAiModels(
-					message?.values?.baseUrl,
-					message?.values?.apiKey,
-					message?.values?.openAiHeaders,
-				)
+		case "requestOpenAiModels": {
+			const state = await provider.getState()
+			const baseUrl = message?.values?.baseUrl || state?.apiConfiguration?.openAiBaseUrl
+			const apiKey = message?.values?.apiKey ?? state?.apiConfiguration?.openAiApiKey
+			const openAiHeaders = message?.values?.openAiHeaders || state?.apiConfiguration?.openAiHeaders
+
+			if (baseUrl) {
+				const openAiModels = await getOpenAiModels(baseUrl, apiKey, openAiHeaders)
 
 				provider.postMessageToWebview({ type: "openAiModels", openAiModels })
 			}
 
 			break
+		}
 		case "requestVsCodeLmModels":
 			const vsCodeLmModels = await getVsCodeLmModels()
 			// TODO: Cache like we do for OpenRouter, etc?
