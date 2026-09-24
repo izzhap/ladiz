@@ -5,6 +5,7 @@ import { ladizModels, ladizDefaultModelId, type ModelInfo } from "@roo-code/type
 import type { ApiHandlerOptions } from "../../shared/api"
 import { TagMatcher } from "../../utils/tag-matcher"
 import { convertToOpenAiMessages } from "../transform/openai-format"
+import { getModelParams } from "../transform/model-params"
 import type { ApiHandlerCreateMessageMetadata } from "../index"
 import type { ApiStream } from "../transform/stream"
 
@@ -30,10 +31,17 @@ export class LadizHandler extends OpenAiHandler {
 		})
 	}
 
-	override getModel(): { id: string; info: ModelInfo; reasoning?: boolean } {
-		const modelId = this.options.openAiModelId || this.options.apiModelId || ladizDefaultModelId
-		const info = ladizModels[modelId as keyof typeof ladizModels] || ladizModels[ladizDefaultModelId]
-		return { id: modelId, info }
+	override getModel() {
+		const id = this.options.apiModelId || this.options.openAiModelId || ladizDefaultModelId
+		const info = ladizModels[id as keyof typeof ladizModels] || ladizModels[ladizDefaultModelId]
+		const params = getModelParams({
+			format: "openai",
+			modelId: id,
+			model: info,
+			settings: this.options,
+			defaultTemperature: 0,
+		})
+		return { id, info, ...params }
 	}
 
 	protected override addMaxTokensIfNeeded(

@@ -2252,7 +2252,6 @@ export class ClineProvider
 			imageGenerationProvider: stateValues.imageGenerationProvider,
 			openRouterImageApiKey: stateValues.openRouterImageApiKey,
 			openRouterImageGenerationSelectedModel: stateValues.openRouterImageGenerationSelectedModel,
-			version: this.context.extension?.packageJSON?.version ?? Package.version,
 		}
 	}
 
