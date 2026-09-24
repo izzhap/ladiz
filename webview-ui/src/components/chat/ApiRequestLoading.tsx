@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { LadizAnimatedLogo } from "./LadizAnimatedLogo"
+import { cn } from "@/lib/utils"
 
 const TIPS_ID = [
 	"Gunakan @ untuk melampirkan file, folder, atau git diff ke dalam prompt",
@@ -53,24 +53,25 @@ export function ApiRequestLoading() {
 					return next
 				})
 				setIsVisible(true)
-			}, 200)
+			}, 250)
 		}, 4500)
 
 		return () => clearInterval(interval)
 	}, [tips.length])
 
 	return (
-		<div className="flex items-center gap-2 min-w-0 flex-1 py-0 my-0 leading-tight">
-			<LadizAnimatedLogo className="size-3.5 shrink-0" />
-			<div className="min-w-0 flex-1 overflow-hidden">
-				<p
-					className={`text-[11px] text-slate-300 font-normal truncate transition-all duration-200 m-0 p-0 ${
-						isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-0.5"
-					}`}
-					title={tips[tipIndex]}>
-					{tips[tipIndex]}
-				</p>
-			</div>
+		<div className="flex items-start gap-2 min-w-0 w-full py-0.5 leading-snug">
+			<span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 shrink-0 select-none mt-0.5">
+				Tip
+			</span>
+			<p
+				className={cn(
+					"text-xs text-slate-300/85 font-normal line-clamp-2 leading-snug break-words transition-all duration-300 m-0 p-0 flex-1",
+					isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-0.5",
+				)}
+				title={tips[tipIndex]}>
+				{tips[tipIndex]}
+			</p>
 		</div>
 	)
 }

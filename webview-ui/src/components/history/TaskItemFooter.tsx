@@ -6,7 +6,6 @@ import { ExportButton } from "./ExportButton"
 import { DeleteButton } from "./DeleteButton"
 import { StandardTooltip } from "../ui/standard-tooltip"
 import { useAppTranslation } from "@/i18n/TranslationContext"
-import { Split } from "lucide-react"
 
 export interface TaskItemFooterProps {
 	item: HistoryItem
@@ -26,13 +25,14 @@ const TaskItemFooter: React.FC<TaskItemFooterProps> = ({
 	const { t } = useAppTranslation()
 
 	return (
-		<div className="text-xs text-vscode-descriptionForeground flex justify-between items-center">
-			<div className="flex gap-1 items-center text-vscode-descriptionForeground/60">
+		<div className="text-[11px] text-vscode-descriptionForeground/70 flex justify-between items-center mt-1">
+			<div className="flex gap-1.5 items-center">
 				{/* Subtask tag */}
 				{isSubtask && (
 					<>
-						<Split className="size-3" />
-						<span>{t("history:subtaskTag")}</span>
+						<span className="px-1.5 py-0.5 rounded bg-vscode-badge-background/40 text-[10px] font-medium text-vscode-badge-foreground">
+							{t("history:subtaskTag")}
+						</span>
 						<span>·</span>
 					</>
 				)}
@@ -45,7 +45,7 @@ const TaskItemFooter: React.FC<TaskItemFooterProps> = ({
 				{!!item.totalCost && (
 					<>
 						<span>·</span>
-						<span className="flex items-center" data-testid="cost-footer-compact">
+						<span className="flex items-center font-mono text-[10px]" data-testid="cost-footer-compact">
 							{"$" + item.totalCost.toFixed(2)}
 						</span>
 					</>
@@ -54,7 +54,7 @@ const TaskItemFooter: React.FC<TaskItemFooterProps> = ({
 
 			{/* Action Buttons for non-compact view */}
 			{!isSelectionMode && (
-				<div className="flex flex-row gap-0 -mx-1.5 items-center text-vscode-descriptionForeground/60 hover:text-vscode-descriptionForeground opacity-0 group-hover:opacity-100">
+				<div className="flex flex-row gap-0.5 -mx-1 items-center text-vscode-descriptionForeground/60 hover:text-vscode-foreground opacity-0 group-hover:opacity-100 transition-opacity">
 					<CopyButton itemTask={item.task} />
 					{variant === "full" && <ExportButton itemId={item.id} />}
 					{onDelete && <DeleteButton itemId={item.id} onDelete={onDelete} />}

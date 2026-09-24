@@ -11,9 +11,9 @@ export function MaxRequestsInput({ allowedMaxRequests, onValueChange }: MaxReque
 	const { t } = useTranslation()
 
 	return (
-		<>
-			<label className="flex items-center gap-2 text-sm font-medium whitespace-nowrap">
-				<span className="codicon codicon-pulse" />
+		<div className="flex flex-col gap-1.5 w-full">
+			<label className="flex items-center gap-1.5 text-xs font-medium text-slate-300 whitespace-nowrap">
+				<span className="codicon codicon-pulse text-amber-400" />
 				{t("settings:autoApprove.apiRequestLimit.title")}:
 			</label>
 			<FormattedTextField
@@ -21,9 +21,9 @@ export function MaxRequestsInput({ allowedMaxRequests, onValueChange }: MaxReque
 				onValueChange={onValueChange}
 				formatter={unlimitedIntegerFormatter}
 				placeholder={t("settings:autoApprove.apiRequestLimit.unlimited")}
-				style={{ maxWidth: "200px" }}
+				className="w-full"
 				data-testid="max-requests-input"
 			/>
-		</>
+		</div>
 	)
 }

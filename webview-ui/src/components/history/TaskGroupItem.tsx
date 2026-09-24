@@ -53,7 +53,7 @@ const TaskGroupItem = ({
 		<div
 			data-testid={`task-group-${parent.id}`}
 			className={cn(
-				"bg-vscode-editor-background rounded-xl border border-transparent overflow-hidden",
+				"bg-vscode-sideBar-background/50 hover:bg-vscode-list-hoverBackground/30 border border-vscode-panel-border/40 hover:border-blue-500/30 rounded-xl overflow-hidden transition-all duration-150",
 				className,
 			)}>
 			{/* Parent task */}

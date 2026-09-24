@@ -1,5 +1,4 @@
 import { memo } from "react"
-import { ArrowRight, Folder } from "lucide-react"
 import type { DisplayHistoryItem } from "./types"
 
 import { vscode } from "@/utils/vscode"
@@ -48,16 +47,16 @@ const TaskItem = ({
 			data-testid={`task-item-${item.id}`}
 			className={cn(
 				"cursor-pointer group relative overflow-hidden",
-				"text-vscode-foreground/80 hover:text-vscode-foreground transition-colors",
+				"text-vscode-foreground/90 hover:text-vscode-foreground transition-colors",
 				hasSubtasks ? "rounded-t-xl" : "rounded-xl",
 				className,
 			)}
 			onClick={handleClick}>
-			<div className={(!isCompact && isSelectionMode ? "pl-3 pb-3" : "pl-4") + " flex gap-3 px-3 pt-3 pb-1"}>
+			<div className={cn("flex gap-3 px-3.5 py-2.5", !isCompact && isSelectionMode ? "pl-3" : "")}>
 				{/* Selection checkbox - only in full variant */}
 				{!isCompact && isSelectionMode && (
 					<div
-						className="task-checkbox mt-1"
+						className="task-checkbox mt-0.5"
 						onClick={(e) => {
 							e.stopPropagation()
 						}}>
@@ -74,9 +73,9 @@ const TaskItem = ({
 						{item.highlight ? (
 							<div
 								className={cn(
-									"flex-1 min-w-0 overflow-hidden whitespace-pre-wrap font-light text-ellipsis line-clamp-3",
+									"flex-1 min-w-0 overflow-hidden whitespace-pre-wrap font-medium text-xs leading-snug line-clamp-2",
 									{
-										"text-base": !isCompact,
+										"text-sm": !isCompact,
 									},
 									!isCompact && isSelectionMode ? "mb-1" : "",
 								)}
@@ -86,9 +85,9 @@ const TaskItem = ({
 						) : (
 							<div
 								className={cn(
-									"flex-1 min-w-0 overflow-hidden whitespace-pre-wrap font-light text-ellipsis line-clamp-3",
+									"flex-1 min-w-0 overflow-hidden whitespace-pre-wrap font-medium text-xs leading-snug line-clamp-2",
 									{
-										"text-base": !isCompact,
+										"text-sm": !isCompact,
 									},
 									!isCompact && isSelectionMode ? "mb-1" : "",
 								)}
@@ -98,14 +97,11 @@ const TaskItem = ({
 								</StandardTooltip>
 							</div>
 						)}
-						{/* Arrow icon that appears on hover */}
-						<ArrowRight className="size-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
 					</div>
 
 					{showWorkspace && item.workspace && (
-						<div className="flex items-center font-mono gap-1 text-vscode-descriptionForeground text-xs mt-1">
-							<Folder className="size-3" />
-							<span>{item.workspace}</span>
+						<div className="text-vscode-descriptionForeground/70 text-[10px] font-mono truncate mt-0.5">
+							{item.workspace}
 						</div>
 					)}
 

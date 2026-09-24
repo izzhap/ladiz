@@ -1,7 +1,7 @@
 import { useCallback, useState, memo, useMemo } from "react"
 import { useEvent } from "react-use"
 import { t } from "i18next"
-import { ChevronDown, OctagonX } from "lucide-react"
+import { ChevronDown, OctagonX, Terminal } from "lucide-react"
 
 import { type ExtensionMessage, type CommandExecutionStatus, commandExecutionStatusSchema } from "@roo-code/types"
 
@@ -19,6 +19,7 @@ import CodeBlock from "@src/components/common/CodeBlock"
 
 import { CommandPatternSelector } from "./CommandPatternSelector"
 import { TerminalOutput } from "./TerminalOutput"
+import { TimelineItem } from "./TimelineItem"
 
 interface CommandPattern {
 	pattern: string
@@ -32,7 +33,7 @@ interface CommandExecutionProps {
 	title?: JSX.Element | null
 }
 
-export const CommandExecution = ({ executionId, text, icon, title }: CommandExecutionProps) => {
+export const CommandExecution = ({ executionId, text, icon: _icon, title: _title }: CommandExecutionProps) => {
 	const {
 		terminalShellIntegrationDisabled = false,
 		allowedCommands = [],
@@ -145,61 +146,71 @@ export const CommandExecution = ({ executionId, text, icon, title }: CommandExec
 
 	useEvent("message", onMessage)
 
+	const isRunning = status?.status === "started"
+	const isExited = status?.status === "exited"
+	const exitCode = status?.status === "exited" ? status.exitCode : undefined
+	const pid = status?.status === "started" ? status.pid : undefined
+	const isExitOk = exitCode === 0
+
 	return (
-		<>
-			<div className="flex flex-row items-center justify-between gap-2 mb-1">
-				<div className="flex flex-row items-center gap-2">
-					{icon}
-					{title}
-					{status?.status === "exited" && (
-						<div className="flex flex-row items-center gap-2 font-mono text-xs">
-							<StandardTooltip
-								content={t("chat.commandExecution.exitStatus", { exitStatus: status.exitCode })}>
-								<div
-									className={cn(
-										"rounded-full size-2",
-										status.exitCode === 0 ? "bg-green-600" : "bg-red-600",
-									)}
-								/>
-							</StandardTooltip>
-						</div>
+		<TimelineItem
+			status={isRunning ? "running" : isExited && !isExitOk ? "error" : "command"}
+			customDot={
+				<div
+					className={cn(
+						"flex items-center justify-center size-3.5 rounded-full",
+						isRunning
+							? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 animate-pulse"
+							: isExited && !isExitOk
+								? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+								: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30",
+					)}>
+					<Terminal className="size-2.5" />
+				</div>
+			}
+			action={<span>{t("chat:commandExecution.running")}</span>}
+			target={<span className="font-mono text-[11px] truncate max-w-[280px]">{command}</span>}
+			subtext={
+				isExited ? (
+					<span className={cn("text-[10px] font-mono", isExitOk ? "text-emerald-400" : "text-rose-400")}>
+						Exit code: {exitCode}
+					</span>
+				) : pid ? (
+					<span className="text-[10px] font-mono text-cyan-400">PID: {pid}</span>
+				) : null
+			}
+			actions={
+				<div className="flex items-center gap-1">
+					{isRunning && (
+						<StandardTooltip content={t("chat:commandExecution.abort")}>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="size-5 p-0 text-rose-400 hover:text-rose-300"
+								onClick={() =>
+									vscode.postMessage({
+										type: "terminalOperation",
+										terminalOperation: "abort",
+									})
+								}>
+								<OctagonX className="size-3.5" />
+							</Button>
+						</StandardTooltip>
+					)}
+					{output.length > 0 && (
+						<Button
+							variant="ghost"
+							size="icon"
+							className="size-5 p-0 text-vscode-descriptionForeground hover:text-vscode-foreground"
+							onClick={() => setIsExpanded(!isExpanded)}>
+							<ChevronDown
+								className={cn("size-3.5 transition-transform duration-200", isExpanded && "rotate-180")}
+							/>
+						</Button>
 					)}
 				</div>
-				<div className=" flex flex-row items-center justify-between gap-2 px-1">
-					<div className="flex flex-row items-center gap-1">
-						{status?.status === "started" && (
-							<div className="flex flex-row items-center gap-2 font-mono text-xs">
-								{status.pid && <div className="whitespace-nowrap">(PID: {status.pid})</div>}
-								<StandardTooltip content={t("chat:commandExecution.abort")}>
-									<Button
-										variant="ghost"
-										size="icon"
-										onClick={() =>
-											vscode.postMessage({
-												type: "terminalOperation",
-												terminalOperation: "abort",
-											})
-										}>
-										<OctagonX className="size-4" />
-									</Button>
-								</StandardTooltip>
-							</div>
-						)}
-						{output.length > 0 && (
-							<Button variant="ghost" size="icon" onClick={() => setIsExpanded(!isExpanded)}>
-								<ChevronDown
-									className={cn(
-										"size-4 transition-transform duration-300",
-										isExpanded && "rotate-180",
-									)}
-								/>
-							</Button>
-						)}
-					</div>
-				</div>
-			</div>
-
-			<div className="bg-vscode-editor-background border border-vscode-border rounded-xs ml-6 mt-2">
+			}>
+			<div className="bg-vscode-editor-background/60 border border-vscode-panel-border/40 rounded-lg overflow-hidden mt-1">
 				<div className="p-2">
 					<CodeBlock source={command} language="shell" />
 					<OutputContainer isExpanded={isExpanded} output={output} />
@@ -214,7 +225,7 @@ export const CommandExecution = ({ executionId, text, icon, title }: CommandExec
 					/>
 				)}
 			</div>
-		</>
+		</TimelineItem>
 	)
 }
 

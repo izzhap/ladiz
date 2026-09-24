@@ -21,17 +21,26 @@ const HistoryPreview = () => {
 
 	return (
 		<div className="flex flex-col gap-1">
-			<div className="flex flex-wrap items-center justify-between mt-4 mb-2">
-				<h2 className="font-semibold text-lg grow m-0">{t("history:recentTasks")}</h2>
+			<div className="flex items-center justify-between pt-1 pb-1">
+				<div className="flex items-center gap-2">
+					<h2 className="text-xs font-semibold uppercase tracking-wider text-vscode-foreground/80 m-0">
+						{t("history:recentTasks")}
+					</h2>
+					{groups.length > 0 && (
+						<span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-vscode-badge-background text-vscode-badge-foreground">
+							{groups.length}
+						</span>
+					)}
+				</div>
 				<button
 					onClick={handleViewAllHistory}
-					className="text-base text-vscode-descriptionForeground hover:text-vscode-textLink-foreground transition-colors cursor-pointer"
+					className="text-xs text-vscode-textLink-foreground hover:underline transition-colors cursor-pointer font-medium"
 					aria-label={t("history:viewAllHistory")}>
 					{t("history:viewAllHistory")}
 				</button>
 			</div>
 			{displayGroups.length !== 0 && (
-				<>
+				<div className="flex flex-col gap-1.5">
 					{displayGroups.map((group) => (
 						<TaskGroupItem
 							key={group.parent.id}
@@ -41,7 +50,7 @@ const HistoryPreview = () => {
 							onToggleSubtaskExpand={toggleExpand}
 						/>
 					))}
-				</>
+				</div>
 			)}
 		</div>
 	)

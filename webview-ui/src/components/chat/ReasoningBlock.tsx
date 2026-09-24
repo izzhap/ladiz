@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next"
 import { useExtensionState } from "@src/context/ExtensionStateContext"
 
 import MarkdownBlock from "../common/MarkdownBlock"
-import { Lightbulb, ChevronUp } from "lucide-react"
+import { ChevronDown, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { TimelineItem } from "./TimelineItem"
 
 interface ReasoningBlockProps {
 	content: string
@@ -44,34 +45,40 @@ export const ReasoningBlock = ({ content, isStreaming, isLast }: ReasoningBlockP
 		setIsCollapsed(!isCollapsed)
 	}
 
+	const hasContent = (content?.trim()?.length ?? 0) > 0
+
 	return (
-		<div className="group">
-			<div
-				className="flex items-center justify-between mb-2.5 pr-2 cursor-pointer select-none"
-				onClick={handleToggle}>
-				<div className="flex items-center gap-2">
-					<Lightbulb className="w-4" />
-					<span className="font-bold text-vscode-foreground">{t("chat:reasoning.thinking")}</span>
-					{elapsed > 0 && (
-						<span className="text-sm text-vscode-descriptionForeground mt-0.5">{secondsLabel}</span>
-					)}
+		<TimelineItem
+			status={isStreaming ? "running" : "info"}
+			customDot={
+				<div className="flex items-center justify-center size-3.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+					<Sparkles className="size-2.5" />
 				</div>
-				<div className="flex items-center gap-2">
-					<ChevronUp
-						className={cn(
-							"w-4 transition-all opacity-0 group-hover:opacity-100",
-							isCollapsed && "-rotate-180",
-						)}
-					/>
-				</div>
-			</div>
-			{(content?.trim()?.length ?? 0) > 0 && !isCollapsed && (
+			}
+			action={<span>{t("chat:reasoning.thinking")}</span>}
+			target={
+				elapsed > 0 ? <span className="text-[10px] text-indigo-300 font-mono">({secondsLabel})</span> : null
+			}
+			actions={
+				hasContent ? (
+					<button
+						onClick={handleToggle}
+						className="cursor-pointer text-vscode-descriptionForeground/60 hover:text-vscode-foreground p-0.5 rounded transition-colors"
+						aria-label="Toggle thinking content">
+						<ChevronDown
+							className={cn("size-3.5 transition-transform duration-200", !isCollapsed && "rotate-180")}
+						/>
+					</button>
+				) : null
+			}
+			onClick={hasContent ? handleToggle : undefined}>
+			{hasContent && !isCollapsed && (
 				<div
 					ref={contentRef}
-					className="border-l border-vscode-descriptionForeground/20 ml-2 pl-4 pb-1 text-vscode-descriptionForeground break-words">
+					className="bg-vscode-editor-background/50 border border-vscode-panel-border/40 rounded-lg p-2.5 text-xs text-vscode-descriptionForeground/90 break-words mt-1 leading-relaxed">
 					<MarkdownBlock markdown={content} />
 				</div>
 			)}
-		</div>
+		</TimelineItem>
 	)
 }

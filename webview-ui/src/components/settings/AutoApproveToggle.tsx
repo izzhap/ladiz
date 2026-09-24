@@ -2,7 +2,7 @@ import type { GlobalSettings } from "@roo-code/types"
 
 import { useAppTranslation } from "@/i18n/TranslationContext"
 import { cn } from "@/lib/utils"
-import { Button, StandardTooltip } from "@/components/ui"
+import { StandardTooltip } from "@/components/ui"
 
 type AutoApproveToggles = Pick<
 	GlobalSettings,
@@ -85,21 +85,37 @@ export const AutoApproveToggle = ({ onToggle, ...props }: AutoApproveToggleProps
 	const { t } = useAppTranslation()
 
 	return (
-		<div className={cn("flex flex-row flex-wrap gap-2 py-2")}>
-			{Object.values(autoApproveSettingsConfig).map(({ key, descriptionKey, labelKey, icon, testId }) => (
-				<StandardTooltip key={key} content={t(descriptionKey || "")}>
-					<Button
-						variant={props[key] ? "primary" : "secondary"}
-						onClick={() => onToggle(key, !props[key])}
-						aria-label={t(labelKey)}
-						aria-pressed={!!props[key]}
-						data-testid={testId}
-						className={cn("gap-1.5 text-xs whitespace-nowrap", !props[key] && "opacity-50")}>
-						<span className={`codicon codicon-${icon} text-sm`} />
-						<span>{t(labelKey)}</span>
-					</Button>
-				</StandardTooltip>
-			))}
+		<div className="flex flex-row flex-wrap gap-2 py-1">
+			{Object.values(autoApproveSettingsConfig).map(({ key, descriptionKey, labelKey, icon, testId }) => {
+				const isEnabled = !!props[key]
+				return (
+					<StandardTooltip key={key} content={t(descriptionKey || "")}>
+						<button
+							type="button"
+							onClick={() => onToggle(key, !isEnabled)}
+							aria-label={t(labelKey)}
+							aria-pressed={isEnabled}
+							data-testid={testId}
+							className={cn(
+								"inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg select-none cursor-pointer transition-all duration-150 border focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-500 active:scale-95",
+								isEnabled
+									? "bg-amber-500/15 border-amber-500/40 text-amber-300 shadow-sm shadow-amber-500/10 hover:bg-amber-500/25"
+									: "bg-white/[0.03] border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] hover:border-white/20",
+							)}>
+							<span
+								className={cn(
+									"size-1.5 rounded-full shrink-0 transition-colors",
+									isEnabled
+										? "bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.9)] animate-pulse"
+										: "bg-slate-500",
+								)}
+							/>
+							<span className={`codicon codicon-${icon} text-xs`} />
+							<span>{t(labelKey)}</span>
+						</button>
+					</StandardTooltip>
+				)
+			})}
 		</div>
 	)
 }

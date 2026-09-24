@@ -1,5 +1,6 @@
 import React from "react"
 import { useTranslation } from "react-i18next"
+import { ShieldCheck } from "lucide-react"
 import { MaxRequestsInput } from "./MaxRequestsInput"
 import { MaxCostInput } from "./MaxCostInput"
 
@@ -19,8 +20,12 @@ export const MaxLimitInputs: React.FC<MaxLimitInputsProps> = ({
 	const { t } = useTranslation()
 
 	return (
-		<div className="space-y-2">
-			<div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-2 items-center">
+		<div className="space-y-3 p-3.5 rounded-xl bg-white/[0.02] border border-white/10">
+			<div className="flex items-center gap-2 text-xs font-semibold text-slate-200">
+				<ShieldCheck className="size-4 text-amber-400" />
+				<span>Batas Permintaan & Biaya</span>
+			</div>
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
 				<MaxRequestsInput allowedMaxRequests={allowedMaxRequests} onValueChange={onMaxRequestsChange} />
 				<MaxCostInput allowedMaxCost={allowedMaxCost} onValueChange={onMaxCostChange} />
 			</div>

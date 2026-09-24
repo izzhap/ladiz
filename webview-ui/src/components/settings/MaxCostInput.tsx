@@ -11,9 +11,9 @@ export function MaxCostInput({ allowedMaxCost, onValueChange }: MaxCostInputProp
 	const { t } = useTranslation()
 
 	return (
-		<>
-			<label className="flex items-center gap-2 text-sm font-medium whitespace-nowrap">
-				<span className="codicon codicon-credit-card" />
+		<div className="flex flex-col gap-1.5 w-full">
+			<label className="flex items-center gap-1.5 text-xs font-medium text-slate-300 whitespace-nowrap">
+				<span className="codicon codicon-credit-card text-amber-400" />
 				{t("settings:autoApprove.apiCostLimit.title")}:
 			</label>
 			<FormattedTextField
@@ -21,10 +21,14 @@ export function MaxCostInput({ allowedMaxCost, onValueChange }: MaxCostInputProp
 				onValueChange={onValueChange}
 				formatter={unlimitedDecimalFormatter}
 				placeholder={t("settings:autoApprove.apiCostLimit.unlimited")}
-				style={{ maxWidth: "200px" }}
+				className="w-full"
 				data-testid="max-cost-input"
-				leftNodes={[<span key="dollar">$</span>]}
+				leftNodes={[
+					<span key="dollar" className="text-amber-400 font-semibold px-1">
+						$
+					</span>,
+				]}
 			/>
-		</>
+		</div>
 	)
 }

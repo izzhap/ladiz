@@ -1,41 +1,40 @@
-import { ShieldCheck, Sparkles, Terminal, Code2 } from "lucide-react"
-
 const RooTips = () => {
 	return (
-		<div className="flex flex-col gap-3 my-2 w-full max-w-[500px]">
-			{/* Main Feature Highlight Card inspired by Claude Code UI */}
-			<div className="relative overflow-hidden rounded-xl border border-blue-500/20 bg-gradient-to-b from-[#131b2e] to-[#0c101d] p-4 shadow-lg shadow-black/40">
-				<div className="flex items-start gap-3">
-					<div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400">
-						<ShieldCheck className="size-4.5" />
-					</div>
-					<div className="flex flex-col gap-1 text-xs">
-						<div className="flex items-center gap-2">
-							<span className="font-semibold text-sm text-blue-100">Ladiz AI Ready</span>
-							<span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-medium text-blue-300 border border-blue-400/30">
-								Active
-							</span>
-						</div>
-						<p className="text-slate-300/80 leading-relaxed m-0 text-xs">
-							Autonomous AI development team in your editor. Automatically handles code editing, file operations, debugging, and terminal execution with approval guardrails.
-						</p>
-					</div>
-				</div>
+		<div className="w-full rounded-xl border border-vscode-panel-border/40 bg-vscode-sideBar-background/30 p-3.5 space-y-2.5">
+			<div className="flex items-center justify-between">
+				<span className="text-xs font-semibold text-vscode-foreground/90">Capabilities</span>
+				<span className="text-[10px] uppercase font-semibold tracking-wider text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
+					Ready
+				</span>
+			</div>
 
-				{/* Feature pills */}
-				<div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-3 text-[11px] text-slate-400">
-					<div className="flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 border border-white/5">
-						<Code2 className="size-3 text-blue-400" />
-						<span>Smart Code Edit</span>
+			<div className="grid grid-cols-1 gap-1.5 text-xs text-vscode-descriptionForeground">
+				<div className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-vscode-editor-background/30 hover:bg-vscode-editor-background/60 transition-colors">
+					<div className="flex items-center gap-2 min-w-0">
+						<span className="text-blue-400 font-bold text-xs select-none">•</span>
+						<span className="text-vscode-foreground/90 font-medium">Smart Editing</span>
 					</div>
-					<div className="flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 border border-white/5">
-						<Terminal className="size-3 text-cyan-400" />
-						<span>Terminal Automation</span>
+					<span className="text-vscode-descriptionForeground/70 text-[11px] truncate">
+						Refactor, fix, add features
+					</span>
+				</div>
+				<div className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-vscode-editor-background/30 hover:bg-vscode-editor-background/60 transition-colors">
+					<div className="flex items-center gap-2 min-w-0">
+						<span className="text-cyan-400 font-bold text-xs select-none">•</span>
+						<span className="text-vscode-foreground/90 font-medium">Terminal</span>
 					</div>
-					<div className="flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 border border-white/5">
-						<Sparkles className="size-3 text-indigo-400" />
-						<span>Multi-Mode Reasoning</span>
+					<span className="text-vscode-descriptionForeground/70 text-[11px] truncate">
+						Run & test with approval
+					</span>
+				</div>
+				<div className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-vscode-editor-background/30 hover:bg-vscode-editor-background/60 transition-colors">
+					<div className="flex items-center gap-2 min-w-0">
+						<span className="text-indigo-400 font-bold text-xs select-none">•</span>
+						<span className="text-vscode-foreground/90 font-medium">Deep Context</span>
 					</div>
+					<span className="text-vscode-descriptionForeground/70 text-[11px] truncate">
+						Semantic codebase index
+					</span>
 				</div>
 			</div>
 		</div>

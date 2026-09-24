@@ -24,6 +24,7 @@ import { checkExistKey } from "@roo/checkExistApiConfig"
 import { Mode, defaultModeSlug, defaultPrompts } from "@roo/modes"
 import { CustomSupportPrompts } from "@roo/support-prompt"
 import { experimentDefault } from "@roo/experiments"
+import { Package } from "@roo/package"
 
 import { vscode } from "@src/utils/vscode"
 import { convertTextMateToHljs } from "@src/utils/textMateToHljs"
@@ -177,7 +178,7 @@ export const mergeExtensionState = (prevState: ExtensionState, newState: Partial
 export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const [state, setState] = useState<ExtensionState>({
 		apiConfiguration: {},
-		version: "",
+		version: Package.version,
 		clineMessages: [],
 		taskHistory: [],
 		shouldShowAnnouncement: false,

@@ -31,7 +31,7 @@
 		"mcp": "MCP Servers",
 		"worktrees": "Worktrees",
 		"skills": "Skills",
-		"autoApprove": "Auto-Approve",
+		"autoApprove": "YOLO / Auto-Approve",
 		"checkpoints": "Checkpoints",
 		"notifications": "Notifications",
 		"contextManagement": "Context",
@@ -275,7 +275,7 @@
 	"autoApprove": {
 		"description": "Run these actions without asking for permission. Only enable for actions you fully trust and if you understand the security risks.",
 		"toggleShortcut": "You can configure a keyboard shortcut for this setting <SettingsLink>in your IDE preferences</SettingsLink>.",
-		"enabled": "Auto-Approve Enabled",
+		"enabled": "Enable YOLO Mode (Auto-Approve)",
 		"readOnly": {
 			"label": "Read",
 			"description": "When enabled, Ladiz will automatically view directory contents and read files without requiring you to click the Approve button.",

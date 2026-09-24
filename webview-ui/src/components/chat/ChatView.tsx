@@ -26,10 +26,13 @@ import { vscode } from "@src/utils/vscode"
 import { useAppTranslation } from "@src/i18n/TranslationContext"
 import { useExtensionState } from "@src/context/ExtensionStateContext"
 import { useSelectedModel } from "@src/components/ui/hooks/useSelectedModel"
+import { useAutoApprovalToggles } from "@/hooks/useAutoApprovalToggles"
+import { useAutoApprovalState } from "@/hooks/useAutoApprovalState"
+import { Plus, Check, Play, RotateCw, X, ArrowDown, History } from "lucide-react"
+import { cn } from "@/lib/utils"
 import RooHero from "@src/components/welcome/RooHero"
 import RooTips from "@src/components/welcome/RooTips"
-import { StandardTooltip, Button } from "@src/components/ui"
-import VersionIndicator from "../common/VersionIndicator"
+import { StandardTooltip } from "@src/components/ui"
 import HistoryPreview from "../history/HistoryPreview"
 import Announcement from "./Announcement"
 import ChatRow from "./ChatRow"
@@ -83,7 +86,12 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		soundVolume,
 		messageQueue = [],
 		showWorktreesInHomeScreen,
+		autoApprovalEnabled,
 	} = useExtensionState()
+
+	const toggles = useAutoApprovalToggles()
+	const { effectiveAutoApprovalEnabled } = useAutoApprovalState(toggles, autoApprovalEnabled)
+	const isYoloOn = !!effectiveAutoApprovalEnabled
 
 	// Show a WarningRow when the user sends a message with a retired provider.
 	const [showRetiredProviderWarning, setShowRetiredProviderWarning] = useState(false)
@@ -1515,6 +1523,103 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		}
 	}, [handleKeyDown])
 
+	const isApprovalButton = useCallback(
+		(text?: string): boolean => {
+			if (!text) return false
+			return (
+				text === t("chat:approve.title") ||
+				text === t("chat:save.title") ||
+				text === t("chat:runCommand.title") ||
+				text === t("chat:completeSubtaskAndReturn") ||
+				text === t("chat:read-batch.approve.title") ||
+				text === t("chat:list-batch.approve.title") ||
+				text === t("chat:edit-batch.approve.title")
+			)
+		},
+		[t],
+	)
+
+	const shouldHideApproval = isYoloOn && isApprovalButton(primaryButtonText)
+	const visiblePrimaryButtonText = shouldHideApproval ? undefined : primaryButtonText
+	const visibleSecondaryButtonText = shouldHideApproval ? undefined : secondaryButtonText
+
+	const getPrimaryButtonIcon = (text: string) => {
+		if (text === t("chat:startNewTask.title")) {
+			return <Plus className="size-4 stroke-[2.5]" />
+		}
+		if (
+			text === t("chat:approve.title") ||
+			text === t("chat:save.title") ||
+			text === t("chat:completeSubtaskAndReturn") ||
+			text === t("chat:read-batch.approve.title") ||
+			text === t("chat:list-batch.approve.title") ||
+			text === t("chat:edit-batch.approve.title")
+		) {
+			return <Check className="size-4 stroke-[2.5]" />
+		}
+		if (text === t("chat:runCommand.title") || text === t("chat:proceedWhileRunning.title")) {
+			return <Play className="size-3.5 fill-current" />
+		}
+		if (text === t("chat:retry.title")) {
+			return <RotateCw className="size-3.5" />
+		}
+		return null
+	}
+
+	const getPrimaryButtonClass = (text: string) => {
+		if (text === t("chat:startNewTask.title") || text === t("chat:resumeTask.title")) {
+			return "bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:via-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/35 border border-blue-400/30"
+		}
+		if (
+			text === t("chat:approve.title") ||
+			text === t("chat:save.title") ||
+			text === t("chat:completeSubtaskAndReturn") ||
+			text === t("chat:read-batch.approve.title") ||
+			text === t("chat:list-batch.approve.title") ||
+			text === t("chat:edit-batch.approve.title")
+		) {
+			return "bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/35 border border-emerald-400/30"
+		}
+		if (text === t("chat:runCommand.title") || text === t("chat:proceedWhileRunning.title")) {
+			return "bg-gradient-to-r from-indigo-600 to-violet-500 hover:from-indigo-500 hover:to-violet-400 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/35 border border-indigo-400/30"
+		}
+		if (text === t("chat:retry.title")) {
+			return "bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white shadow-lg shadow-amber-500/25 hover:shadow-amber-500/35 border border-amber-400/30"
+		}
+		return "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/25 border border-blue-400/30"
+	}
+
+	const getSecondaryButtonIcon = (text: string) => {
+		if (
+			text === t("chat:reject.title") ||
+			text === t("chat:terminate.title") ||
+			text === t("chat:killCommand.title") ||
+			text === t("chat:read-batch.deny.title") ||
+			text === t("chat:list-batch.deny.title") ||
+			text === t("chat:edit-batch.deny.title")
+		) {
+			return <X className="size-3.5" />
+		}
+		if (text === t("chat:startNewTask.title")) {
+			return <Plus className="size-3.5 stroke-[2.5]" />
+		}
+		return null
+	}
+
+	const getSecondaryButtonClass = (text: string) => {
+		if (
+			text === t("chat:reject.title") ||
+			text === t("chat:terminate.title") ||
+			text === t("chat:killCommand.title") ||
+			text === t("chat:read-batch.deny.title") ||
+			text === t("chat:list-batch.deny.title") ||
+			text === t("chat:edit-batch.deny.title")
+		) {
+			return "bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 border border-rose-500/30 shadow-sm"
+		}
+		return "bg-white/[0.06] hover:bg-white/10 text-slate-200 border border-white/10 shadow-sm"
+	}
+
 	useImperativeHandle(ref, () => ({
 		acceptInput: () => {
 			const hasInput = inputValue.trim() || selectedImages.length > 0
@@ -1528,7 +1633,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				return
 			}
 
-			if (enableButtons && primaryButtonText) {
+			if (enableButtons && visiblePrimaryButtonText) {
 				handlePrimaryButtonClick(inputValue, selectedImages)
 			} else if (!sendingDisabled && !isProfileDisabled && hasInput) {
 				handleSendMessage(inputValue, selectedImages)
@@ -1545,7 +1650,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		vscode.postMessage({ type: "condenseTaskContextRequest", text: taskId })
 	}
 
-	const areButtonsVisible = showScrollToBottom || primaryButtonText || secondaryButtonText
+	const areButtonsVisible = showScrollToBottom || !!visiblePrimaryButtonText || !!visibleSecondaryButtonText
 
 	return (
 		<div
@@ -1606,19 +1711,13 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 					)}
 				</>
 			) : (
-				<div className="flex flex-col h-full justify-center p-6 min-h-0 overflow-y-auto gap-4 relative">
-					<div className="flex flex-col items-start gap-2 justify-center h-full min-[400px]:px-6">
-						<VersionIndicator
-							onClick={() => setShowAnnouncementModal(true)}
-							className="absolute top-2 right-3 z-10"
-						/>
-						<div className="flex flex-col gap-4 w-full">
-							<RooHero />
-							{/* Show RooTips when authenticated or when user is new */}
-							{taskHistory.length < 6 && <RooTips />}
-							{/* Everyone should see their task history if any */}
-							{taskHistory.length > 0 && <HistoryPreview />}
-						</div>
+				<div className="flex flex-col h-full min-h-0 overflow-y-auto px-4 py-4 gap-4">
+					<div className="w-full max-w-[560px] mx-auto flex flex-col gap-4">
+						<RooHero onVersionClick={() => setShowAnnouncementModal(true)} />
+						{/* Show RooTips when authenticated or when user is new */}
+						{taskHistory.length < 6 && <RooTips />}
+						{/* Everyone should see their task history if any */}
+						{taskHistory.length > 0 && <HistoryPreview />}
 					</div>
 				</div>
 			)}
@@ -1643,85 +1742,101 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 					<FileChangesPanel clineMessages={messages} />
 					{areButtonsVisible && (
 						<div
-							className={`flex h-9 items-center mb-1 px-[15px] ${
+							className={`flex h-9 items-center mb-1.5 px-[15px] gap-2 ${
 								showScrollToBottom ? "opacity-100" : enableButtons ? "opacity-100" : "opacity-50"
 							}`}>
 							{showScrollToBottom ? (
 								<>
 									<StandardTooltip content={t("chat:scrollToBottom")}>
-										<Button
-											variant="secondary"
-											className={hasLatestCheckpoint ? "flex-1 mr-[6px]" : "flex-[2]"}
+										<button
+											type="button"
+											className={cn(
+												"flex items-center justify-center gap-1.5 rounded-xl text-xs font-medium h-8.5 px-3 bg-slate-900/80 hover:bg-slate-800/90 text-slate-200 border border-slate-700/50 shadow-md transition-all duration-200 cursor-pointer active:scale-[0.98]",
+												hasLatestCheckpoint ? "flex-1" : "flex-[2]",
+											)}
 											onClick={handleScrollToBottomAndResetCheckpointCursor}>
-											<span className="codicon codicon-chevron-down"></span>
-										</Button>
+											<ArrowDown className="size-4 text-cyan-400" />
+											<span className="text-xs">{t("chat:scrollToBottom")}</span>
+										</button>
 									</StandardTooltip>
 									{hasLatestCheckpoint && (
 										<StandardTooltip content={t("chat:scrollToLatestCheckpoint")}>
-											<Button
-												variant="secondary"
-												className="flex-1 ml-[6px]"
+											<button
+												type="button"
+												className="flex-1 flex items-center justify-center gap-1.5 rounded-xl text-xs font-medium h-8.5 px-3 bg-slate-900/80 hover:bg-slate-800/90 text-slate-200 border border-slate-700/50 shadow-md transition-all duration-200 cursor-pointer active:scale-[0.98]"
 												onClick={handleScrollToLatestCheckpoint}
 												aria-label={t("chat:scrollToLatestCheckpoint")}>
-												<span className="codicon codicon-history"></span>
-											</Button>
+												<History className="size-4 text-indigo-400" />
+												<span className="text-xs">{t("chat:scrollToLatestCheckpoint")}</span>
+											</button>
 										</StandardTooltip>
 									)}
 								</>
 							) : (
 								<>
-									{primaryButtonText && (
+									{visiblePrimaryButtonText && (
 										<StandardTooltip
 											content={
-												primaryButtonText === t("chat:retry.title")
+												visiblePrimaryButtonText === t("chat:retry.title")
 													? t("chat:retry.tooltip")
-													: primaryButtonText === t("chat:save.title")
+													: visiblePrimaryButtonText === t("chat:save.title")
 														? t("chat:save.tooltip")
-														: primaryButtonText === t("chat:approve.title")
+														: visiblePrimaryButtonText === t("chat:approve.title")
 															? t("chat:approve.tooltip")
-															: primaryButtonText === t("chat:runCommand.title")
+															: visiblePrimaryButtonText === t("chat:runCommand.title")
 																? t("chat:runCommand.tooltip")
-																: primaryButtonText === t("chat:startNewTask.title")
+																: visiblePrimaryButtonText ===
+																	  t("chat:startNewTask.title")
 																	? t("chat:startNewTask.tooltip")
-																	: primaryButtonText === t("chat:resumeTask.title")
+																	: visiblePrimaryButtonText ===
+																		  t("chat:resumeTask.title")
 																		? t("chat:resumeTask.tooltip")
-																		: primaryButtonText ===
+																		: visiblePrimaryButtonText ===
 																			  t("chat:proceedAnyways.title")
 																			? t("chat:proceedAnyways.tooltip")
-																			: primaryButtonText ===
+																			: visiblePrimaryButtonText ===
 																				  t("chat:proceedWhileRunning.title")
 																				? t("chat:proceedWhileRunning.tooltip")
 																				: undefined
 											}>
-											<Button
-												variant="primary"
+											<button
+												type="button"
 												disabled={!enableButtons}
-												className={secondaryButtonText ? "flex-1 mr-[6px]" : "flex-[2] mr-0"}
+												className={cn(
+													"flex items-center justify-center gap-2 rounded-xl text-xs font-semibold h-8.5 px-4 transition-all duration-200 cursor-pointer select-none active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none",
+													visibleSecondaryButtonText ? "flex-1" : "flex-[2]",
+													getPrimaryButtonClass(visiblePrimaryButtonText),
+												)}
 												onClick={() => handlePrimaryButtonClick(inputValue, selectedImages)}>
-												{primaryButtonText}
-											</Button>
+												{getPrimaryButtonIcon(visiblePrimaryButtonText)}
+												<span>{visiblePrimaryButtonText}</span>
+											</button>
 										</StandardTooltip>
 									)}
-									{secondaryButtonText && (
+									{visibleSecondaryButtonText && (
 										<StandardTooltip
 											content={
-												secondaryButtonText === t("chat:startNewTask.title")
+												visibleSecondaryButtonText === t("chat:startNewTask.title")
 													? t("chat:startNewTask.tooltip")
-													: secondaryButtonText === t("chat:reject.title")
+													: visibleSecondaryButtonText === t("chat:reject.title")
 														? t("chat:reject.tooltip")
-														: secondaryButtonText === t("chat:terminate.title")
+														: visibleSecondaryButtonText === t("chat:terminate.title")
 															? t("chat:terminate.tooltip")
-															: secondaryButtonText === t("chat:killCommand.title")
+															: visibleSecondaryButtonText === t("chat:killCommand.title")
 																? t("chat:killCommand.tooltip")
 																: undefined
 											}>
-											<Button
-												variant="secondary"
+											<button
+												type="button"
 												disabled={!enableButtons}
-												className="flex-1 ml-[6px]"
+												className={cn(
+													"flex items-center justify-center gap-2 rounded-xl text-xs font-semibold h-8.5 px-4 transition-all duration-200 cursor-pointer select-none active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none flex-1",
+													getSecondaryButtonClass(visibleSecondaryButtonText),
+												)}
 												onClick={() => handleSecondaryButtonClick(inputValue, selectedImages)}>
-												{secondaryButtonText}
-											</Button>
+												{getSecondaryButtonIcon(visibleSecondaryButtonText)}
+												<span>{visibleSecondaryButtonText}</span>
+											</button>
 										</StandardTooltip>
 									)}
 								</>
