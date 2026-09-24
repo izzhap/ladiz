@@ -10,7 +10,6 @@ import React, {
 	useState,
 } from "react"
 import {
-	CheckCheck,
 	GitBranch,
 	Bell,
 	Database,
@@ -29,6 +28,7 @@ import {
 	ArrowLeft,
 	GitCommitVertical,
 	GraduationCap,
+	Zap,
 } from "lucide-react"
 
 import {
@@ -498,7 +498,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>(({ onDone, t
 			{ id: "modes", icon: Users2 },
 			{ id: "skills", icon: GraduationCap },
 			{ id: "slashCommands", icon: SquareSlash },
-			{ id: "autoApprove", icon: CheckCheck },
+			{ id: "autoApprove", icon: Zap },
 			{ id: "mcp", icon: Server },
 			{ id: "checkpoints", icon: GitCommitVertical },
 			{ id: "notifications", icon: Bell },
