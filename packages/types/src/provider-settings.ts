@@ -383,7 +383,7 @@ const basetenSchema = apiModelIdProviderModelSchema.extend({
 	basetenApiKey: z.string().optional(),
 })
 
-const ladizSchema = baseProviderSettingsSchema.extend({
+const ladizSchema = apiModelIdProviderModelSchema.extend({
 	ladizApiKey: z.string().optional(),
 	ladizBaseUrl: z.string().optional(),
 	ladizModelId: z.string().optional(),

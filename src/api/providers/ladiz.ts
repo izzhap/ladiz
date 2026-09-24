@@ -1,3 +1,4 @@
+import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI from "openai"
 import { OpenAiHandler } from "./openai"
 import { ladizModels, ladizDefaultModelId, type ModelInfo } from "@roo-code/types"
@@ -49,7 +50,7 @@ export class LadizHandler extends OpenAiHandler {
 
 	override async *createMessage(
 		systemPrompt: string,
-		messages: any[],
+		messages: Anthropic.Messages.MessageParam[],
 		metadata?: ApiHandlerCreateMessageMetadata,
 	): ApiStream {
 		const { info: modelInfo } = this.getModel()
