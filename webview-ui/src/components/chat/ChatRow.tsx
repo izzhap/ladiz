@@ -1004,7 +1004,7 @@ export const ChatRowContent = ({
 						<div className="group relative my-2.5">
 							<div className="flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-vscode-panel-border/30 select-none">
 								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(56,189,248,0.6)]" />
+									<LadizAnimatedLogo className="size-3.5" active={!!message.partial} />
 									<span className="text-xs font-semibold tracking-tight text-vscode-foreground">
 										Ladiz AI
 									</span>
@@ -1025,7 +1025,7 @@ export const ChatRowContent = ({
 					)
 				case "user_feedback":
 					return (
-						<div className="group relative my-2">
+						<div className="group relative my-3">
 							<div
 								className={cn(
 									"relative rounded-xl border border-vscode-panel-border/50 bg-vscode-sideBar-background/70 backdrop-blur-sm overflow-hidden transition-all duration-200 shadow-sm hover:border-blue-500/30",
@@ -1052,39 +1052,47 @@ export const ChatRowContent = ({
 										/>
 									</div>
 								) : (
-									<div className="flex items-start justify-between gap-3">
-										<div
-											className="flex-grow text-xs leading-relaxed text-vscode-foreground wrap-anywhere font-medium select-text"
-											onClick={(e) => {
-												e.stopPropagation()
-												if (!isStreaming) {
-													handleEditClick()
-												}
-											}}
-											title={t("chat:queuedMessages.clickToEdit")}>
-											<Mention text={message.text} />
+									<div className="flex flex-col gap-2">
+										<div className="flex items-center justify-between gap-2 pb-1.5 border-b border-vscode-panel-border/20 text-[11px] select-none text-vscode-descriptionForeground/70">
+											<div className="flex items-center gap-1.5 font-medium">
+												<span className="size-1.5 rounded-full bg-blue-400" />
+												<span>You</span>
+											</div>
 										</div>
-										<div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-											<button
-												className="p-1 rounded text-vscode-descriptionForeground/60 hover:text-vscode-foreground hover:bg-vscode-toolbar-hoverBackground transition-colors cursor-pointer"
-												style={{ visibility: isStreaming ? "hidden" : "visible" }}
+										<div className="flex items-start justify-between gap-3">
+											<div
+												className="flex-grow text-xs leading-relaxed text-vscode-foreground wrap-anywhere font-medium select-text"
 												onClick={(e) => {
 													e.stopPropagation()
-													handleEditClick()
+													if (!isStreaming) {
+														handleEditClick()
+													}
 												}}
-												aria-label={t("chat:queuedMessages.clickToEdit")}>
-												<Edit className="size-3.5" />
-											</button>
-											<button
-												className="p-1 rounded text-vscode-descriptionForeground/60 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
-												style={{ visibility: isStreaming ? "hidden" : "visible" }}
-												onClick={(e) => {
-													e.stopPropagation()
-													vscode.postMessage({ type: "deleteMessage", value: message.ts })
-												}}
-												aria-label="Delete message">
-												<Trash2 className="size-3.5" />
-											</button>
+												title={t("chat:queuedMessages.clickToEdit")}>
+												<Mention text={message.text} />
+											</div>
+											<div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+												<button
+													className="p-1 rounded text-vscode-descriptionForeground/60 hover:text-vscode-foreground hover:bg-vscode-toolbar-hoverBackground transition-colors cursor-pointer"
+													style={{ visibility: isStreaming ? "hidden" : "visible" }}
+													onClick={(e) => {
+														e.stopPropagation()
+														handleEditClick()
+													}}
+													aria-label={t("chat:queuedMessages.clickToEdit")}>
+													<Edit className="size-3.5" />
+												</button>
+												<button
+													className="p-1 rounded text-vscode-descriptionForeground/60 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+													style={{ visibility: isStreaming ? "hidden" : "visible" }}
+													onClick={(e) => {
+														e.stopPropagation()
+														vscode.postMessage({ type: "deleteMessage", value: message.ts })
+													}}
+													aria-label="Delete message">
+													<Trash2 className="size-3.5" />
+												</button>
+											</div>
 										</div>
 									</div>
 								)}

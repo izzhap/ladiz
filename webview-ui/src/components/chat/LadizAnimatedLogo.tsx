@@ -1,15 +1,21 @@
-export function LadizAnimatedLogo({ className = "" }: { className?: string }) {
+export function LadizAnimatedLogo({ className = "", active = true }: { className?: string; active?: boolean }) {
 	return (
 		<div className={`relative flex items-center justify-center shrink-0 size-4 ${className}`}>
-			{/* Ambient luminous glow halo */}
-			<div className="absolute -inset-0.5 rounded-full bg-gradient-to-tr from-cyan-400/40 via-sky-500/20 to-indigo-500/40 blur-[2.5px] animate-pulse" />
+			{/* Ambient luminous glow halo - Ladiz signature */}
+			<div
+				className={`absolute -inset-0.5 rounded-full bg-gradient-to-tr from-cyan-400/50 via-sky-500/25 to-indigo-500/50 blur-[3px] transition-all duration-300 ${
+					active ? "animate-pulse opacity-100 scale-105" : "opacity-40"
+				}`}
+			/>
 
 			{/* Outer rotating orbital arc ring */}
 			<svg
 				viewBox="0 0 24 24"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
-				className="absolute inset-0 size-full animate-[spin_3s_linear_infinite]">
+				className={`absolute inset-0 size-full ${
+					active ? "animate-[spin_2s_linear_infinite]" : "animate-[spin_6s_linear_infinite]"
+				}`}>
 				<circle
 					cx="12"
 					cy="12"
@@ -28,13 +34,16 @@ export function LadizAnimatedLogo({ className = "" }: { className?: string }) {
 				</defs>
 			</svg>
 
-			{/* Center radiant kinetic star */}
-			<div className="relative size-3 flex items-center justify-center animate-[spin_8s_linear_infinite]">
+			{/* Center radiant kinetic star - counter-rotating */}
+			<div
+				className={`relative size-3 flex items-center justify-center ${
+					active ? "animate-[spin_5s_linear_infinite_reverse]" : "animate-[spin_10s_linear_infinite_reverse]"
+				}`}>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
-					className="size-full drop-shadow-[0_0_5px_rgba(56,189,248,0.9)]">
+					className="size-full drop-shadow-[0_0_6px_rgba(56,189,248,0.95)]">
 					<defs>
 						<linearGradient id="ladizCoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
 							<stop offset="0%" stopColor="#ffffff" />

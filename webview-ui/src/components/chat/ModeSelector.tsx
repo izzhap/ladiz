@@ -218,8 +218,12 @@ export const ModeSelector = ({
 					disabled={disabled}
 					data-testid="mode-selector-trigger"
 					className={cn(
-						"inline-flex items-center relative whitespace-nowrap px-2.5 py-1 text-xs font-medium rounded-full",
-						"bg-white/[0.06] border border-white/10 text-slate-200 shadow-sm",
+						"inline-flex items-center relative whitespace-nowrap px-2.5 py-1 text-xs font-medium rounded-full border shadow-sm",
+						value === "architect" || value === "plan"
+							? "bg-purple-950/70 border-purple-500/40 text-purple-200 shadow-purple-500/20"
+							: value === "code"
+								? "bg-blue-950/60 border-blue-500/30 text-blue-200"
+								: "bg-white/[0.06] border-white/10 text-slate-200",
 						"transition-all duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500",
 						disabled
 							? "opacity-50 cursor-not-allowed"
@@ -227,7 +231,11 @@ export const ModeSelector = ({
 						triggerClassName,
 					)}>
 					<span className="truncate">
-						{selectedMode?.name ? selectedMode.name.replace(/^[\p{Emoji}\s]+/u, "") : ""}
+						{selectedMode?.name
+							? value === "architect"
+								? "Plan"
+								: selectedMode.name.replace(/^[\p{Emoji}\s]+/u, "")
+							: ""}
 					</span>
 				</PopoverTrigger>
 			</StandardTooltip>

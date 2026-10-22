@@ -56,7 +56,7 @@ const TaskHeader = ({
 	todos,
 }: TaskHeaderProps) => {
 	const { t } = useTranslation()
-	const { apiConfiguration, currentTaskItem } = useExtensionState()
+	const { apiConfiguration, currentTaskItem, mode } = useExtensionState()
 	const { id: modelId, info: model } = useSelectedModel(apiConfiguration)
 	const [isTaskExpanded, setIsTaskExpanded] = useState(false)
 
@@ -147,17 +147,30 @@ const TaskHeader = ({
 
 					setIsTaskExpanded(!isTaskExpanded)
 				}}>
-				<div className="flex justify-between items-center gap-0">
-					<div className="flex items-center select-none grow min-w-0">
+				<div className="flex justify-between items-center gap-2">
+					<div className="flex items-center select-none grow min-w-0 gap-2">
+						{mode && (
+							<span
+								className={cn(
+									"px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold uppercase tracking-wider shrink-0 select-none border",
+									mode === "architect" || mode === "plan"
+										? "bg-purple-500/15 text-purple-300 border-purple-500/30 shadow-[0_0_8px_rgba(168,85,247,0.2)]"
+										: mode === "ask"
+											? "bg-sky-500/15 text-sky-300 border-sky-500/30"
+											: "bg-blue-500/15 text-blue-300 border-blue-500/30",
+								)}>
+								{mode === "architect" ? "PLAN" : mode.toUpperCase()}
+							</span>
+						)}
 						<div className="grow min-w-0">
 							{isTaskExpanded && <span className="font-bold">{t("chat:task.title")}</span>}
 							{!isTaskExpanded && (
-								<div className="flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
+								<div className="flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis text-xs font-medium">
 									<Mention text={task.text} />
 								</div>
 							)}
 						</div>
-						<div className="flex items-center shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
+						<div className="flex items-center shrink-0 ml-auto" onClick={(e) => e.stopPropagation()}>
 							<StandardTooltip content={isTaskExpanded ? t("chat:task.collapse") : t("chat:task.expand")}>
 								<button
 									onClick={() => setIsTaskExpanded(!isTaskExpanded)}

@@ -47,17 +47,31 @@ export const ReasoningBlock = ({ content, isStreaming, isLast }: ReasoningBlockP
 
 	const hasContent = (content?.trim()?.length ?? 0) > 0
 
+	const thinkingTitle = isStreaming
+		? t("chat:reasoning.thinking")
+		: seconds > 0
+			? t("chat:reasoning.thought", { count: seconds, defaultValue: `Thought for ${seconds}s` })
+			: t("chat:reasoning.thinking")
+
 	return (
 		<TimelineItem
 			status={isStreaming ? "running" : "info"}
 			customDot={
-				<div className="flex items-center justify-center size-3.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+				<div
+					className={cn(
+						"flex items-center justify-center size-3.5 rounded-full border transition-colors",
+						isStreaming
+							? "bg-indigo-500/20 text-indigo-400 border-indigo-500/40 animate-pulse"
+							: "bg-indigo-500/10 text-indigo-300 border-indigo-500/20",
+					)}>
 					<Sparkles className="size-2.5" />
 				</div>
 			}
-			action={<span>{t("chat:reasoning.thinking")}</span>}
+			action={<span>{thinkingTitle}</span>}
 			target={
-				elapsed > 0 ? <span className="text-[10px] text-indigo-300 font-mono">({secondsLabel})</span> : null
+				isStreaming && elapsed > 0 ? (
+					<span className="text-[10px] text-indigo-300 font-mono">({secondsLabel})</span>
+				) : null
 			}
 			actions={
 				hasContent ? (

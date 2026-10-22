@@ -1261,7 +1261,6 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 
 				<div className="flex items-center gap-2">
 					<div className="flex items-center gap-2 min-w-0 overflow-clip flex-1">
-						<ModelSelector triggerClassName="text-ellipsis overflow-hidden flex-shrink-0" />
 						<ModeSelector
 							value={mode}
 							title={t("chat:selectMode")}
@@ -1271,6 +1270,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							customModes={customModes}
 							customModePrompts={customModePrompts}
 						/>
+						<ModelSelector triggerClassName="text-ellipsis overflow-hidden flex-shrink-0" />
 						<AutoApproveDropdown triggerClassName="min-w-[28px] text-ellipsis overflow-hidden flex-shrink" />
 					</div>
 					<div className={cn("flex flex-shrink-0 items-center gap-0.5 h-5 leading-none", "pr-2")}>
