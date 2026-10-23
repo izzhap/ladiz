@@ -257,25 +257,25 @@ export const ErrorRow = memo(
 				{/* Error Details Dialog */}
 				{formattedErrorDetails && (
 					<Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-						<DialogContent className="max-w-2xl">
+						<DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg p-4 sm:p-6 overflow-hidden">
 							<DialogHeader>
-								<DialogTitle>{t("chat:errorDetails.title")}</DialogTitle>
+								<DialogTitle className="text-base">{t("chat:errorDetails.title")}</DialogTitle>
 							</DialogHeader>
-							<div className="max-h-96 overflow-auto bg-vscode-editor-background rounded-xl border border-vscode-editorGroup-border">
-								<pre className="font-mono text-sm whitespace-pre-wrap break-words bg-transparent px-3">
+							<div className="min-w-0 max-h-80 overflow-y-auto overflow-x-hidden bg-vscode-editor-background rounded-xl border border-vscode-editorGroup-border">
+								<pre className="font-mono text-xs whitespace-pre-wrap break-words break-all bg-transparent p-3 my-0">
 									{formattedErrorDetails}
 								</pre>
 								{usesProxy && (
-									<div className="cursor-default flex gap-2 border-t-1 px-3 py-2 border-vscode-editorGroup-border bg-foreground/5 text-vscode-button-secondaryForeground">
-										<Info className="size-3 shrink-0 mt-1 text-vscode-descriptionForeground" />
-										<span className="text-vscode-descriptionForeground text-sm">
+									<div className="cursor-default flex gap-2 border-t px-3 py-2 border-vscode-editorGroup-border bg-foreground/5 text-vscode-button-secondaryForeground">
+										<Info className="size-3.5 shrink-0 mt-0.5 text-vscode-descriptionForeground" />
+										<span className="text-vscode-descriptionForeground text-xs break-words">
 											{t("chat:errorDetails.proxyProvider")}
 										</span>
 									</div>
 								)}
 							</div>
-							<DialogFooter>
-								<Button variant="secondary" className="w-full" onClick={handleCopyDetails}>
+							<DialogFooter className="flex-col sm:flex-row gap-2 w-full">
+								<Button variant="secondary" className="w-full text-xs h-8" onClick={handleCopyDetails}>
 									{showDetailsCopySuccess ? (
 										<>
 											<Check className="size-3" />
@@ -288,7 +288,10 @@ export const ErrorRow = memo(
 										</>
 									)}
 								</Button>
-								<Button variant="secondary" className="w-full" onClick={handleDownloadDiagnostics}>
+								<Button
+									variant="secondary"
+									className="w-full text-xs h-8"
+									onClick={handleDownloadDiagnostics}>
 									<Microscope className="size-3" />
 									{t("chat:errorDetails.diagnostics")}
 								</Button>

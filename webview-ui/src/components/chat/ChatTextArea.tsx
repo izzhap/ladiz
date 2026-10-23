@@ -30,7 +30,6 @@ import { ModelSelector } from "./ModelSelector"
 import { AutoApproveDropdown } from "./AutoApproveDropdown"
 import { MAX_IMAGES_PER_MESSAGE } from "./ChatView"
 import ContextMenu from "./ContextMenu"
-import { IndexingStatusBadge } from "./IndexingStatusBadge"
 import { usePromptHistory } from "./hooks/usePromptHistory"
 
 interface ChatTextAreaProps {
@@ -1108,7 +1107,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 
 					{/* Integrated Bottom Toolbar inside the Card */}
 					<div className="flex items-center justify-between gap-2 px-3 pb-2.5 pt-1 border-t border-white/[0.04]">
-						{/* Left: Mode, Model, and YOLO status pills */}
+						{/* Left: Mode and Model selector pills */}
 						<div className="flex items-center gap-1.5 min-w-0 overflow-x-auto scrollbar-none flex-1">
 							<ModeSelector
 								value={mode}
@@ -1120,12 +1119,13 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								customModePrompts={customModePrompts}
 							/>
 							<ModelSelector triggerClassName="text-ellipsis overflow-hidden flex-shrink-0" />
-							<AutoApproveDropdown triggerClassName="min-w-[28px] text-ellipsis overflow-hidden flex-shrink-0" />
 						</div>
 
-						{/* Right: Indexing status, Attach image, Enhance prompt, Queue, Cancel, Send/Stop */}
+						{/* Right: YOLO status, Attach image, Enhance prompt, Queue, Cancel, Send/Stop */}
 						<div className="flex items-center gap-1.5 shrink-0">
-							{!isEditMode && <IndexingStatusBadge />}
+							{!isEditMode && (
+								<AutoApproveDropdown triggerClassName="min-w-[28px] text-ellipsis overflow-hidden shrink-0" />
+							)}
 
 							{!shouldDisableImages && (
 								<StandardTooltip content={t("chat:addImages")}>

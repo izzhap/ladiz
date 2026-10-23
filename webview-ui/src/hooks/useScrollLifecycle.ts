@@ -61,6 +61,7 @@ export interface UseScrollLifecycleReturn {
 	handleRowHeightChange: (isTaller: boolean) => void
 	handleScrollToBottomClick: () => void
 	enterUserBrowsingHistory: (source: ScrollFollowDisengageSource) => void
+	enterAnchoredFollowing: () => void
 	followOutputCallback: () => "auto" | false
 	atBottomStateChangeCallback: (isAtBottom: boolean) => void
 	scrollToBottomAuto: () => void
@@ -76,7 +77,7 @@ export function useScrollLifecycle({
 	virtuosoRef,
 	scrollContainerRef,
 	taskTs,
-	isStreaming,
+	isStreaming: _isStreaming,
 	isHidden,
 	hasTask,
 }: UseScrollLifecycleOptions): UseScrollLifecycleReturn {
@@ -266,8 +267,8 @@ export function useScrollLifecycle({
 				return
 			}
 
-			const shouldForcePinForAnchoredStreaming = scrollPhaseRef.current === "ANCHORED_FOLLOWING" && isStreaming
-			if (isAtBottomRef.current || shouldForcePinForAnchoredStreaming) {
+			// When anchored following, any height growth on the last row should scroll to bottom
+			if (scrollPhaseRef.current === "ANCHORED_FOLLOWING") {
 				if (isTaller) {
 					scrollToBottomSmooth()
 				} else {
@@ -275,7 +276,7 @@ export function useScrollLifecycle({
 				}
 			}
 		},
-		[isStreaming, scrollToBottomSmooth, scrollToBottomAuto],
+		[scrollToBottomSmooth, scrollToBottomAuto],
 	)
 
 	// -----------------------------------------------------------------------
@@ -332,7 +333,7 @@ export function useScrollLifecycle({
 				return
 			}
 
-			if (currentPhase === "ANCHORED_FOLLOWING" && isStreaming) {
+			if (currentPhase === "ANCHORED_FOLLOWING") {
 				scrollToBottomAuto()
 				setShowScrollToBottom(false)
 				return
@@ -340,7 +341,7 @@ export function useScrollLifecycle({
 
 			setShowScrollToBottom(currentPhase === "USER_BROWSING_HISTORY")
 		},
-		[enterAnchoredFollowing, enterUserBrowsingHistory, isStreaming, scrollToBottomAuto],
+		[enterAnchoredFollowing, enterUserBrowsingHistory, scrollToBottomAuto],
 	)
 
 	// -----------------------------------------------------------------------
@@ -480,6 +481,7 @@ export function useScrollLifecycle({
 		handleRowHeightChange,
 		handleScrollToBottomClick,
 		enterUserBrowsingHistory,
+		enterAnchoredFollowing,
 		followOutputCallback,
 		atBottomStateChangeCallback,
 		scrollToBottomAuto,

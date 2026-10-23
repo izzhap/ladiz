@@ -481,7 +481,10 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		this.api = buildApiHandler(this.apiConfiguration)
 		this.autoApprovalHandler = new AutoApprovalHandler()
 
-		this.consecutiveMistakeLimit = consecutiveMistakeLimit ?? DEFAULT_CONSECUTIVE_MISTAKE_LIMIT
+		this.consecutiveMistakeLimit =
+			consecutiveMistakeLimit === 3 || consecutiveMistakeLimit == null
+				? DEFAULT_CONSECUTIVE_MISTAKE_LIMIT
+				: consecutiveMistakeLimit
 		this.providerRef = new WeakRef(provider)
 		this.globalStoragePath = provider.context.globalStorageUri.fsPath
 		this.diffViewProvider = new DiffViewProvider(this.cwd, this)

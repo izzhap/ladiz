@@ -34,6 +34,7 @@ export const providerProfilesSchema = z.object({
 			rateLimitSecondsMigrated: z.boolean().optional(),
 			openAiHeadersMigrated: z.boolean().optional(),
 			consecutiveMistakeLimitMigrated: z.boolean().optional(),
+			consecutiveMistakeLimit5Migrated: z.boolean().optional(),
 			todoListEnabledMigrated: z.boolean().optional(),
 			claudeCodeLegacySettingsMigrated: z.boolean().optional(),
 		})
@@ -65,6 +66,7 @@ export class ProviderSettingsManager {
 			rateLimitSecondsMigrated: true, // Mark as migrated on fresh installs
 			openAiHeadersMigrated: true, // Mark as migrated on fresh installs
 			consecutiveMistakeLimitMigrated: true, // Mark as migrated on fresh installs
+			consecutiveMistakeLimit5Migrated: true, // Mark as migrated on fresh installs
 			todoListEnabledMigrated: true, // Mark as migrated on fresh installs
 			claudeCodeLegacySettingsMigrated: true, // Mark as migrated on fresh installs
 		},
@@ -137,6 +139,7 @@ export class ProviderSettingsManager {
 						rateLimitSecondsMigrated: false,
 						openAiHeadersMigrated: false,
 						consecutiveMistakeLimitMigrated: false,
+						consecutiveMistakeLimit5Migrated: false,
 						todoListEnabledMigrated: false,
 						claudeCodeLegacySettingsMigrated: false,
 					} // Initialize with default values
@@ -158,6 +161,12 @@ export class ProviderSettingsManager {
 				if (!providerProfiles.migrations.consecutiveMistakeLimitMigrated) {
 					await this.migrateConsecutiveMistakeLimit(providerProfiles)
 					providerProfiles.migrations.consecutiveMistakeLimitMigrated = true
+					isDirty = true
+				}
+
+				if (!providerProfiles.migrations.consecutiveMistakeLimit5Migrated) {
+					await this.migrateConsecutiveMistakeLimit(providerProfiles)
+					providerProfiles.migrations.consecutiveMistakeLimit5Migrated = true
 					isDirty = true
 				}
 
@@ -249,7 +258,7 @@ export class ProviderSettingsManager {
 	private async migrateConsecutiveMistakeLimit(providerProfiles: ProviderProfiles) {
 		try {
 			for (const [name, apiConfig] of Object.entries(providerProfiles.apiConfigs)) {
-				if (apiConfig.consecutiveMistakeLimit == null) {
+				if (apiConfig.consecutiveMistakeLimit == null || apiConfig.consecutiveMistakeLimit === 3) {
 					apiConfig.consecutiveMistakeLimit = DEFAULT_CONSECUTIVE_MISTAKE_LIMIT
 				}
 			}

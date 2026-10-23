@@ -64,6 +64,7 @@ describe("ProviderSettingsManager", () => {
 						rateLimitSecondsMigrated: true,
 						openAiHeadersMigrated: true,
 						consecutiveMistakeLimitMigrated: true,
+						consecutiveMistakeLimit5Migrated: true,
 						todoListEnabledMigrated: true,
 						claudeCodeLegacySettingsMigrated: true,
 					},
@@ -177,8 +178,8 @@ describe("ProviderSettingsManager", () => {
 			// Get the last call to store, which should contain the migrated config
 			const calls = mockSecrets.store.mock.calls
 			const storedConfig = JSON.parse(calls[calls.length - 1][1])
-			expect(storedConfig.apiConfigs.default.consecutiveMistakeLimit).toEqual(3)
-			expect(storedConfig.apiConfigs.test.consecutiveMistakeLimit).toEqual(3)
+			expect(storedConfig.apiConfigs.default.consecutiveMistakeLimit).toEqual(5)
+			expect(storedConfig.apiConfigs.test.consecutiveMistakeLimit).toEqual(5)
 			expect(storedConfig.apiConfigs.existing.consecutiveMistakeLimit).toEqual(5)
 			expect(storedConfig.migrations.consecutiveMistakeLimitMigrated).toEqual(true)
 		})
@@ -573,6 +574,7 @@ describe("ProviderSettingsManager", () => {
 					rateLimitSecondsMigrated: true,
 					openAiHeadersMigrated: true,
 					consecutiveMistakeLimitMigrated: true,
+					consecutiveMistakeLimit5Migrated: true,
 					todoListEnabledMigrated: true,
 					claudeCodeLegacySettingsMigrated: true,
 				},
@@ -718,6 +720,7 @@ describe("ProviderSettingsManager", () => {
 					rateLimitSecondsMigrated: false,
 					openAiHeadersMigrated: true,
 					consecutiveMistakeLimitMigrated: true,
+					consecutiveMistakeLimit5Migrated: true,
 					todoListEnabledMigrated: true,
 					claudeCodeLegacySettingsMigrated: true,
 				},

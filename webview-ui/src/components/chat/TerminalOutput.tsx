@@ -12,7 +12,7 @@ const converter = new Convert({
 	bg: "var(--vscode-terminal-background, transparent)",
 	// Map ANSI colors to VSCode terminal color CSS variables for theme compatibility
 	colors: {
-		0: "var(--vscode-terminal-ansiBlack, #000000)",
+		0: "var(--vscode-terminal-ansiBrightBlack, #888888)",
 		1: "var(--vscode-terminal-ansiRed, #cd3131)",
 		2: "var(--vscode-terminal-ansiGreen, #0dbc79)",
 		3: "var(--vscode-terminal-ansiYellow, #e5e510)",
@@ -45,7 +45,11 @@ const converter = new Convert({
 export const TerminalOutput: React.FC<TerminalOutputProps> = ({ content, className }) => {
 	const html = useMemo(() => {
 		try {
-			return converter.toHtml(content)
+			let converted = converter.toHtml(content)
+			// Strip background-color styles from generated spans to prevent ANSI background bleeding
+			// (e.g. unclosed ANSI 41 red background blocks from test runners like Vitest)
+			converted = converted.replace(/background-color:\s*[^;"]+;?/gi, "")
+			return converted
 		} catch {
 			// Fallback: if conversion fails, show raw text (stripped of ANSI)
 			// eslint-disable-next-line no-control-regex

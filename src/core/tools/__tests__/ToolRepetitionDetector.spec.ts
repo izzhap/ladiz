@@ -28,7 +28,7 @@ function createToolUse(name: string, displayName?: string, params: Record<string
 describe("ToolRepetitionDetector", () => {
 	// ===== Initialization tests =====
 	describe("initialization", () => {
-		it("should default to a limit of 3 if no argument provided", () => {
+		it("should default to a limit of 5 if no argument provided", () => {
 			const detector = new ToolRepetitionDetector()
 			// We'll verify this through behavior in subsequent tests
 
@@ -44,9 +44,17 @@ describe("ToolRepetitionDetector", () => {
 			const result3 = detector.check(createToolUse("test", "test-tool"))
 			expect(result3.allowExecution).toBe(true)
 
-			// Fourth identical call (counter = 3) reaches the default limit
+			// Fourth identical call (counter = 3)
 			const result4 = detector.check(createToolUse("test", "test-tool"))
-			expect(result4.allowExecution).toBe(false)
+			expect(result4.allowExecution).toBe(true)
+
+			// Fifth identical call (counter = 4)
+			const result5 = detector.check(createToolUse("test", "test-tool"))
+			expect(result5.allowExecution).toBe(true)
+
+			// Sixth identical call (counter = 5) reaches the default limit
+			const result6 = detector.check(createToolUse("test", "test-tool"))
+			expect(result6.allowExecution).toBe(false)
 		})
 
 		it("should use the custom limit when provided", () => {

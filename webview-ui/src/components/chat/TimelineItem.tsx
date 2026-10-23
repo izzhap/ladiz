@@ -99,27 +99,29 @@ export const TimelineItem: React.FC<TimelineItemProps> = memo(
 
 					{/* Action + Target + Subtext */}
 					<div className="flex flex-col min-w-0 flex-1 leading-snug">
-						<div className="flex items-start gap-2 flex-wrap min-w-0">
+						<div className="flex items-center gap-2 min-w-0 w-full">
 							{action && (
 								<div
 									className={cn(
-										"font-semibold text-xs text-vscode-foreground tracking-tight",
-										target ? "shrink-0" : "min-w-0 flex-1",
+										"font-semibold text-xs text-vscode-foreground tracking-tight shrink-0",
+										!target && !actions && "flex-1",
 									)}>
 									{action}
 								</div>
 							)}
 							{target && (
-								<span className="font-mono text-[11px] text-vscode-foreground/90 break-all select-text font-normal opacity-90">
+								<div
+									className="font-mono text-[11px] text-vscode-foreground/90 select-text font-normal opacity-90 min-w-0 flex-1 truncate"
+									title={typeof target === "string" ? target : undefined}>
 									{target}
-								</span>
+								</div>
 							)}
 							{actions && <div className="ml-auto shrink-0 flex items-center gap-1.5">{actions}</div>}
 						</div>
 
 						{/* Subtext description / metadata */}
 						{subtext && (
-							<div className="text-[11px] text-vscode-descriptionForeground/70 font-normal leading-relaxed mt-0.5 select-text">
+							<div className="text-[11px] text-vscode-descriptionForeground/70 font-normal leading-relaxed mt-0.5 select-text truncate">
 								{subtext}
 							</div>
 						)}

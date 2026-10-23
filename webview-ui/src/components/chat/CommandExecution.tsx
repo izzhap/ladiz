@@ -1,4 +1,4 @@
-import { useCallback, useState, memo, useMemo } from "react"
+import { useCallback, useState, useMemo } from "react"
 import { useEvent } from "react-use"
 import { t } from "i18next"
 import { ChevronDown, OctagonX, Terminal } from "lucide-react"
@@ -31,22 +31,23 @@ interface CommandExecutionProps {
 	text?: string
 	icon?: JSX.Element | null
 	title?: JSX.Element | null
+	initialExpanded?: boolean
 }
 
-export const CommandExecution = ({ executionId, text, icon: _icon, title: _title }: CommandExecutionProps) => {
-	const {
-		terminalShellIntegrationDisabled = false,
-		allowedCommands = [],
-		deniedCommands = [],
-		setAllowedCommands,
-		setDeniedCommands,
-	} = useExtensionState()
+export const CommandExecution = ({
+	executionId,
+	text,
+	icon: _icon,
+	title: _title,
+	initialExpanded = false,
+}: CommandExecutionProps) => {
+	const { allowedCommands = [], deniedCommands = [], setAllowedCommands, setDeniedCommands } = useExtensionState()
 
 	const { command, output: parsedOutput } = useMemo(() => parseCommandAndOutput(text), [text])
 
-	// If we aren't opening the VSCode terminal for this command then we default
-	// to expanding the command execution output.
-	const [isExpanded, setIsExpanded] = useState(terminalShellIntegrationDisabled)
+	// Keep command prompt details and output collapsed by default
+	// Only show high-level info unless user explicitly expands
+	const [isExpanded, setIsExpanded] = useState(initialExpanded)
 	const [streamingOutput, setStreamingOutput] = useState("")
 	const [status, setStatus] = useState<CommandExecutionStatus | null>(null)
 
@@ -132,7 +133,6 @@ export const CommandExecution = ({ executionId, text, icon: _icon, title: _title
 							setStreamingOutput(data.output)
 							break
 						case "fallback":
-							setIsExpanded(true)
 							break
 						default:
 							setStatus(data)
@@ -168,8 +168,16 @@ export const CommandExecution = ({ executionId, text, icon: _icon, title: _title
 					<Terminal className="size-2.5" />
 				</div>
 			}
-			action={<span>{t("chat:commandExecution.running")}</span>}
-			target={<span className="font-mono text-[11px] truncate max-w-[280px]">{command}</span>}
+			action={
+				<span>
+					{isRunning
+						? t("chat:commandExecution.running")
+						: isExited && !isExitOk
+							? t("chat:error", "Failed")
+							: t("chat:commandExecution.title", "Command")}
+				</span>
+			}
+			target={<span title={command}>{command}</span>}
 			subtext={
 				isExited ? (
 					<span className={cn("text-[10px] font-mono", isExitOk ? "text-emerald-400" : "text-rose-400")}>
@@ -179,6 +187,7 @@ export const CommandExecution = ({ executionId, text, icon: _icon, title: _title
 					<span className="text-[10px] font-mono text-cyan-400">PID: {pid}</span>
 				) : null
 			}
+			onClick={() => setIsExpanded(!isExpanded)}
 			actions={
 				<div className="flex items-center gap-1">
 					{isRunning && (
@@ -187,61 +196,62 @@ export const CommandExecution = ({ executionId, text, icon: _icon, title: _title
 								variant="ghost"
 								size="icon"
 								className="size-5 p-0 text-rose-400 hover:text-rose-300"
-								onClick={() =>
+								onClick={(e) => {
+									e.stopPropagation()
 									vscode.postMessage({
 										type: "terminalOperation",
 										terminalOperation: "abort",
 									})
-								}>
+								}}>
 								<OctagonX className="size-3.5" />
 							</Button>
 						</StandardTooltip>
 					)}
-					{output.length > 0 && (
-						<Button
-							variant="ghost"
-							size="icon"
-							className="size-5 p-0 text-vscode-descriptionForeground hover:text-vscode-foreground"
-							onClick={() => setIsExpanded(!isExpanded)}>
-							<ChevronDown
-								className={cn("size-3.5 transition-transform duration-200", isExpanded && "rotate-180")}
-							/>
-						</Button>
-					)}
+					<Button
+						variant="ghost"
+						size="icon"
+						className="size-5 p-0 text-vscode-descriptionForeground hover:text-vscode-foreground"
+						onClick={(e) => {
+							e.stopPropagation()
+							setIsExpanded(!isExpanded)
+						}}
+						aria-label={
+							isExpanded
+								? t("chat:commandExecution.collapseOutput", "Collapse")
+								: t("chat:commandExecution.expandOutput", "Expand")
+						}>
+						<ChevronDown
+							className={cn("size-3.5 transition-transform duration-200", isExpanded && "rotate-180")}
+						/>
+					</Button>
 				</div>
 			}>
-			<div className="bg-vscode-editor-background/60 border border-vscode-panel-border/40 rounded-lg overflow-hidden mt-1">
-				<div className="p-2">
-					<CodeBlock source={command} language="shell" />
-					<OutputContainer isExpanded={isExpanded} output={output} />
+			{isExpanded && (
+				<div className="bg-vscode-editor-background/60 border border-vscode-panel-border/40 rounded-lg overflow-hidden mt-1">
+					<div className="p-2">
+						<CodeBlock source={command} language="shell" />
+						{output.length > 0 && (
+							<div className="mt-1 pt-1 border-t border-border/25 max-h-[300px] overflow-y-auto">
+								<TerminalOutput content={output} />
+							</div>
+						)}
+					</div>
+					{command && command.trim() && (
+						<CommandPatternSelector
+							patterns={commandPatterns}
+							allowedCommands={allowedCommands}
+							deniedCommands={deniedCommands}
+							onAllowPatternChange={handleAllowPatternChange}
+							onDenyPatternChange={handleDenyPatternChange}
+						/>
+					)}
 				</div>
-				{command && command.trim() && (
-					<CommandPatternSelector
-						patterns={commandPatterns}
-						allowedCommands={allowedCommands}
-						deniedCommands={deniedCommands}
-						onAllowPatternChange={handleAllowPatternChange}
-						onDenyPatternChange={handleDenyPatternChange}
-					/>
-				)}
-			</div>
+			)}
 		</TimelineItem>
 	)
 }
 
 CommandExecution.displayName = "CommandExecution"
-
-const OutputContainerInternal = ({ isExpanded, output }: { isExpanded: boolean; output: string }) => (
-	<div
-		className={cn("overflow-hidden", {
-			"max-h-0": !isExpanded,
-			"max-h-[100%] mt-1 pt-1 border-t border-border/25": isExpanded,
-		})}>
-		{output.length > 0 && <TerminalOutput content={output} />}
-	</div>
-)
-
-const OutputContainer = memo(OutputContainerInternal)
 
 const parseCommandAndOutput = (text: string | undefined) => {
 	if (!text) {

@@ -1,4 +1,5 @@
 import stringify from "safe-stable-stringify"
+import { DEFAULT_CONSECUTIVE_MISTAKE_LIMIT, type ToolName } from "@roo-code/types"
 import { ToolUse } from "../../shared/tools"
 import { t } from "../../i18n"
 
@@ -15,7 +16,7 @@ export class ToolRepetitionDetector {
 	 * Creates a new ToolRepetitionDetector
 	 * @param limit The maximum number of identical consecutive tool calls allowed
 	 */
-	constructor(limit: number = 3) {
+	constructor(limit: number = DEFAULT_CONSECUTIVE_MISTAKE_LIMIT) {
 		this.consecutiveIdenticalToolCallLimit = limit
 	}
 

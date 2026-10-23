@@ -58,20 +58,25 @@ describe("CommandExecution", () => {
 		vi.clearAllMocks()
 	})
 
-	it("should render command without output", () => {
+	it("should be collapsed by default without code block detail prompt", () => {
 		render(
 			<ExtensionStateWrapper>
 				<CommandExecution executionId="test-1" text="npm install" />
 			</ExtensionStateWrapper>,
 		)
 
-		expect(screen.getByTestId("code-block")).toHaveTextContent("npm install")
+		expect(screen.queryByTestId("code-block")).not.toBeInTheDocument()
+		expect(screen.getByText("npm install")).toBeInTheDocument()
 	})
 
-	it("should render command with output", () => {
+	it("should render command with output when expanded", () => {
 		render(
 			<ExtensionStateWrapper>
-				<CommandExecution executionId="test-1" text="npm install\nOutput:\nInstalling packages..." />
+				<CommandExecution
+					executionId="test-1"
+					text="npm install\nOutput:\nInstalling packages..."
+					initialExpanded={true}
+				/>
 			</ExtensionStateWrapper>,
 		)
 
@@ -82,13 +87,33 @@ describe("CommandExecution", () => {
 		expect(terminalOutput).toHaveTextContent("Installing packages...")
 	})
 
+	it("should toggle expand on button click", () => {
+		render(
+			<ExtensionStateWrapper>
+				<CommandExecution executionId="test-1" text="npm install\nOutput:\nDone" />
+			</ExtensionStateWrapper>,
+		)
+
+		expect(screen.queryByTestId("code-block")).not.toBeInTheDocument()
+		const expandButton = screen.getByRole("button", { name: /expand/i })
+		fireEvent.click(expandButton)
+		expect(screen.getByTestId("code-block")).toHaveTextContent("npm install")
+		expect(screen.getByTestId("terminal-output")).toHaveTextContent("Done")
+	})
+
 	it("should render with custom icon and title", () => {
 		const icon = <span data-testid="custom-icon">📦</span>
 		const title = <span data-testid="custom-title">Installing Dependencies</span>
 
 		render(
 			<ExtensionStateWrapper>
-				<CommandExecution executionId="test-1" text="npm install" icon={icon} title={title} />
+				<CommandExecution
+					executionId="test-1"
+					text="npm install"
+					icon={icon}
+					title={title}
+					initialExpanded={true}
+				/>
 			</ExtensionStateWrapper>,
 		)
 
@@ -96,10 +121,10 @@ describe("CommandExecution", () => {
 		expect(screen.getByTestId("custom-title")).toBeInTheDocument()
 	})
 
-	it("should show command pattern selector for commands", () => {
+	it("should show command pattern selector for commands when expanded", () => {
 		render(
 			<ExtensionStateWrapper>
-				<CommandExecution executionId="test-1" text="npm install express" />
+				<CommandExecution executionId="test-1" text="npm install express" initialExpanded={true} />
 			</ExtensionStateWrapper>,
 		)
 
@@ -112,7 +137,7 @@ describe("CommandExecution", () => {
 	it("should handle allow command change", () => {
 		render(
 			<ExtensionStateWrapper>
-				<CommandExecution executionId="test-1" text="git push" />
+				<CommandExecution executionId="test-1" text="git push" initialExpanded={true} />
 			</ExtensionStateWrapper>,
 		)
 
@@ -133,7 +158,7 @@ describe("CommandExecution", () => {
 	it("should handle deny command change", () => {
 		render(
 			<ExtensionStateWrapper>
-				<CommandExecution executionId="test-1" text="docker run" />
+				<CommandExecution executionId="test-1" text="docker run" initialExpanded={true} />
 			</ExtensionStateWrapper>,
 		)
 
@@ -161,7 +186,7 @@ describe("CommandExecution", () => {
 
 		render(
 			<ExtensionStateContext.Provider value={stateWithNpmTest as any}>
-				<CommandExecution executionId="test-1" text="npm test" />
+				<CommandExecution executionId="test-1" text="npm test" initialExpanded={true} />
 			</ExtensionStateContext.Provider>,
 		)
 
@@ -190,7 +215,7 @@ describe("CommandExecution", () => {
 
 		render(
 			<ExtensionStateContext.Provider value={stateWithRmRf as any}>
-				<CommandExecution executionId="test-1" text="rm -rf" />
+				<CommandExecution executionId="test-1" text="rm -rf" initialExpanded={true} />
 			</ExtensionStateContext.Provider>,
 		)
 
@@ -216,7 +241,7 @@ Installing...`
 
 		render(
 			<ExtensionStateWrapper>
-				<CommandExecution executionId="test-1" text={commandText} />
+				<CommandExecution executionId="test-1" text={commandText} initialExpanded={true} />
 			</ExtensionStateWrapper>,
 		)
 
@@ -231,7 +256,7 @@ Suggested patterns: npm, npm install, npm run`
 
 		render(
 			<ExtensionStateWrapper>
-				<CommandExecution executionId="test-1" text={commandText} />
+				<CommandExecution executionId="test-1" text={commandText} initialExpanded={true} />
 			</ExtensionStateWrapper>,
 		)
 
@@ -251,7 +276,7 @@ Suggested patterns: npm, npm install, npm run`
 	it("should handle commands with pipes", () => {
 		render(
 			<ExtensionStateWrapper>
-				<CommandExecution executionId="test-1" text="ls -la | grep test" />
+				<CommandExecution executionId="test-1" text="ls -la | grep test" initialExpanded={true} />
 			</ExtensionStateWrapper>,
 		)
 
@@ -264,7 +289,7 @@ Suggested patterns: npm, npm install, npm run`
 	it("should handle commands with && operator", () => {
 		render(
 			<ExtensionStateWrapper>
-				<CommandExecution executionId="test-1" text="npm install && npm test" />
+				<CommandExecution executionId="test-1" text="npm install && npm test" initialExpanded={true} />
 			</ExtensionStateWrapper>,
 		)
 
@@ -277,35 +302,11 @@ Suggested patterns: npm, npm install, npm run`
 	it("should not show pattern selector for empty commands", () => {
 		render(
 			<ExtensionStateWrapper>
-				<CommandExecution executionId="test-1" text="" />
+				<CommandExecution executionId="test-1" text="" initialExpanded={true} />
 			</ExtensionStateWrapper>,
 		)
 
 		expect(screen.queryByTestId("command-pattern-selector")).not.toBeInTheDocument()
-	})
-
-	it("should expand output when terminal shell integration is disabled", () => {
-		const disabledState = {
-			...mockExtensionState,
-			terminalShellIntegrationDisabled: true,
-		}
-
-		const commandText = `npm install
-Output:
-Output here`
-
-		render(
-			<ExtensionStateContext.Provider value={disabledState as any}>
-				<CommandExecution executionId="test-1" text={commandText} />
-			</ExtensionStateContext.Provider>,
-		)
-
-		// Output should be visible when shell integration is disabled
-		const codeBlocks = screen.getAllByTestId("code-block")
-		expect(codeBlocks).toHaveLength(1) // Only command block
-
-		const terminalOutput = screen.getByTestId("terminal-output")
-		expect(terminalOutput).toHaveTextContent("Output here")
 	})
 
 	it("should handle undefined allowedCommands and deniedCommands", () => {
@@ -317,7 +318,7 @@ Output here`
 
 		render(
 			<ExtensionStateContext.Provider value={stateWithUndefined as any}>
-				<CommandExecution executionId="test-1" text="npm install" />
+				<CommandExecution executionId="test-1" text="npm install" initialExpanded={true} />
 			</ExtensionStateContext.Provider>,
 		)
 
@@ -335,7 +336,7 @@ Output here`
 
 		render(
 			<ExtensionStateContext.Provider value={stateWithRmInDenied as any}>
-				<CommandExecution executionId="test-1" text="rm file.txt" />
+				<CommandExecution executionId="test-1" text="rm file.txt" initialExpanded={true} />
 			</ExtensionStateContext.Provider>,
 		)
 
@@ -358,7 +359,11 @@ Output here`
 		it("should show complex commands with multiple operators", () => {
 			render(
 				<ExtensionStateWrapper>
-					<CommandExecution executionId="test-6" text="npm install && npm test || echo 'failed'" />
+					<CommandExecution
+						executionId="test-6"
+						text="npm install && npm test || echo 'failed'"
+						initialExpanded={true}
+					/>
 				</ExtensionStateWrapper>,
 			)
 
@@ -381,6 +386,7 @@ Other output here`
 						text={commandWithOutput}
 						icon={<span>icon</span>}
 						title={<span>Run Command</span>}
+						initialExpanded={true}
 					/>
 				</ExtensionStateWrapper>,
 			)
@@ -394,7 +400,7 @@ Other output here`
 		it("should handle commands with subshells", () => {
 			render(
 				<ExtensionStateWrapper>
-					<CommandExecution executionId="test-7" text="echo $(whoami) && git status" />
+					<CommandExecution executionId="test-7" text="echo $(whoami) && git status" initialExpanded={true} />
 				</ExtensionStateWrapper>,
 			)
 
@@ -407,7 +413,7 @@ Other output here`
 		it("should handle commands with backtick subshells", () => {
 			render(
 				<ExtensionStateWrapper>
-					<CommandExecution executionId="test-8" text="git commit -m `date`" />
+					<CommandExecution executionId="test-8" text="git commit -m `date`" initialExpanded={true} />
 				</ExtensionStateWrapper>,
 			)
 
@@ -420,7 +426,7 @@ Other output here`
 		it("should handle commands with special characters", () => {
 			render(
 				<ExtensionStateWrapper>
-					<CommandExecution executionId="test-9" text="cd ~/projects && npm start" />
+					<CommandExecution executionId="test-9" text="cd ~/projects && npm start" initialExpanded={true} />
 				</ExtensionStateWrapper>,
 			)
 
@@ -444,6 +450,7 @@ Running tests...
 						text={commandWithMixedContent}
 						icon={<span>icon</span>}
 						title={<span>Run Command</span>}
+						initialExpanded={true}
 					/>
 				</ExtensionStateWrapper>,
 			)
@@ -463,7 +470,7 @@ Running tests...
 
 			render(
 				<ExtensionStateContext.Provider value={conflictState as any}>
-					<CommandExecution executionId="test-11" text="git push origin main" />
+					<CommandExecution executionId="test-11" text="git push origin main" initialExpanded={true} />
 				</ExtensionStateContext.Provider>,
 			)
 
@@ -482,7 +489,7 @@ Running tests...
 
 			render(
 				<ExtensionStateWrapper>
-					<CommandExecution executionId="test-12" text={commandWithQuotes} />
+					<CommandExecution executionId="test-12" text={commandWithQuotes} initialExpanded={true} />
 				</ExtensionStateWrapper>,
 			)
 
@@ -498,7 +505,7 @@ Running tests...
 		it("should handle empty or whitespace-only commands", () => {
 			render(
 				<ExtensionStateWrapper>
-					<CommandExecution executionId="test-13" text="   " />
+					<CommandExecution executionId="test-13" text="   " initialExpanded={true} />
 				</ExtensionStateWrapper>,
 			)
 
@@ -516,7 +523,7 @@ Without any command prefix`
 
 			render(
 				<ExtensionStateWrapper>
-					<CommandExecution executionId="test-14" text={outputOnly} />
+					<CommandExecution executionId="test-14" text={outputOnly} initialExpanded={true} />
 				</ExtensionStateWrapper>,
 			)
 
@@ -533,7 +540,7 @@ Without any command prefix`
 
 			render(
 				<ExtensionStateWrapper>
-					<CommandExecution executionId="test-15" text={plainCommand} />
+					<CommandExecution executionId="test-15" text={plainCommand} initialExpanded={true} />
 				</ExtensionStateWrapper>,
 			)
 
@@ -553,14 +560,14 @@ Without any command prefix`
 		it("should handle commands with numeric output", () => {
 			const commandWithNumericOutput = `wc -l *.go *.java
 Output:
-			   10 file1.go
-			   20 file2.go
-			   15 Main.java
-			   45 total`
+				   10 file1.go
+				   20 file2.go
+				   15 Main.java
+				   45 total`
 
 			render(
 				<ExtensionStateWrapper>
-					<CommandExecution executionId="test-16" text={commandWithNumericOutput} />
+					<CommandExecution executionId="test-16" text={commandWithNumericOutput} initialExpanded={true} />
 				</ExtensionStateWrapper>,
 			)
 
@@ -584,11 +591,11 @@ Output:
 		it("should handle commands with zero output", () => {
 			const commandWithZeroTotal = `wc -l *.go *.java
 Output:
-		     0 total`
+			     0 total`
 
 			render(
 				<ExtensionStateWrapper>
-					<CommandExecution executionId="test-17" text={commandWithZeroTotal} />
+					<CommandExecution executionId="test-17" text={commandWithZeroTotal} initialExpanded={true} />
 				</ExtensionStateWrapper>,
 			)
 
