@@ -891,17 +891,7 @@ export const ChatRowContent = ({
 						apiReqCancelReason === undefined && apiRequestFailedMessage === undefined && cost === undefined
 
 					if (isApiRequestInProgress) {
-						return (
-							<TimelineItem
-								status="running"
-								customDot={
-									<div className="flex items-center justify-center size-3.5">
-										<LadizAnimatedLogo className="size-3.5" />
-									</div>
-								}
-								action={<ApiRequestLoading />}
-							/>
-						)
+						return <TimelineItem status="running" isLast={isLast} action={<ApiRequestLoading />} />
 					}
 
 					return (

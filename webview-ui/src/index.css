@@ -240,8 +240,21 @@ textarea:focus {
 	outline: 1.5px solid var(--vscode-focusBorder, #007fd4);
 }
 
-.focus\:outline-0 {
-	outline: 0 !important; /* Allow tailwind to override the `textarea:focus` rule */
+.focus\:outline-0,
+.chat-text-area textarea:focus {
+	outline: none !important;
+}
+
+.scrollbar-none::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
+	width: 0;
+	height: 0;
+}
+.scrollbar-none,
+.scrollbar-hide {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
 }
 
 /**

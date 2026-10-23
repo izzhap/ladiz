@@ -1,7 +1,6 @@
 import React, { useState, useCallback, memo, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
-import { BookOpenText, MessageCircleWarning, Copy, Check, Microscope, Info } from "lucide-react"
+import { BookOpenText, Copy, Check, Microscope, Info, ChevronDown } from "lucide-react"
 
 import { useCopyToClipboard } from "@src/utils/clipboard"
 import { vscode } from "@src/utils/vscode"
@@ -11,44 +10,9 @@ import { Button } from "../ui"
 import { useExtensionState } from "@src/context/ExtensionStateContext"
 import { useSelectedModel } from "@src/components/ui/hooks/useSelectedModel"
 import { PROVIDERS } from "../settings/constants"
+import { TimelineItem } from "./TimelineItem"
+import { cn } from "@/lib/utils"
 
-/**
- * Unified error display component for all error types in the chat.
- * Provides consistent styling, icons, and optional documentation links across all errors.
- *
- * @param type - Error type determines default title
- * @param title - Optional custom title (overrides default for error type)
- * @param message - Error message text (required)
- * @param docsURL - Optional documentation link URL (shown as "Learn more" with book icon)
- * @param showCopyButton - Whether to show copy button for error message
- * @param expandable - Whether error content can be expanded/collapsed
- * @param defaultExpanded - Whether expandable content starts expanded
- * @param additionalContent - Optional React nodes to render after message
- * @param headerClassName - Custom CSS classes for header section
- * @param messageClassName - Custom CSS classes for message section
- *
- * @example
- * // Simple error
- * <ErrorRow type="error" message="File not found" />
- *
- * @example
- * // Error with documentation link
- * <ErrorRow
- *   type="api_failure"
- *   message="API key missing"
- *   docsURL="https://docs.example.com/api-setup"
- * />
- *
- * @example
- * // Expandable error with code
- * <ErrorRow
- *   type="diff_error"
- *   message="Patch failed to apply"
- *   expandable={true}
- *   defaultExpanded={false}
- *   additionalContent={<pre>{errorDetails}</pre>}
- * />
- */
 export interface ErrorRowProps {
 	type:
 		| "error"
@@ -67,13 +31,10 @@ export interface ErrorRowProps {
 	headerClassName?: string
 	messageClassName?: string
 	code?: number
-	docsURL?: string // Optional documentation link
-	errorDetails?: string // Optional detailed error message shown in modal
+	docsURL?: string
+	errorDetails?: string
 }
 
-/**
- * Unified error display component for all error types in the chat
- */
 export const ErrorRow = memo(
 	({
 		type,
@@ -83,7 +44,7 @@ export const ErrorRow = memo(
 		expandable = false,
 		defaultExpanded = false,
 		additionalContent,
-		headerClassName,
+		headerClassName: _headerClassName,
 		messageClassName,
 		docsURL,
 		code,
@@ -97,7 +58,6 @@ export const ErrorRow = memo(
 		const { copyWithFeedback } = useCopyToClipboard()
 		const { version, apiConfiguration } = useExtensionState()
 		const { provider, id: modelId } = useSelectedModel(apiConfiguration)
-
 		const usesProxy = PROVIDERS.find((p) => p.value === provider)?.proxy ?? false
 
 		// Format error details with metadata prepended
@@ -198,85 +158,93 @@ export const ErrorRow = memo(
 		// For diff_error type with expandable content
 		if (type === "diff_error" && expandable) {
 			return (
-				<div className="mt-0 overflow-hidden mb-2 pr-1 group">
-					<div
-						className="font-sm text-vscode-editor-foreground flex items-center justify-between cursor-pointer"
-						onClick={handleToggleExpand}>
-						<div className="flex items-center gap-2 flex-grow  text-vscode-errorForeground">
-							<MessageCircleWarning className="w-4" />
-							<span className="text-vscode-errorForeground font-bold grow cursor-pointer">
-								{errorTitle}
-							</span>
-						</div>
-						<div className="flex items-center transition-opacity opacity-0 group-hover:opacity-100">
+				<TimelineItem
+					status="error"
+					className="py-1"
+					action={
+						<span className="text-rose-400 font-semibold text-xs cursor-pointer hover:underline">
+							{errorTitle}
+						</span>
+					}
+					actions={
+						<div className="flex items-center gap-1">
 							{showCopyButton && (
-								<VSCodeButton
-									appearance="icon"
-									className="p-0.75 h-6 mr-1 text-vscode-editor-foreground flex items-center justify-center bg-transparent"
-									onClick={handleCopy}>
-									<span className={`codicon codicon-${showCopySuccess ? "check" : "copy"}`} />
-								</VSCodeButton>
+								<button
+									type="button"
+									className="p-1 rounded text-vscode-descriptionForeground/60 hover:text-vscode-foreground hover:bg-white/10 transition-colors cursor-pointer"
+									onClick={handleCopy}
+									title="Copy error">
+									{showCopySuccess ? (
+										<Check className="size-3 text-emerald-400" />
+									) : (
+										<Copy className="size-3" />
+									)}
+								</button>
 							)}
-							<span className={`codicon codicon-chevron-${isExpanded ? "up" : "down"}`} />
+							<button
+								type="button"
+								className="text-vscode-descriptionForeground/60 hover:text-vscode-foreground p-0.5 rounded transition-colors cursor-pointer"
+								aria-label="Toggle error details">
+								<ChevronDown
+									className={cn(
+										"size-3.5 transition-transform duration-200",
+										isExpanded && "rotate-180",
+									)}
+								/>
+							</button>
 						</div>
-					</div>
+					}
+					onClick={handleToggleExpand}>
 					{isExpanded && (
-						<div className="px-2 py-1 mt-2 bg-vscode-editor-background ml-6 rounded-lg">
+						<div className="p-2 mt-1 bg-vscode-editor-background/60 border border-vscode-panel-border/40 rounded-lg text-xs">
 							<CodeBlock source={message} language="text" />
 						</div>
 					)}
-				</div>
+				</TimelineItem>
 			)
 		}
 
 		// Standard error display
 		return (
 			<>
-				<div className="group pr-2">
-					{errorTitle && (
-						<div className={headerClassName || "flex items-center justify-between gap-2 break-words"}>
-							<MessageCircleWarning className="w-4 text-vscode-errorForeground" />
-							<span className="font-bold grow cursor-default">{errorTitle}</span>
-							<div className="flex items-center gap-2">
-								{docsURL && (
-									<a
-										href={docsURL}
-										className="text-sm flex items-center gap-1 transition-opacity opacity-0 group-hover:opacity-100"
-										onClick={(e) => {
-											e.preventDefault()
-											// Handle internal navigation to settings
-											if (docsURL.startsWith("roocode://settings")) {
-												vscode.postMessage({
-													type: "switchTab",
-													tab: "settings",
-													values: { section: "providers" },
-												})
-											} else {
-												vscode.postMessage({ type: "openExternal", url: docsURL })
-											}
-										}}>
-										<BookOpenText className="size-3 mt-[3px]" />
-										{docsURL.startsWith("roocode://settings")
-											? t("chat:apiRequest.errorMessage.goToSettings", {
-													defaultValue: "Settings",
-												})
-											: t("chat:apiRequest.errorMessage.docs")}
-									</a>
-								)}
-							</div>
-						</div>
-					)}
-					<div className="ml-2 pl-4 mt-1 pt-0.5 border-l border-vscode-errorForeground/50">
-						<p
-							className={
-								messageClassName ||
-								"cursor-default my-0 font-light whitespace-pre-wrap break-words text-vscode-descriptionForeground"
-							}>
+				<TimelineItem
+					status="error"
+					className="py-1"
+					action={<span className="text-rose-400 font-semibold text-xs">{errorTitle}</span>}
+					actions={
+						docsURL ? (
+							<a
+								href={docsURL}
+								className="text-xs text-blue-400 hover:underline flex items-center gap-1"
+								onClick={(e) => {
+									e.preventDefault()
+									if (docsURL.startsWith("roocode://settings")) {
+										vscode.postMessage({
+											type: "switchTab",
+											tab: "settings",
+											values: { section: "providers" },
+										})
+									} else {
+										vscode.postMessage({ type: "openExternal", url: docsURL })
+									}
+								}}>
+								<BookOpenText className="size-3" />
+								<span>
+									{docsURL.startsWith("roocode://settings")
+										? t("chat:apiRequest.errorMessage.goToSettings", { defaultValue: "Settings" })
+										: t("chat:apiRequest.errorMessage.docs")}
+								</span>
+							</a>
+						) : null
+					}>
+					<div className="text-xs text-vscode-descriptionForeground leading-relaxed select-text mt-0.5">
+						<p className={messageClassName || "cursor-default my-0 whitespace-pre-wrap break-words"}>
 							{message}
 							{formattedErrorDetails && (
 								<button
+									type="button"
 									onClick={() => setIsDetailsDialogOpen(true)}
-									className="cursor-pointer ml-1 text-vscode-descriptionForeground/50 hover:text-vscode-descriptionForeground hover:underline font-normal"
+									className="cursor-pointer ml-1.5 text-blue-400 hover:underline font-medium inline-flex items-center gap-0.5"
 									aria-label={t("chat:errorDetails.title")}>
 									{t("chat:errorDetails.link")}
 								</button>
@@ -284,7 +252,7 @@ export const ErrorRow = memo(
 						</p>
 						{additionalContent}
 					</div>
-				</div>
+				</TimelineItem>
 
 				{/* Error Details Dialog */}
 				{formattedErrorDetails && (

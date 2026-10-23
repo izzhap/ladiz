@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from "react"
-import { Database } from "lucide-react"
 
 import type { IndexingStatus, IndexingStatusUpdateMessage } from "@roo-code/types"
 
@@ -8,7 +7,7 @@ import { vscode } from "@src/utils/vscode"
 import { useAppTranslation } from "@/i18n/TranslationContext"
 
 import { useExtensionState } from "@src/context/ExtensionStateContext"
-import { PopoverTrigger, StandardTooltip, Button } from "@src/components/ui"
+import { PopoverTrigger, StandardTooltip } from "@src/components/ui"
 
 import { CodeIndexPopover } from "./CodeIndexPopover"
 
@@ -89,25 +88,29 @@ export const IndexingStatusBadge: React.FC<IndexingStatusBadgeProps> = ({ classN
 		<CodeIndexPopover indexingStatus={indexingStatus}>
 			<StandardTooltip content={tooltipText}>
 				<PopoverTrigger asChild>
-					<Button
-						variant="ghost"
-						size="sm"
+					<button
+						type="button"
 						aria-label={tooltipText}
 						className={cn(
-							"relative h-5 w-5 p-0",
-							"text-vscode-foreground opacity-85",
-							"hover:opacity-100 hover:bg-[rgba(255,255,255,0.03)]",
-							"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+							"inline-flex items-center gap-1.5 relative whitespace-nowrap px-2.5 py-1 text-xs font-mono font-medium rounded-full border transition-all duration-150 select-none cursor-pointer",
+							"bg-white/[0.04] border-white/10 text-slate-300 hover:bg-white/[0.08] hover:text-slate-100 hover:border-white/20",
+							"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder active:scale-95",
 							className,
 						)}>
-						<Database className="w-4 h-4" />
 						<span
 							className={cn(
-								"absolute top-0 right-0 w-1.5 h-1.5 rounded-full transition-colors duration-200",
+								"size-1.5 rounded-full shrink-0 transition-colors duration-200",
 								statusColorClass,
 							)}
 						/>
-					</Button>
+						<span className="font-sans text-xs">
+							{indexingStatus.systemStatus === "Indexing"
+								? `${progressPercentage}%`
+								: indexingStatus.systemStatus === "Indexed"
+									? t("chat:indexingStatus.indexed")
+									: "Index"}
+						</span>
+					</button>
 				</PopoverTrigger>
 			</StandardTooltip>
 		</CodeIndexPopover>

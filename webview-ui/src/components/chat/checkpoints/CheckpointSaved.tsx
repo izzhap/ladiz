@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 
 import { CheckpointMenu } from "./CheckpointMenu"
 import { checkpointSchema } from "./schema"
-import { GitCommitVertical } from "lucide-react"
+import { TimelineItem } from "../TimelineItem"
 
 type CheckpointSavedProps = {
 	ts: number
@@ -84,31 +84,36 @@ export const CheckpointSaved = ({
 
 	return (
 		<div
-			className="flex items-center justify-between gap-2 pt-2 pb-3"
+			className="flex items-center justify-between gap-2 w-full group/checkpoint"
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}>
-			<div className="flex items-center gap-2 text-blue-400 whitespace-nowrap">
-				<GitCommitVertical className="w-4" />
-				<span className="font-semibold">{t("chat:checkpoint.regular")}</span>
-				{isCurrent && <span className="text-muted">({t("chat:checkpoint.current")})</span>}
-			</div>
-			<span
-				className="block w-full h-[2px] mt-[2px] text-xs"
-				style={{
-					backgroundImage:
-						"linear-gradient(90deg, rgba(0, 188, 255, .65), rgba(0, 188, 255, .65) 80%, rgba(0, 188, 255, 0) 99%)",
-				}}></span>
-
-			{/* Keep menu visible while hovering, popover is open, or briefly after close to prevent jump */}
-			<div data-testid="checkpoint-menu-container" className={cn("h-4 -mt-2", menuVisible ? "block" : "hidden")}>
-				<CheckpointMenu
-					ts={props.ts}
-					commitHash={props.commitHash}
-					checkpoint={metadata}
-					onOpenChange={handlePopoverOpenChange}
-					onJumpToPreviousCheckpoint={onJumpToPreviousCheckpoint}
-				/>
-			</div>
+			<TimelineItem
+				status="info"
+				className="w-full py-0.5"
+				action={
+					<span className="text-sky-400 font-semibold text-xs flex items-center gap-1.5">
+						<span>{t("chat:checkpoint.regular")}</span>
+						{isCurrent && (
+							<span className="text-vscode-descriptionForeground/60 text-[11px] font-normal">
+								({t("chat:checkpoint.current")})
+							</span>
+						)}
+					</span>
+				}
+				actions={
+					<div
+						data-testid="checkpoint-menu-container"
+						className={cn("h-4", menuVisible ? "block" : "hidden")}>
+						<CheckpointMenu
+							ts={props.ts}
+							commitHash={props.commitHash}
+							checkpoint={metadata}
+							onOpenChange={handlePopoverOpenChange}
+							onJumpToPreviousCheckpoint={onJumpToPreviousCheckpoint}
+						/>
+					</div>
+				}
+			/>
 		</div>
 	)
 }

@@ -1586,7 +1586,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		if (text === t("chat:retry.title")) {
 			return "bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white shadow-lg shadow-amber-500/25 hover:shadow-amber-500/35 border border-amber-400/30"
 		}
-		return "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/25 border border-blue-400/30"
+		return "bg-blue-600 hover:bg-blue-500 text-white shadow-sm border border-blue-500/30"
 	}
 
 	const getSecondaryButtonIcon = (text: string) => {
@@ -1730,7 +1730,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 						<Virtuoso
 							ref={virtuosoRef}
 							key={task.ts}
-							className="scrollable grow overflow-y-scroll mb-1"
+							className="scrollable grow overflow-y-auto mb-2"
 							increaseViewportBy={{ top: 3_000, bottom: 1000 }}
 							data={groupedMessages}
 							itemContent={itemContent}
@@ -1803,7 +1803,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 												type="button"
 												disabled={!enableButtons}
 												className={cn(
-													"flex items-center justify-center gap-2 rounded-xl text-xs font-semibold h-8.5 px-4 transition-all duration-200 cursor-pointer select-none active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none",
+													"flex items-center justify-center gap-2 rounded-xl text-xs font-semibold h-9 px-4 transition-all duration-200 cursor-pointer select-none active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none",
 													visibleSecondaryButtonText ? "flex-1" : "flex-[2]",
 													getPrimaryButtonClass(visiblePrimaryButtonText),
 												)}
@@ -1830,7 +1830,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 												type="button"
 												disabled={!enableButtons}
 												className={cn(
-													"flex items-center justify-center gap-2 rounded-xl text-xs font-semibold h-8.5 px-4 transition-all duration-200 cursor-pointer select-none active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none flex-1",
+													"flex items-center justify-center gap-2 rounded-xl text-xs font-semibold h-9 px-4 transition-all duration-200 cursor-pointer select-none active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none flex-1",
 													getSecondaryButtonClass(visibleSecondaryButtonText),
 												)}
 												onClick={() => handleSecondaryButtonClick(inputValue, selectedImages)}>

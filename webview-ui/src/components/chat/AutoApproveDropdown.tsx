@@ -88,7 +88,7 @@ export const AutoApproveDropdown = ({ disabled = false, triggerClassName = "" }:
 				<span
 					className={cn(
 						"size-1.5 rounded-full shrink-0 transition-colors",
-						isYoloOn ? "bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.9)] animate-pulse" : "bg-slate-500",
+						isYoloOn ? "bg-amber-400" : "bg-slate-500",
 					)}
 				/>
 				<span className="font-mono tracking-tight">{isYoloOn ? "YOLO: On" : "YOLO: Off"}</span>
