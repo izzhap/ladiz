@@ -274,7 +274,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							setClineAsk("api_req_failed")
 							setEnableButtons(true)
 							setPrimaryButtonText(t("chat:retry.title"))
-							setSecondaryButtonText(t("chat:startNewTask.title"))
+							setSecondaryButtonText(undefined)
 							break
 						case "mistake_limit_reached":
 							playSound("progress_loop")
@@ -282,7 +282,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							setClineAsk("mistake_limit_reached")
 							setEnableButtons(true)
 							setPrimaryButtonText(t("chat:proceedAnyways.title"))
-							setSecondaryButtonText(t("chat:startNewTask.title"))
+							setSecondaryButtonText(undefined)
 							break
 						case "followup":
 							setSendingDisabled(isPartial)
@@ -375,7 +375,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							setSendingDisabled(isPartial)
 							setClineAsk("completion_result")
 							setEnableButtons(!isPartial)
-							setPrimaryButtonText(t("chat:startNewTask.title"))
+							setPrimaryButtonText(undefined)
 							setSecondaryButtonText(undefined)
 							break
 						case "resume_task":
@@ -392,7 +392,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 									(msg) => msg.ask === "completion_result" || msg.say === "completion_result",
 								)
 							if (isCompletedSubtask) {
-								setPrimaryButtonText(t("chat:startNewTask.title"))
+								setPrimaryButtonText(undefined)
 								setSecondaryButtonText(undefined)
 							} else {
 								setPrimaryButtonText(t("chat:resumeTask.title"))
@@ -404,7 +404,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							setSendingDisabled(false)
 							setClineAsk("resume_completed_task")
 							setEnableButtons(true)
-							setPrimaryButtonText(t("chat:startNewTask.title"))
+							setPrimaryButtonText(undefined)
 							setSecondaryButtonText(undefined)
 							setDidClickCancel(false)
 							break
@@ -453,7 +453,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				(msg) => msg.ask === "completion_result" || msg.say === "completion_result",
 			)
 			if (hasCompletionResult) {
-				setPrimaryButtonText(t("chat:startNewTask.title"))
+				setPrimaryButtonText(undefined)
 				setSecondaryButtonText(undefined)
 			}
 		}
@@ -1540,8 +1540,10 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	)
 
 	const shouldHideApproval = isYoloOn && isApprovalButton(primaryButtonText)
-	const visiblePrimaryButtonText = shouldHideApproval ? undefined : primaryButtonText
-	const visibleSecondaryButtonText = shouldHideApproval ? undefined : secondaryButtonText
+	const visiblePrimaryButtonText =
+		shouldHideApproval || primaryButtonText === t("chat:startNewTask.title") ? undefined : primaryButtonText
+	const visibleSecondaryButtonText =
+		shouldHideApproval || secondaryButtonText === t("chat:startNewTask.title") ? undefined : secondaryButtonText
 
 	const getPrimaryButtonIcon = (text: string) => {
 		if (text === t("chat:startNewTask.title")) {
