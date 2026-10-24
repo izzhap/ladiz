@@ -18,6 +18,7 @@ import {
 	insertMention,
 	removeMention,
 	shouldShowContextMenu,
+	getContextMenuContext,
 	SearchResult,
 } from "@src/utils/context-mentions"
 import { cn } from "@src/lib/utils"
@@ -305,7 +306,14 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				if (type === ContextMenuOptionType.Mode && value) {
 					// Handle mode selection.
 					setMode(value)
-					setInputValue("")
+					const currentText = textAreaRef.current ? textAreaRef.current.value : inputValue
+					const beforeCursor = currentText.slice(0, cursorPosition)
+					const slashIndex = beforeCursor.lastIndexOf("/")
+					if (slashIndex > 0) {
+						setInputValue(currentText.slice(0, slashIndex))
+					} else {
+						setInputValue("")
+					}
 					setShowContextMenu(false)
 					vscode.postMessage({ type: "mode", text: value })
 					return
@@ -314,19 +322,27 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				if (type === ContextMenuOptionType.Command && value) {
 					// Handle command selection.
 					setSelectedMenuIndex(-1)
-					setInputValue("")
 					setShowContextMenu(false)
+
+					const currentText = textAreaRef.current ? textAreaRef.current.value : inputValue
+					const beforeCursor = currentText.slice(0, cursorPosition)
+					const afterCursor = currentText.slice(cursorPosition)
+					const slashIndex = beforeCursor.lastIndexOf("/")
+					const beforeSlash = slashIndex !== -1 ? currentText.slice(0, slashIndex) : ""
 
 					// Insert the command mention into the textarea
 					const commandMention = `/${value}`
-					setInputValue(commandMention + " ")
-					setCursorPosition(commandMention.length + 1)
-					setIntendedCursorPosition(commandMention.length + 1)
+					const newValue = (beforeSlash ? beforeSlash : "") + commandMention + " " + afterCursor
+					setInputValue(newValue)
+					const newPos = (beforeSlash ? beforeSlash.length : 0) + commandMention.length + 1
+					setCursorPosition(newPos)
+					setIntendedCursorPosition(newPos)
 
 					// Focus the textarea
 					setTimeout(() => {
 						if (textAreaRef.current) {
 							textAreaRef.current.focus()
+							textAreaRef.current.setSelectionRange(newPos, newPos)
 						}
 					}, 0)
 					return
@@ -577,13 +593,14 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				const newCursorPosition = e.target.selectionStart
 				setCursorPosition(newCursorPosition)
 
-				const showMenu = shouldShowContextMenu(newValue, newCursorPosition)
+				const context = getContextMenuContext(newValue, newCursorPosition)
+				const showMenu = context.type !== null
 				setShowContextMenu(showMenu)
 
 				if (showMenu) {
-					if (newValue.startsWith("/") && !newValue.includes(" ")) {
+					if (context.type === "slash") {
 						// Handle slash command - request fresh commands
-						const query = newValue
+						const query = context.query
 						setSearchQuery(query)
 						// Set to first selectable item (skip section headers)
 						setSelectedMenuIndex(1) // Section header is at 0, first command is at 1
@@ -591,8 +608,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						vscode.postMessage({ type: "requestCommands" })
 					} else {
 						// Existing @ mention handling.
-						const lastAtIndex = newValue.lastIndexOf("@", newCursorPosition - 1)
-						const query = newValue.slice(lastAtIndex + 1, newCursorPosition)
+						const query = context.query
 						setSearchQuery(query)
 
 						// Send file search request if query is not empty.

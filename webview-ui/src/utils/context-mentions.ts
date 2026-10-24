@@ -32,6 +32,19 @@ export function insertMention(
 ): { newValue: string; mentionIndex: number } {
 	// Handle slash command selection (only when explicitly selecting a slash command)
 	if (isSlashCommand) {
+		const beforeCursor = text.slice(0, position)
+		const slashIndex = beforeCursor.lastIndexOf("/")
+		if (slashIndex !== -1) {
+			const beforeSlash = text.slice(0, slashIndex)
+			const afterCursor = text.slice(position)
+			const commandVal = value.startsWith("/") ? value : `/${value}`
+			if (beforeSlash.length > 0) {
+				return {
+					newValue: beforeSlash + commandVal + " " + afterCursor,
+					mentionIndex: slashIndex,
+				}
+			}
+		}
 		return {
 			newValue: value,
 			mentionIndex: 0,
@@ -364,34 +377,55 @@ export function getContextMenuOptions(
 	return deduped.length > 0 ? deduped : [{ type: ContextMenuOptionType.NoResults }]
 }
 
-export function shouldShowContextMenu(text: string, position: number): boolean {
+export interface ContextMenuContext {
+	type: "slash" | "mention" | null
+	query: string
+	index: number
+}
+
+export function getContextMenuContext(text: string, position: number): ContextMenuContext {
 	const beforeCursor = text.slice(0, position)
 
-	// Check if we're in a slash command context (at the beginning and no space yet)
-	if (text.startsWith("/") && !text.includes(" ") && position <= text.length) {
-		return true
-	}
-
-	// Check for @ mention context
 	const atIndex = beforeCursor.lastIndexOf("@")
+	const slashIndex = beforeCursor.lastIndexOf("/")
 
-	if (atIndex === -1) {
-		return false
+	// Check if slash command is valid at cursor
+	let isSlashValid = false
+	if (slashIndex !== -1) {
+		const isSlashAtWordBoundary = slashIndex === 0 || /\s/.test(beforeCursor[slashIndex - 1])
+		const textAfterSlash = beforeCursor.slice(slashIndex + 1)
+		const hasWhitespaceAfterSlash = /\s/.test(textAfterSlash)
+		if (isSlashAtWordBoundary && !hasWhitespaceAfterSlash) {
+			isSlashValid = true
+		}
 	}
 
-	const textAfterAt = beforeCursor.slice(atIndex + 1)
-
-	// Check if there's any unescaped whitespace after the '@'
-	// We need to check for whitespace that isn't preceded by a backslash
-	// Using a negative lookbehind to ensure the space isn't escaped
-	const hasUnescapedSpace = /(?<!\\)\s/.test(textAfterAt)
-	if (hasUnescapedSpace) return false
-
-	// Don't show the menu if it's clearly a URL
-	if (textAfterAt.toLowerCase().startsWith("http")) {
-		return false
+	// Check if @ mention is valid at cursor
+	let isAtValid = false
+	if (atIndex !== -1) {
+		const textAfterAt = beforeCursor.slice(atIndex + 1)
+		const hasUnescapedSpace = /(?<!\\)\s/.test(textAfterAt)
+		const isHttp = textAfterAt.toLowerCase().startsWith("http")
+		if (!hasUnescapedSpace && !isHttp) {
+			isAtValid = true
+		}
 	}
 
-	// Show menu in all other cases
-	return true
+	if (isSlashValid && isAtValid) {
+		if (slashIndex > atIndex) {
+			return { type: "slash", query: beforeCursor.slice(slashIndex), index: slashIndex }
+		} else {
+			return { type: "mention", query: beforeCursor.slice(atIndex + 1), index: atIndex }
+		}
+	} else if (isSlashValid) {
+		return { type: "slash", query: beforeCursor.slice(slashIndex), index: slashIndex }
+	} else if (isAtValid) {
+		return { type: "mention", query: beforeCursor.slice(atIndex + 1), index: atIndex }
+	}
+
+	return { type: null, query: "", index: -1 }
+}
+
+export function shouldShowContextMenu(text: string, position: number): boolean {
+	return getContextMenuContext(text, position).type !== null
 }

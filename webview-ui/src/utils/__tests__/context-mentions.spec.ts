@@ -3,6 +3,7 @@ import {
 	removeMention,
 	getContextMenuOptions,
 	shouldShowContextMenu,
+	getContextMenuContext,
 	ContextMenuOptionType,
 	ContextMenuQueryItem,
 	SearchResult,
@@ -116,6 +117,12 @@ describe("insertMention", () => {
 			const result = insertMention("/code @some/file.ts", 5, "debug", true)
 			expect(result.newValue).toBe("debug")
 			expect(result.mentionIndex).toBe(0)
+		})
+
+		it("should preserve text before slash command when text exists before slash", () => {
+			const result = insertMention("halo /ui", 8, "ui-ux-pro-max", true)
+			expect(result.newValue).toBe("halo /ui-ux-pro-max ")
+			expect(result.mentionIndex).toBe(5)
 		})
 
 		it("should insert @ mention correctly after slash command when isSlashCommand is false", () => {
@@ -584,5 +591,29 @@ describe("shouldShowContextMenu", () => {
 	it("should return false if an unescaped space exists after @", () => {
 		// This case means the regex wouldn't match anyway, but confirms context menu logic
 		expect(shouldShowContextMenu("@/path/with space", 13)).toBe(false) // Cursor after unescaped space
+	})
+
+	it("should return true for slash command at the start of text", () => {
+		expect(shouldShowContextMenu("/", 1)).toBe(true)
+		expect(shouldShowContextMenu("/test", 5)).toBe(true)
+	})
+
+	it("should return true for slash command with text before slash at word boundary", () => {
+		expect(shouldShowContextMenu("halo /", 6)).toBe(true)
+		expect(shouldShowContextMenu("halo /ui", 8)).toBe(true)
+		expect(shouldShowContextMenu("first line\n/cmd", 15)).toBe(true)
+	})
+
+	it("should return false for slash command followed by space or inside a path", () => {
+		expect(shouldShowContextMenu("halo /ui ", 9)).toBe(false)
+		expect(shouldShowContextMenu("https://example.com/test", 24)).toBe(false)
+		expect(shouldShowContextMenu("src/utils/file", 14)).toBe(false)
+	})
+
+	it("should return correct context for slash command with leading text", () => {
+		const context = getContextMenuContext("halo /ui", 8)
+		expect(context.type).toBe("slash")
+		expect(context.query).toBe("/ui")
+		expect(context.index).toBe(5)
 	})
 })
