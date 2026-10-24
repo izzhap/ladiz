@@ -36,8 +36,9 @@ describe("isToolAllowedForMode", () => {
 	]
 
 	it("allows always available tools", () => {
-		expect(isToolAllowedForMode("ask_followup_question", "markdown-editor", customModes)).toBe(true)
 		expect(isToolAllowedForMode("attempt_completion", "markdown-editor", customModes)).toBe(true)
+		expect(isToolAllowedForMode("switch_mode", "markdown-editor", customModes)).toBe(true)
+		expect(isToolAllowedForMode("ask_followup_question", "markdown-editor", customModes)).toBe(false)
 	})
 
 	it("allows unrestricted tools", () => {
@@ -612,7 +613,7 @@ describe("FileRestrictionError", () => {
 				slug: "debug",
 				name: "🪲 Debug",
 				roleDefinition:
-					"You are Roo, an expert software debugger specializing in systematic problem diagnosis and resolution.",
+					"You are Ladiz, an expert software debugger specializing in systematic problem diagnosis and resolution.",
 				groups: ["read", "edit", "command", "mcp"],
 			})
 			expect(debugMode?.customInstructions).toContain(
@@ -633,7 +634,7 @@ describe("FileRestrictionError", () => {
 				slug: "debug",
 				name: "🪲 Debug",
 				roleDefinition:
-					"You are Roo, an expert software debugger specializing in systematic problem diagnosis and resolution.",
+					"You are Ladiz, an expert software debugger specializing in systematic problem diagnosis and resolution.",
 			})
 		})
 

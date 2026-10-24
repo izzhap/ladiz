@@ -315,7 +315,6 @@ export const TOOL_GROUPS: Record<ToolGroup, ToolGroupConfig> = {
 
 // Tools that are always available to all modes.
 export const ALWAYS_AVAILABLE_TOOLS: ToolName[] = [
-	"ask_followup_question",
 	"attempt_completion",
 	"switch_mode",
 	"new_task",

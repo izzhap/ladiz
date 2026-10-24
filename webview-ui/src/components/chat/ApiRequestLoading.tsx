@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { cn } from "@/lib/utils"
 
@@ -15,6 +15,12 @@ const TIPS_ID = [
 	"Gunakan mode Ask untuk berdiskusi & konsultasi tanpa mengubah file",
 	"Sertakan log error atau stack trace lengkap untuk diagnosis cepat",
 	"Gunakan @terminal untuk membagikan output terminal terkini ke AI",
+	"Gunakan mode Debug untuk diagnosis bug dan pelacakan akar masalah sistematis",
+	"Gunakan pintasan keyboard Enter untuk kirim, Shift+Enter untuk baris baru",
+	"Buka Settings untuk menyesuaikan provider AI, API key, dan model kustom",
+	"Manfaatkan Yolo mode untuk auto-approve tindakan berulang yang aman",
+	"Gunakan Todo Checklist untuk melacak progres tugas secara terstruktur",
+	"Ekstensi mendukung MCP servers untuk mengintegrasikan alat dan API eksternal",
 ]
 
 const TIPS_EN = [
@@ -30,47 +36,61 @@ const TIPS_EN = [
 	"Use Ask mode to discuss solutions without editing files",
 	"Include full error stack traces for faster root-cause fixes",
 	"Use @terminal to share recent terminal output with the AI",
+	"Switch to Debug mode for systematic diagnostic workflows",
+	"Press Enter to send message, Shift+Enter for a new line",
+	"Open Settings to configure custom AI providers and model keys",
+	"Enable Yolo mode to auto-approve repetitive safe tool actions",
+	"Use Todo Checklist to track task progress methodically",
+	"Connect MCP servers to integrate external developer tools and APIs",
 ]
+
+// Fisher-Yates shuffle helper
+function shuffleArray<T>(array: readonly T[]): T[] {
+	const copy = [...array]
+	for (let i = copy.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1))
+		;[copy[i], copy[j]] = [copy[j], copy[i]]
+	}
+	return copy
+}
 
 export function ApiRequestLoading() {
 	const { i18n } = useTranslation()
 	const isIndonesian = i18n.language?.toLowerCase().startsWith("id")
-	const tips = isIndonesian ? TIPS_ID : TIPS_EN
 
-	// Random initial tip index
-	const [tipIndex, setTipIndex] = useState(() => Math.floor(Math.random() * tips.length))
+	// Randomly shuffled tips list on mount
+	const shuffledTips = useMemo(() => {
+		const rawTips = isIndonesian ? TIPS_ID : TIPS_EN
+		return shuffleArray(rawTips)
+	}, [isIndonesian])
+
+	const [tipIndex, setTipIndex] = useState(0)
 	const [isVisible, setIsVisible] = useState(true)
 
 	useEffect(() => {
 		const interval = setInterval(() => {
 			setIsVisible(false)
 			setTimeout(() => {
-				setTipIndex((prev) => {
-					let next = Math.floor(Math.random() * tips.length)
-					if (next === prev && tips.length > 1) {
-						next = (prev + 1) % tips.length
-					}
-					return next
-				})
+				setTipIndex((prev) => (prev + 1) % shuffledTips.length)
 				setIsVisible(true)
 			}, 250)
 		}, 4500)
 
 		return () => clearInterval(interval)
-	}, [tips.length])
+	}, [shuffledTips.length])
 
 	return (
-		<div className="flex items-start gap-2 min-w-0 w-full py-0.5 leading-snug">
-			<span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 shrink-0 select-none mt-0.5">
+		<div className="flex items-center gap-2 min-w-0 w-full py-0.5">
+			<span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase rounded bg-vscode-badge-background text-vscode-badge-foreground shrink-0 select-none leading-none">
 				Tip
 			</span>
 			<p
 				className={cn(
-					"text-xs text-slate-300/85 font-normal line-clamp-2 leading-snug break-words transition-all duration-300 m-0 p-0 flex-1",
+					"text-xs text-vscode-descriptionForeground font-normal line-clamp-2 leading-normal break-words transition-all duration-300 m-0 p-0 flex-1",
 					isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-0.5",
 				)}
-				title={tips[tipIndex]}>
-				{tips[tipIndex]}
+				title={shuffledTips[tipIndex]}>
+				{shuffledTips[tipIndex]}
 			</p>
 		</div>
 	)

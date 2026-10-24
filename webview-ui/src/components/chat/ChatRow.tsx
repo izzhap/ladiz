@@ -894,38 +894,26 @@ export const ChatRowContent = ({
 						return <TimelineItem status="running" isLast={isLast} action={<ApiRequestLoading />} />
 					}
 
-					return (
-						<>
-							<TimelineItem
-								status="idle"
-								action={
-									<span className="text-vscode-descriptionForeground/70 text-[11px] font-medium">
-										{t("chat:apiRequest.title")}
-									</span>
+					const hasApiError =
+						((cost === null || cost === undefined) && apiRequestFailedMessage) ||
+						apiReqStreamingFailedMessage
+
+					if (hasApiError) {
+						return (
+							<ErrorRow
+								type="api_failure"
+								message={apiRequestFailedMessage || apiReqStreamingFailedMessage || ""}
+								docsURL={
+									apiRequestFailedMessage?.toLowerCase().includes("powershell")
+										? "https://github.com/cline/cline/wiki/TroubleShooting-%E2%80%90-%22PowerShell-is-not-recognized-as-an-internal-or-external-command%22"
+										: undefined
 								}
-								actions={
-									cost !== null && cost !== undefined && cost > 0 ? (
-										<span className="text-[10px] font-mono text-cyan-300 bg-blue-500/10 border border-blue-400/20 px-2 py-0.5 rounded-full">
-											${Number(cost || 0)?.toFixed(4)}
-										</span>
-									) : null
-								}
+								errorDetails={apiReqStreamingFailedMessage}
 							/>
-							{(((cost === null || cost === undefined) && apiRequestFailedMessage) ||
-								apiReqStreamingFailedMessage) && (
-								<ErrorRow
-									type="api_failure"
-									message={apiRequestFailedMessage || apiReqStreamingFailedMessage || ""}
-									docsURL={
-										apiRequestFailedMessage?.toLowerCase().includes("powershell")
-											? "https://github.com/cline/cline/wiki/TroubleShooting-%E2%80%90-%22PowerShell-is-not-recognized-as-an-internal-or-external-command%22"
-											: undefined
-									}
-									errorDetails={apiReqStreamingFailedMessage}
-								/>
-							)}
-						</>
-					)
+						)
+					}
+
+					return null
 				case "api_req_retry_delayed":
 					let body = t(`chat:apiRequest.failed`)
 					let retryInfo, rawError, code, docsURL

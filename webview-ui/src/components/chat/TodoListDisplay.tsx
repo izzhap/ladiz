@@ -1,22 +1,27 @@
 import { cn } from "@/lib/utils"
-import { t } from "i18next"
-import { ArrowRight, Check, ListChecks, SquareDashed } from "lucide-react"
+import { useTranslation } from "react-i18next"
+import { ChevronDown } from "lucide-react"
 import { useState, useRef, useMemo, useEffect } from "react"
 
 type TodoStatus = "completed" | "in_progress" | "pending"
 
-function getTodoIcon(status: TodoStatus | null) {
+function getStatusDot(status: TodoStatus | null) {
 	switch (status) {
 		case "completed":
-			return <Check className={`size-3 mt-1 shrink-0`} />
+			return <span className="size-1.5 rounded-full bg-emerald-500/80 mt-2 shrink-0" />
 		case "in_progress":
-			return <ArrowRight className="size-3 mt-1 shrink-0" />
+			return (
+				<span className="size-1.5 rounded-full bg-amber-400 mt-2 shrink-0 animate-pulse ring-2 ring-amber-400/20" />
+			)
 		default:
-			return <SquareDashed className="size-3 mt-1 shrink-0" />
+			return (
+				<span className="size-1.5 rounded-full border border-vscode-descriptionForeground/40 mt-2 shrink-0" />
+			)
 	}
 }
 
 export function TodoListDisplay({ todos }: { todos: any[] }) {
+	const { t } = useTranslation()
 	const [isCollapsed, setIsCollapsed] = useState(true)
 	const ulRef = useRef<HTMLUListElement>(null)
 	const itemRefs = useRef<(HTMLLIElement | null)[]>([])
@@ -26,12 +31,12 @@ export function TodoListDisplay({ todos }: { todos: any[] }) {
 		return todos.findIndex((todo: any) => todo.status !== "completed")
 	}, [todos])
 
-	// Find the most important todo to display when collapsed
 	const mostImportantTodo = useMemo(() => {
 		const inProgress = todos.find((todo: any) => todo.status === "in_progress")
 		if (inProgress) return inProgress
 		return todos.find((todo: any) => todo.status !== "completed")
 	}, [todos])
+
 	useEffect(() => {
 		if (isCollapsed) return
 		if (!ulRef.current) return
@@ -46,53 +51,69 @@ export function TodoListDisplay({ todos }: { todos: any[] }) {
 			ul.scrollTop = scrollTo
 		}
 	}, [todos, isCollapsed, scrollIndex])
+
 	if (!Array.isArray(todos) || todos.length === 0) return null
 
 	const totalCount = todos.length
 	const completedCount = todos.filter((todo: any) => todo.status === "completed").length
-
 	const allCompleted = completedCount === totalCount && totalCount > 0
 
 	return (
-		<div data-todo-list className="mt-1 -mx-2.5 border-t border-vscode-sideBar-background overflow-hidden">
+		<div data-todo-list className="mt-1.5 -mx-3.5 px-3.5 pt-2 border-t border-white/[0.06] overflow-hidden">
 			<div
 				className={cn(
-					"flex items-center gap-2 pt-2 px-2.5 cursor-pointer select-none",
+					"flex items-center gap-2 cursor-pointer select-none text-xs transition-colors",
 					mostImportantTodo?.status === "in_progress" && isCollapsed
-						? "text-vscode-charts-yellow"
-						: "text-vscode-foreground",
+						? "text-amber-300"
+						: "text-vscode-foreground hover:text-white",
 				)}
 				onClick={() => setIsCollapsed((v) => !v)}>
-				<ListChecks className="size-3 shrink-0" />
-				<span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+				<span
+					className={cn(
+						"size-2 rounded-full shrink-0 transition-colors",
+						allCompleted
+							? "bg-emerald-500"
+							: mostImportantTodo?.status === "in_progress"
+								? "bg-amber-400 animate-pulse"
+								: "bg-vscode-descriptionForeground/50",
+					)}
+				/>
+				<span className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap font-medium">
 					{isCollapsed
 						? allCompleted
 							? t("chat:todo.complete", { total: completedCount })
-							: mostImportantTodo?.content // show current todo while not done
+							: mostImportantTodo?.content
 						: t("chat:todo.partial", { completed: completedCount, total: totalCount })}
 				</span>
-				{isCollapsed && completedCount < totalCount && (
-					<div className="shrink-0 text-vscode-descriptionForeground text-xs">
-						{completedCount}/{totalCount}
-					</div>
-				)}
+				<span className="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.05] border border-white/10 text-vscode-descriptionForeground">
+					{completedCount}/{totalCount}
+				</span>
+				<ChevronDown
+					className={cn(
+						"size-3 text-vscode-descriptionForeground transition-transform duration-200",
+						!isCollapsed && "rotate-180",
+					)}
+				/>
 			</div>
-			{/* Inline expanded list */}
 			{!isCollapsed && (
-				<ul ref={ulRef} className="list-none max-h-[300px] overflow-y-auto mt-2 -mb-1 pb-0 px-2 cursor-default">
+				<ul
+					ref={ulRef}
+					className="list-none max-h-[260px] overflow-y-auto mt-2 mb-1 pb-1 space-y-1.5 px-0.5 cursor-default">
 					{todos.map((todo: any, idx: number) => {
-						const icon = getTodoIcon(todo.status as TodoStatus)
+						const status = (todo.status || "pending") as TodoStatus
 						return (
 							<li
 								key={todo.id || todo.content}
 								ref={(el) => (itemRefs.current[idx] = el)}
 								className={cn(
-									"font-light flex flex-row gap-2 items-start min-h-[20px] leading-normal mb-2",
-									todo.status === "in_progress" && "text-vscode-charts-yellow",
-									todo.status !== "in_progress" && todo.status !== "completed" && "opacity-60",
+									"text-xs flex flex-row gap-2.5 items-start min-h-[20px] leading-relaxed",
+									status === "in_progress" && "text-amber-300 font-medium",
+									status === "completed" &&
+										"text-vscode-descriptionForeground/60 line-through decoration-vscode-descriptionForeground/30",
+									status === "pending" && "text-vscode-foreground/80",
 								)}>
-								{icon}
-								<span>{todo.content}</span>
+								{getStatusDot(status)}
+								<span className="select-text break-words flex-1">{todo.content}</span>
 							</li>
 						)
 					})}

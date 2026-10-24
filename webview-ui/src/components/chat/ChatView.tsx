@@ -1567,9 +1567,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	}
 
 	const getPrimaryButtonClass = (text: string) => {
-		if (text === t("chat:startNewTask.title") || text === t("chat:resumeTask.title")) {
-			return "bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:via-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/35 border border-blue-400/30"
-		}
 		if (
 			text === t("chat:approve.title") ||
 			text === t("chat:save.title") ||
@@ -1578,15 +1575,12 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			text === t("chat:list-batch.approve.title") ||
 			text === t("chat:edit-batch.approve.title")
 		) {
-			return "bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/35 border border-emerald-400/30"
-		}
-		if (text === t("chat:runCommand.title") || text === t("chat:proceedWhileRunning.title")) {
-			return "bg-gradient-to-r from-indigo-600 to-violet-500 hover:from-indigo-500 hover:to-violet-400 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/35 border border-indigo-400/30"
+			return "bg-vscode-button-background hover:bg-vscode-button-hoverBackground text-vscode-button-foreground shadow-sm border border-vscode-button-border/40"
 		}
 		if (text === t("chat:retry.title")) {
-			return "bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 text-white shadow-lg shadow-amber-500/25 hover:shadow-amber-500/35 border border-amber-400/30"
+			return "bg-amber-600/90 hover:bg-amber-600 text-white shadow-sm border border-amber-500/40"
 		}
-		return "bg-blue-600 hover:bg-blue-500 text-white shadow-sm border border-blue-500/30"
+		return "bg-vscode-button-background hover:bg-vscode-button-hoverBackground text-vscode-button-foreground shadow-sm border border-vscode-button-border/40"
 	}
 
 	const getSecondaryButtonIcon = (text: string) => {
@@ -1615,9 +1609,9 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			text === t("chat:list-batch.deny.title") ||
 			text === t("chat:edit-batch.deny.title")
 		) {
-			return "bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 border border-rose-500/30 shadow-sm"
+			return "bg-vscode-button-secondaryBackground hover:bg-vscode-button-secondaryHoverBackground text-vscode-button-secondaryForeground border border-vscode-panel-border/40 shadow-sm"
 		}
-		return "bg-white/[0.06] hover:bg-white/10 text-slate-200 border border-white/10 shadow-sm"
+		return "bg-vscode-button-secondaryBackground hover:bg-vscode-button-secondaryHoverBackground text-vscode-button-secondaryForeground border border-vscode-panel-border/30 shadow-sm"
 	}
 
 	useImperativeHandle(ref, () => ({

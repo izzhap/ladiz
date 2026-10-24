@@ -1,12 +1,12 @@
 import { HTMLAttributes, useState } from "react"
-import { X, Zap, Terminal, Edit3, Eye, HelpCircle } from "lucide-react"
+import { X, Zap, Terminal, Edit3, Eye } from "lucide-react"
 import { Trans } from "react-i18next"
 import { Package } from "@roo/package"
 
 import { useAppTranslation } from "@/i18n/TranslationContext"
 import { VSCodeCheckbox } from "@vscode/webview-ui-toolkit/react"
 import { vscode } from "@/utils/vscode"
-import { Button, Input, Slider } from "@/components/ui"
+import { Button, Input } from "@/components/ui"
 import { cn } from "@/lib/utils"
 
 import { SetCachedStateField } from "./types"
@@ -65,7 +65,7 @@ export const AutoApproveSettings = ({
 	alwaysAllowSubtasks,
 	alwaysAllowExecute,
 	alwaysAllowFollowupQuestions,
-	followupAutoApproveTimeoutMs = 60000,
+	followupAutoApproveTimeoutMs: _followupAutoApproveTimeoutMs = 60000,
 	allowedCommands,
 	allowedMaxRequests,
 	allowedMaxCost,
@@ -90,7 +90,6 @@ export const AutoApproveSettings = ({
 		alwaysAllowModeSwitch,
 		alwaysAllowSubtasks,
 		alwaysAllowExecute,
-		alwaysAllowFollowupQuestions,
 	].filter(Boolean).length
 
 	const handleAddCommand = () => {
@@ -249,7 +248,6 @@ export const AutoApproveSettings = ({
 							alwaysAllowModeSwitch={alwaysAllowModeSwitch}
 							alwaysAllowSubtasks={alwaysAllowSubtasks}
 							alwaysAllowExecute={alwaysAllowExecute}
-							alwaysAllowFollowupQuestions={alwaysAllowFollowupQuestions}
 							onToggle={(key, value) => setCachedStateField(key, value)}
 						/>
 					</div>
@@ -333,40 +331,6 @@ export const AutoApproveSettings = ({
 								</VSCodeCheckbox>
 								<div className="text-vscode-descriptionForeground text-xs mt-1">
 									{t("settings:autoApprove.write.protected.description")}
-								</div>
-							</SearchableSetting>
-						</div>
-					)}
-
-					{/* Follow-up Questions Timeout */}
-					{alwaysAllowFollowupQuestions && (
-						<div className="rounded-xl p-3.5 bg-white/[0.02] border border-white/10 space-y-3">
-							<div className="flex items-center gap-2 font-semibold text-xs text-slate-200">
-								<HelpCircle className="size-4 text-amber-400" />
-								<span>{t("settings:autoApprove.followupQuestions.label")}</span>
-							</div>
-							<SearchableSetting
-								settingId="auto-approve-followup-timeout"
-								section="autoApprove"
-								label={t("settings:autoApprove.followupQuestions.timeoutLabel")}>
-								<div className="flex items-center gap-3">
-									<Slider
-										min={1000}
-										max={300000}
-										step={1000}
-										value={[followupAutoApproveTimeoutMs]}
-										onValueChange={([value]) =>
-											setCachedStateField("followupAutoApproveTimeoutMs", value)
-										}
-										data-testid="followup-timeout-slider"
-										className="flex-1"
-									/>
-									<span className="px-2 py-0.5 rounded bg-white/[0.05] border border-white/10 font-mono text-xs text-amber-300 min-w-14 text-center">
-										{followupAutoApproveTimeoutMs / 1000}s
-									</span>
-								</div>
-								<div className="text-vscode-descriptionForeground text-xs mt-1.5">
-									{t("settings:autoApprove.followupQuestions.timeoutLabel")}
 								</div>
 							</SearchableSetting>
 						</div>

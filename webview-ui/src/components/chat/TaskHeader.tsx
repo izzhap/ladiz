@@ -115,9 +115,9 @@ const TaskHeader = ({
 			<div
 				className={cn(
 					"px-3.5 pt-3 pb-2.5 flex flex-col gap-1.5 relative z-1 cursor-pointer",
-					"bg-[#0f1422] border border-blue-500/20 hover:border-blue-400/40",
-					"text-slate-200 hover:text-white",
-					"shadow-lg shadow-black/40 rounded-xl transition-all duration-200",
+					"bg-vscode-sideBar-background/95 border border-vscode-panel-border/70 hover:border-vscode-focusBorder/50",
+					"text-vscode-foreground",
+					"shadow-sm rounded-xl transition-all duration-200",
 					hasTodos && "border-b-0",
 				)}
 				onClick={(e) => {
@@ -154,10 +154,10 @@ const TaskHeader = ({
 								className={cn(
 									"px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold uppercase tracking-wider shrink-0 select-none border",
 									mode === "architect" || mode === "plan"
-										? "bg-purple-500/15 text-purple-300 border-purple-500/30 shadow-[0_0_8px_rgba(168,85,247,0.2)]"
+										? "bg-purple-500/15 text-purple-300 border-purple-500/30"
 										: mode === "ask"
 											? "bg-sky-500/15 text-sky-300 border-sky-500/30"
-											: "bg-blue-500/15 text-blue-300 border-blue-500/30",
+											: "bg-vscode-badge-background text-vscode-badge-foreground border-transparent",
 								)}>
 								{mode === "architect" ? "PLAN" : mode.toUpperCase()}
 							</span>
@@ -187,7 +187,7 @@ const TaskHeader = ({
 				</div>
 				{!isTaskExpanded && contextWindow > 0 && (
 					<div
-						className="flex items-center justify-between text-sm text-muted-foreground/70"
+						className="flex items-center justify-between text-xs text-vscode-descriptionForeground/80 pt-1.5 mt-0.5 border-t border-white/[0.04]"
 						onClick={(e) => e.stopPropagation()}>
 						<div className="flex items-center gap-2">
 							<StandardTooltip
@@ -243,8 +243,8 @@ const TaskHeader = ({
 												: 0
 										return (
 											<>
-												<CircularProgress percentage={percentage} />
-												<span>{percentage}%</span>
+												<CircularProgress percentage={percentage} size={13} strokeWidth={2} />
+												<span>{percentage}% context</span>
 											</>
 										)
 									})()}

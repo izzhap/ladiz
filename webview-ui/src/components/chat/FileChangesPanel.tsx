@@ -131,7 +131,7 @@ const FileChangesPanel = memo(({ clineMessages, className }: FileChangesPanelPro
 				) : null}
 			</CollapsibleTrigger>
 			<CollapsibleContent>
-				<div className="flex flex-col gap-1 pb-2 pl-6">
+				<div className="flex flex-col gap-1 pt-1 pb-1 pl-4">
 					{Array.from(byPath.entries()).map(([path, entries]) => {
 						const originalContent = entries[0].originalContent
 						const lookupPath = path.startsWith("./") ? path.slice(2) : path
@@ -150,7 +150,9 @@ const FileChangesPanel = memo(({ clineMessages, className }: FileChangesPanelPro
 						)
 						const isExpanded = expandedPaths.has(path)
 						return (
-							<div key={path} className="rounded border border-vscode-panel-border overflow-hidden">
+							<div
+								key={path}
+								className="rounded-lg border border-vscode-panel-border/50 bg-vscode-editor-background/50 hover:border-vscode-panel-border/80 transition-colors overflow-hidden">
 								<CodeAccordion
 									path={path}
 									code={displayDiff}
