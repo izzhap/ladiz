@@ -15,13 +15,14 @@ interface ReasoningBlockProps {
 	metadata?: any
 }
 
-export const ReasoningBlock = ({ content, isStreaming, isLast }: ReasoningBlockProps) => {
+export const ReasoningBlock = ({ content, ts, isStreaming, isLast }: ReasoningBlockProps) => {
 	const { t } = useTranslation()
 	const { reasoningBlockCollapsed } = useExtensionState()
 
 	const [isCollapsed, setIsCollapsed] = useState(reasoningBlockCollapsed)
 
-	const startTimeRef = useRef<number>(Date.now())
+	const isThinkingStreaming = isStreaming && isLast
+	const startTimeRef = useRef<number>(ts || Date.now())
 	const [elapsed, setElapsed] = useState<number>(0)
 	const contentRef = useRef<HTMLDivElement>(null)
 
@@ -30,13 +31,17 @@ export const ReasoningBlock = ({ content, isStreaming, isLast }: ReasoningBlockP
 	}, [reasoningBlockCollapsed])
 
 	useEffect(() => {
-		if (isLast && isStreaming) {
-			const tick = () => setElapsed(Date.now() - startTimeRef.current)
+		const startTime = ts || startTimeRef.current
+		if (isThinkingStreaming) {
+			const tick = () => setElapsed(Date.now() - startTime)
 			tick()
-			const id = setInterval(tick, 1000)
-			return () => clearInterval(id)
+			const id = setInterval(tick, 500)
+			return () => {
+				clearInterval(id)
+				setElapsed(Date.now() - startTime)
+			}
 		}
-	}, [isLast, isStreaming])
+	}, [isThinkingStreaming, ts])
 
 	const seconds = Math.floor(elapsed / 1000)
 	const secondsLabel = t("chat:reasoning.seconds", { count: seconds })
@@ -47,20 +52,20 @@ export const ReasoningBlock = ({ content, isStreaming, isLast }: ReasoningBlockP
 
 	const hasContent = (content?.trim()?.length ?? 0) > 0
 
-	const thinkingTitle = isStreaming
+	const thinkingTitle = isThinkingStreaming
 		? t("chat:reasoning.thinking")
 		: seconds > 0
 			? t("chat:reasoning.thought", { count: seconds, defaultValue: `Thought for ${seconds}s` })
-			: t("chat:reasoning.thinking")
+			: t("chat:reasoning.thought", { count: 1, defaultValue: `Thought for 1s` })
 
 	return (
 		<TimelineItem
-			status={isStreaming ? "running" : "info"}
+			status={isThinkingStreaming ? "running" : "info"}
 			customDot={
 				<div
 					className={cn(
 						"flex items-center justify-center size-3.5 rounded-full border transition-colors",
-						isStreaming
+						isThinkingStreaming
 							? "bg-indigo-500/20 text-indigo-400 border-indigo-500/40 animate-pulse"
 							: "bg-indigo-500/10 text-indigo-300 border-indigo-500/20",
 					)}>
@@ -69,7 +74,7 @@ export const ReasoningBlock = ({ content, isStreaming, isLast }: ReasoningBlockP
 			}
 			action={<span>{thinkingTitle}</span>}
 			target={
-				isStreaming && elapsed > 0 ? (
+				isThinkingStreaming && seconds > 0 ? (
 					<span className="text-[10px] text-indigo-300 font-mono">({secondsLabel})</span>
 				) : null
 			}
