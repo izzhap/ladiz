@@ -17,7 +17,7 @@ import RooHero from "./RooHero"
 
 const DEFAULT_WELCOME_API_CONFIGURATION: ProviderSettings = {
 	apiProvider: "ladiz",
-	ladizBaseUrl: "https://ladiz.web.id/v1",
+	ladizBaseUrl: "https://api.ladizai.com/v1",
 	apiModelId: ladizDefaultModelId,
 }
 

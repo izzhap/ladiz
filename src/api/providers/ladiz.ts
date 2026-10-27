@@ -9,7 +9,7 @@ import { getModelParams } from "../transform/model-params"
 import type { ApiHandlerCreateMessageMetadata } from "../index"
 import type { ApiStream } from "../transform/stream"
 
-export const LADIZ_DEFAULT_BASE_URL = "https://ladiz.web.id/v1"
+export const LADIZ_DEFAULT_BASE_URL = "https://api.ladizai.com/v1"
 
 export class LadizHandler extends OpenAiHandler {
 	constructor(options: ApiHandlerOptions) {

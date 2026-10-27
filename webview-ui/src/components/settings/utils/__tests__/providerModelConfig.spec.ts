@@ -11,6 +11,13 @@ import {
 
 describe("providerModelConfig", () => {
 	describe("PROVIDER_SERVICE_CONFIG", () => {
+		it("contains service config for ladiz", () => {
+			expect(PROVIDER_SERVICE_CONFIG.ladiz).toEqual({
+				serviceName: "Ladiz AI",
+				serviceUrl: "https://ladizai.com",
+			})
+		})
+
 		it("contains service config for anthropic", () => {
 			expect(PROVIDER_SERVICE_CONFIG.anthropic).toEqual({
 				serviceName: "Anthropic",

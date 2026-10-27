@@ -44,8 +44,8 @@ export const Ladiz = ({ apiConfiguration, setApiConfigurationField }: LadizProps
 			</div>
 
 			{!(apiConfiguration?.ladizApiKey || apiConfiguration?.openAiApiKey) && (
-				<VSCodeButtonLink href="https://ladiz.web.id/" appearance="secondary">
-					Dapatkan API Key di Ladiz.web.id
+				<VSCodeButtonLink href="https://ladizai.com/" appearance="secondary">
+					Dapatkan API Key di ladizai.com
 				</VSCodeButtonLink>
 			)}
 		</>

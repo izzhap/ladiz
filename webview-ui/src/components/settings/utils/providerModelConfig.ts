@@ -27,7 +27,7 @@ export interface ProviderServiceConfig {
 }
 
 export const PROVIDER_SERVICE_CONFIG: Partial<Record<ProviderName, ProviderServiceConfig>> = {
-	ladiz: { serviceName: "Ladiz AI", serviceUrl: "https://ladiz.web.id" },
+	ladiz: { serviceName: "Ladiz AI", serviceUrl: "https://ladizai.com" },
 	anthropic: { serviceName: "Anthropic", serviceUrl: "https://console.anthropic.com" },
 	bedrock: { serviceName: "Amazon Bedrock", serviceUrl: "https://aws.amazon.com/bedrock" },
 	deepseek: { serviceName: "DeepSeek", serviceUrl: "https://platform.deepseek.com" },

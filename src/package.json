@@ -3,7 +3,7 @@
 	"displayName": "%extension.displayName%",
 	"description": "%extension.description%",
 	"publisher": "ladiz",
-	"version": "3.53.7",
+	"version": "3.53.8",
 	"icon": "assets/icons/icon.png",
 	"galleryBanner": {
 		"color": "#0f172a",
@@ -20,7 +20,7 @@
 		"type": "git",
 		"url": "https://github.com/izzhap/ladiz.git"
 	},
-	"homepage": "https://ladiz.web.id",
+	"homepage": "https://ladizai.com",
 	"categories": [
 		"AI",
 		"Chat",

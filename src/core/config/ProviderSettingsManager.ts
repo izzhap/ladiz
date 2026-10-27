@@ -57,7 +57,7 @@ export class ProviderSettingsManager {
 			default: {
 				id: this.defaultConfigId,
 				apiProvider: "ladiz",
-				ladizBaseUrl: "https://ladiz.web.id/v1",
+				ladizBaseUrl: "https://api.ladizai.com/v1",
 				apiModelId: ladizDefaultModelId,
 			},
 		},

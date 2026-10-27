@@ -2146,7 +2146,7 @@ export class ClineProvider
 		}
 		if (providerSettings.apiProvider === "ladiz" && !providerSettings.apiModelId) {
 			providerSettings.apiModelId = ladizDefaultModelId
-			providerSettings.ladizBaseUrl = "https://ladiz.web.id/v1"
+			providerSettings.ladizBaseUrl = "https://api.ladizai.com/v1"
 		}
 		if (providerSettings.apiProvider === "openrouter" && !providerSettings.openRouterModelId) {
 			providerSettings.openRouterModelId = openRouterDefaultModelId
