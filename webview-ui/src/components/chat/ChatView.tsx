@@ -31,9 +31,8 @@ import { useAutoApprovalState } from "@/hooks/useAutoApprovalState"
 import { Plus, Check, Play, RotateCw, X, ArrowDown, History } from "lucide-react"
 import { cn } from "@/lib/utils"
 import RooHero from "@src/components/welcome/RooHero"
-import RooTips from "@src/components/welcome/RooTips"
 import { StandardTooltip } from "@src/components/ui"
-import HistoryPreview from "../history/HistoryPreview"
+import PromptSuggestions from "./PromptSuggestions"
 import Announcement from "./Announcement"
 import ChatRow from "./ChatRow"
 import WarningRow from "./WarningRow"
@@ -1713,13 +1712,15 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 					)}
 				</>
 			) : (
-				<div className="flex flex-col h-full min-h-0 overflow-y-auto px-4 py-4 gap-4">
-					<div className="w-full max-w-[560px] mx-auto flex flex-col gap-4">
-						<RooHero onVersionClick={() => setShowAnnouncementModal(true)} />
-						{/* Show RooTips when authenticated or when user is new */}
-						{taskHistory.length < 6 && <RooTips />}
-						{/* Everyone should see their task history if any */}
-						{taskHistory.length > 0 && <HistoryPreview />}
+				<div className="flex flex-col h-full min-h-0 overflow-y-auto px-4 py-6">
+					<div className="w-full max-w-[500px] mx-auto my-auto flex flex-col items-center justify-center gap-6">
+						<RooHero centered onVersionClick={() => setShowAnnouncementModal(true)} />
+						<PromptSuggestions
+							onSelectPrompt={(prompt) => {
+								setInputValue(prompt)
+								textAreaRef.current?.focus()
+							}}
+						/>
 					</div>
 				</div>
 			)}

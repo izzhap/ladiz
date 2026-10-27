@@ -1,20 +1,17 @@
 import type OpenAI from "openai"
 
-const ASK_FOLLOWUP_QUESTION_DESCRIPTION = `Ask the user a question to gather additional information needed to complete the task. Use when you need clarification or more details to proceed effectively.
+const ASK_FOLLOWUP_QUESTION_DESCRIPTION = `Ask the user a question to gather additional information or confirmation needed to complete the task. Do not create multiple-choice option buttons; always pass an empty list [] for follow_up so the user can type their answer directly.
 
 Parameters:
 - question: (required) A clear, specific question addressing the information needed
-- follow_up: (required) A list of suggested answers (pass empty array [] if asking for confirmation without multiple-choice options). Suggestions must be complete, actionable answers without placeholders. Optionally include mode to switch modes (code/architect/etc.)
+- follow_up: (required) Pass empty list [] (user types their answer directly)
 
-Example: Asking for file path
-{ "question": "What is the path to the frontend-config.json file?", "follow_up": [{ "text": "./src/frontend-config.json", "mode": null }, { "text": "./config/frontend-config.json", "mode": null }, { "text": "./frontend-config.json", "mode": null }] }
-
-Example: Asking with mode switch
-{ "question": "Would you like me to implement this feature?", "follow_up": [{ "text": "Yes, implement it now", "mode": "code" }, { "text": "No, just plan it out", "mode": "architect" }] }`
+Example: Asking user question
+{ "question": "What is the path to the frontend-config.json file?", "follow_up": [] }`
 
 const QUESTION_PARAMETER_DESCRIPTION = `Clear, specific question that captures the missing information you need`
 
-const FOLLOW_UP_PARAMETER_DESCRIPTION = `Required list of 2-4 suggested responses; each suggestion must be a complete, actionable answer and may include a mode switch`
+const FOLLOW_UP_PARAMETER_DESCRIPTION = `List of suggested responses (pass empty list [] so user types their response directly)`
 
 const FOLLOW_UP_TEXT_DESCRIPTION = `Suggested answer the user can pick`
 
