@@ -44,7 +44,7 @@ fi
 
 if [ "$SHOULD_PATCH" = true ]; then
     echo "[VERSION] Melakukan patch versi di src/package.json..."
-    node -e "const fs = require('fs'); const file = './src/package.json'; let c = fs.readFileSync(file, 'utf8'); let updated = false; c = c.replace(/\"version\":\s*\"(\d+)\.(\d+)\.(\d+)\"/, (_, maj, min, pat) => { updated = true; const next = maj + '.' + min + '.' + (Number(pat) + 1); console.log('[VERSION] Versi diperbarui: ' + maj + '.' + min + '.' + pat + ' -> ' + next); return '\"version\": \"' + next + '\"'; }); if (!updated) { console.error('Versi tidak ditemukan'); process.exit(1); }; fs.writeFileSync(file, c, 'utf8');"
+    npm --prefix src version patch --no-git-tag-version
 else
     echo "[VERSION] Patch versi dilewati (menggunakan versi saat ini)."
 fi
