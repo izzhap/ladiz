@@ -7,7 +7,7 @@ export const ladizDefaultModelId: LadizModelId = "ladiz-core"
 export const ladizModels: Record<LadizModelId, ModelInfo> = {
 	"ladiz-core": {
 		maxTokens: 64000,
-		contextWindow: 200000,
+		contextWindow: 1_000_000,
 		supportsImages: true,
 		supportsPromptCache: true,
 		inputPrice: 0,
@@ -16,7 +16,7 @@ export const ladizModels: Record<LadizModelId, ModelInfo> = {
 	},
 	"ladiz-swift": {
 		maxTokens: 32000,
-		contextWindow: 128000,
+		contextWindow: 1_000_000,
 		supportsImages: true,
 		supportsPromptCache: true,
 		inputPrice: 0,
@@ -25,7 +25,7 @@ export const ladizModels: Record<LadizModelId, ModelInfo> = {
 	},
 	"ladiz-apex": {
 		maxTokens: 128000,
-		contextWindow: 400000,
+		contextWindow: 1_000_000,
 		supportsImages: true,
 		supportsPromptCache: true,
 		inputPrice: 0,
