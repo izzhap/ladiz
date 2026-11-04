@@ -4,31 +4,43 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DIR"
 
-if [ -z "$1" ]; then
-    echo "[ERROR] Parameter wajib belum diisi!"
-    echo "Penggunaan: $0 <patch_version: true|false|ya|tidak|1|0>"
-    echo "Contoh:"
-    echo "  $0 true    # Patch versi sebelum build (misal 3.53.8 -> 3.53.9)"
-    echo "  $0 false   # Build tanpa mengubah versi"
-    exit 1
-fi
-
-PARAM="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
 SHOULD_PATCH=false
 
-case "$PARAM" in
-    true|1|ya|y|yes)
-        SHOULD_PATCH=true
-        ;;
-    false|0|tidak|t|no|n)
-        SHOULD_PATCH=false
-        ;;
-    *)
-        echo "[ERROR] Nilai parameter tidak valid: '$1'"
-        echo "Gunakan salah satu: true, false, 1, 0, ya, tidak"
-        exit 1
-        ;;
-esac
+if [ -n "$1" ]; then
+    PARAM="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
+    case "$PARAM" in
+        yes|y)
+            SHOULD_PATCH=true
+            ;;
+        no|n)
+            SHOULD_PATCH=false
+            ;;
+        *)
+            echo "[ERROR] Pilihan tidak valid: '$1'"
+            echo "Gunakan: yes atau no"
+            exit 1
+            ;;
+    esac
+else
+    echo "Apakah ingin melakukan patch versi sebelum build?"
+    PS3="Pilih opsi (1 atau 2): "
+    options=("Yes (Patch versi)" "No (Tanpa patch versi)")
+    select opt in "${options[@]}"; do
+        case $REPLY in
+            1)
+                SHOULD_PATCH=true
+                break
+                ;;
+            2)
+                SHOULD_PATCH=false
+                break
+                ;;
+            *)
+                echo "Pilihan tidak valid. Ketik 1 untuk Yes atau 2 untuk No."
+                ;;
+        esac
+    done
+fi
 
 if [ "$SHOULD_PATCH" = true ]; then
     echo "[VERSION] Melakukan patch versi di src/package.json..."
@@ -55,11 +67,14 @@ else
 fi
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    open "$TARGET"
+    open "$TARGET" 2>/dev/null || true
+elif command -v explorer.exe >/dev/null 2>&1; then
+    WIN_PATH="$(wslpath -w "$TARGET" 2>/dev/null || echo "$TARGET")"
+    explorer.exe "$WIN_PATH" 2>/dev/null || true
 elif command -v xdg-open >/dev/null 2>&1; then
-    xdg-open "$TARGET"
+    xdg-open "$TARGET" 2>/dev/null || true
 elif command -v gio >/dev/null 2>&1; then
-    gio open "$TARGET"
+    gio open "$TARGET" 2>/dev/null || true
 else
     echo "Folder output: $TARGET"
 fi

@@ -1,28 +1,25 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true, Position = 0, HelpMessage = "Wajib: patch versi? (1/0, true/false, ya/tidak)")]
-    [ValidateNotNullOrEmpty()]
-    $PatchVersion
+    [Parameter(Position = 0)]
+    [ValidateSet("yes", "no", "y", "n")]
+    [string]$PatchVersion
 )
 
 $ErrorActionPreference = "Stop"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $scriptDir
 
-# Normalisasi parameter boolean
-$shouldPatch = $false
-if ($PatchVersion -is [bool]) {
-    $shouldPatch = $PatchVersion
+if ([string]::IsNullOrWhiteSpace($PatchVersion)) {
+    $title = "Konfirmasi Patch Versi"
+    $message = "Apakah ingin melakukan patch versi sebelum build?"
+    $choices = @(
+        [System.Management.Automation.Host.ChoiceDescription]::new("&Yes", "Patch versi di src/package.json sebelum build."),
+        [System.Management.Automation.Host.ChoiceDescription]::new("&No", "Build langsung tanpa mengubah versi saat ini.")
+    )
+    $result = $Host.UI.PromptForChoice($title, $message, $choices, 1)
+    $shouldPatch = ($result -eq 0)
 } else {
-    $val = $PatchVersion.ToString().Trim().ToLower()
-    if ($val -in @("true", "1", "ya", "y", "yes")) {
-        $shouldPatch = $true
-    } elseif ($val -in @("false", "0", "tidak", "t", "no", "n")) {
-        $shouldPatch = $false
-    } else {
-        Write-Error "[ERROR] Parameter PatchVersion tidak valid ('$PatchVersion'). Gunakan: true/false, 1/0, ya/tidak."
-        exit 1
-    }
+    $shouldPatch = ($PatchVersion.ToLower() -in @("yes", "y"))
 }
 
 if ($shouldPatch) {
