@@ -52,12 +52,45 @@ fi
 echo "[BUILD] Memulai build Ladiz Extension..."
 
 if command -v pnpm >/dev/null 2>&1; then
+    pnpm build
     pnpm vsix
 else
+    npm run build
     npm run vsix
 fi
 
 BIN_PATH="$DIR/bin"
+PACKAGE_VERSION=$(node -p "require('./src/package.json').version" 2>/dev/null || true)
+TARGET_VSIX="$BIN_PATH/ladiz-$PACKAGE_VERSION.vsix"
+
+if [ -f "$TARGET_VSIX" ]; then
+    LATEST_VSIX="$TARGET_VSIX"
+else
+    LATEST_VSIX=$(ls -1t "$BIN_PATH"/*.vsix 2>/dev/null | head -n 1 || true)
+fi
+
+if [ -n "$LATEST_VSIX" ] && [ -f "$LATEST_VSIX" ]; then
+    echo "[INSTALL] Menginstall $(basename "$LATEST_VSIX") ke Antigravity IDE..."
+    IDE_CMD=""
+    if command -v antigravity-ide >/dev/null 2>&1; then
+        IDE_CMD="antigravity-ide"
+    elif command -v antigravity >/dev/null 2>&1; then
+        IDE_CMD="antigravity"
+    fi
+
+    if [ -n "$IDE_CMD" ]; then
+        INSTALL_PATH="$LATEST_VSIX"
+        if command -v wslpath >/dev/null 2>&1; then
+            INSTALL_PATH="$(wslpath -w "$LATEST_VSIX" 2>/dev/null || echo "$LATEST_VSIX")"
+        elif command -v cygpath >/dev/null 2>&1; then
+            INSTALL_PATH="$(cygpath -w "$LATEST_VSIX" 2>/dev/null || echo "$LATEST_VSIX")"
+        fi
+        "$IDE_CMD" --install-extension "$INSTALL_PATH" --force || echo "[WARN] Gagal install ekstensi ke Antigravity IDE."
+    else
+        echo "[WARN] Perintah antigravity-ide atau antigravity tidak ditemukan di PATH."
+    fi
+fi
+
 echo "[SUCCESS] Build selesai! Membuka folder output..."
 
 if [ -d "$BIN_PATH" ]; then
