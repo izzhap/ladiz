@@ -17,7 +17,6 @@ import {
 	getContextMenuOptions,
 	insertMention,
 	removeMention,
-	shouldShowContextMenu,
 	getContextMenuContext,
 	SearchResult,
 } from "@src/utils/context-mentions"

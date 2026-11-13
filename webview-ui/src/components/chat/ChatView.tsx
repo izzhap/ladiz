@@ -74,7 +74,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		clineMessages: messages,
 		currentTaskItem,
 		currentTaskTodos,
-		taskHistory,
 		apiConfiguration,
 		organizationAllowList,
 		mode,
