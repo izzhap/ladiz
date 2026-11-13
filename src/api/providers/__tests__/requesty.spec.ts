@@ -4,6 +4,7 @@ import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI from "openai"
 
 import { RequestyHandler } from "../requesty"
+import { DEFAULT_HEADERS } from "../constants"
 import { ApiHandlerOptions } from "../../../shared/api"
 import { Package } from "../../../shared/package"
 import { ApiHandlerCreateMessageMetadata } from "../../index"
@@ -57,11 +58,7 @@ describe("RequestyHandler", () => {
 		expect(OpenAI).toHaveBeenCalledWith({
 			baseURL: "https://router.requesty.ai/v1",
 			apiKey: mockOptions.requestyApiKey,
-			defaultHeaders: {
-				"HTTP-Referer": "https://github.com/RooVetGit/Roo-Cline",
-				"X-Title": "Roo Code",
-				"User-Agent": `RooCode/${Package.version}`,
-			},
+			defaultHeaders: DEFAULT_HEADERS,
 		})
 	})
 
@@ -72,11 +69,7 @@ describe("RequestyHandler", () => {
 		expect(OpenAI).toHaveBeenCalledWith({
 			baseURL: "https://custom.requesty.ai/v1",
 			apiKey: mockOptions.requestyApiKey,
-			defaultHeaders: {
-				"HTTP-Referer": "https://github.com/RooVetGit/Roo-Cline",
-				"X-Title": "Roo Code",
-				"User-Agent": `RooCode/${Package.version}`,
-			},
+			defaultHeaders: DEFAULT_HEADERS,
 		})
 	})
 

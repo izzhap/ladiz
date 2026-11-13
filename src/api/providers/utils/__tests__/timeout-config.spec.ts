@@ -2,6 +2,7 @@
 
 import { getApiRequestTimeout } from "../timeout-config"
 import * as vscode from "vscode"
+import { Package } from "../../../../shared/package"
 
 // Mock vscode
 vitest.mock("vscode", () => ({
@@ -18,9 +19,9 @@ describe("getApiRequestTimeout", () => {
 	beforeEach(() => {
 		vitest.clearAllMocks()
 		mockGetConfig = vitest.fn()
-		;(vscode.workspace.getConfiguration as any).mockReturnValue({
-			get: mockGetConfig,
-		})
+			; (vscode.workspace.getConfiguration as any).mockReturnValue({
+				get: mockGetConfig,
+			})
 	})
 
 	it("should return default timeout of 600000ms when no configuration is set", () => {
@@ -28,7 +29,7 @@ describe("getApiRequestTimeout", () => {
 
 		const timeout = getApiRequestTimeout()
 
-		expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("roo-cline")
+		expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith(Package.name)
 		expect(mockGetConfig).toHaveBeenCalledWith("apiRequestTimeout", 600)
 		expect(timeout).toBe(600000) // 600 seconds in milliseconds
 	})

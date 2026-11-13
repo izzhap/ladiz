@@ -132,7 +132,7 @@ describe("importExport", () => {
 
 	describe("importSettings", () => {
 		it("should return success: false when user cancels file selection", async () => {
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue(undefined)
+			; (vscode.window.showOpenDialog as Mock).mockResolvedValue(undefined)
 
 			const result = await importSettings({
 				providerSettingsManager: mockProviderSettingsManager,
@@ -154,7 +154,7 @@ describe("importExport", () => {
 		})
 
 		it("should import settings successfully from a valid file", async () => {
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+			; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 			const mockFileContent = JSON.stringify({
 				providerProfiles: {
@@ -164,7 +164,7 @@ describe("importExport", () => {
 				globalSettings: { mode: "code", autoApprovalEnabled: true },
 			})
 
-			;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+				; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 			const previousProviderProfiles = {
 				currentApiConfigName: "default",
@@ -209,7 +209,7 @@ describe("importExport", () => {
 		})
 
 		it("should return success: false when file content is invalid", async () => {
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+			; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 			// Invalid content (missing required fields).
 			const mockInvalidContent = JSON.stringify({
@@ -217,7 +217,7 @@ describe("importExport", () => {
 				globalSettings: {},
 			})
 
-			;(fs.readFile as Mock).mockResolvedValue(mockInvalidContent)
+				; (fs.readFile as Mock).mockResolvedValue(mockInvalidContent)
 
 			const result = await importSettings({
 				providerSettingsManager: mockProviderSettingsManager,
@@ -232,7 +232,7 @@ describe("importExport", () => {
 		})
 
 		it("should import settings successfully when globalSettings key is missing", async () => {
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+			; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 			const mockFileContent = JSON.stringify({
 				providerProfiles: {
@@ -241,7 +241,7 @@ describe("importExport", () => {
 				},
 			})
 
-			;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+				; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 			const previousProviderProfiles = {
 				currentApiConfigName: "default",
@@ -285,9 +285,9 @@ describe("importExport", () => {
 		})
 
 		it("should return success: false when file content is not valid JSON", async () => {
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+			; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 			const mockInvalidJson = "{ this is not valid JSON }"
-			;(fs.readFile as Mock).mockResolvedValue(mockInvalidJson)
+				; (fs.readFile as Mock).mockResolvedValue(mockInvalidJson)
 
 			const result = await importSettings({
 				providerSettingsManager: mockProviderSettingsManager,
@@ -303,8 +303,8 @@ describe("importExport", () => {
 		})
 
 		it("should return success: false when reading file fails", async () => {
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
-			;(fs.readFile as Mock).mockRejectedValue(new Error("File read error"))
+			; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (fs.readFile as Mock).mockRejectedValue(new Error("File read error"))
 
 			const result = await importSettings({
 				providerSettingsManager: mockProviderSettingsManager,
@@ -325,7 +325,7 @@ describe("importExport", () => {
 			const configs = await providerSettingsManager.listConfig()
 			expect(configs[0].name).toBe("default")
 			expect(configs[1].name).toBe("openai")
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 			const mockFileContent = JSON.stringify({
 				globalSettings: { mode: "code" },
@@ -335,7 +335,7 @@ describe("importExport", () => {
 				},
 			})
 
-			;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+				; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 			mockContextProxy.export.mockResolvedValue({ mode: "code" })
 
@@ -354,7 +354,7 @@ describe("importExport", () => {
 		})
 
 		it("should call updateCustomMode for each custom mode in config", async () => {
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+			; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 			const customModes = [
 				{ slug: "mode1", name: "Mode One", roleDefinition: "Custom role one", groups: [] },
@@ -366,7 +366,7 @@ describe("importExport", () => {
 				globalSettings: { mode: "code", customModes },
 			})
 
-			;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+				; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 			mockProviderSettingsManager.export.mockResolvedValue({
 				currentApiConfigName: "test",
@@ -399,8 +399,8 @@ describe("importExport", () => {
 				globalSettings: { mode: "code", autoApprovalEnabled: true },
 			})
 
-			;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
-			;(fs.access as Mock).mockResolvedValue(undefined) // File exists and is readable
+				; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
+				; (fs.access as Mock).mockResolvedValue(undefined) // File exists and is readable
 
 			const previousProviderProfiles = {
 				currentApiConfigName: "default",
@@ -441,7 +441,7 @@ describe("importExport", () => {
 			const filePath = "/nonexistent/path/settings.json"
 			const accessError = new Error("ENOENT: no such file or directory")
 
-			;(fs.access as Mock).mockRejectedValue(accessError)
+				; (fs.access as Mock).mockRejectedValue(accessError)
 
 			// Create a mock provider for the test
 			const mockProvider = {
@@ -474,7 +474,7 @@ describe("importExport", () => {
 		it("should handle import when reasoning budget fields are missing from config", async () => {
 			// This test verifies that import works correctly when reasoning budget fields are not present
 
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+			; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 			const mockFileContent = JSON.stringify({
 				providerProfiles: {
@@ -492,7 +492,7 @@ describe("importExport", () => {
 				globalSettings: { mode: "code", autoApprovalEnabled: true },
 			})
 
-			;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+				; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 			const previousProviderProfiles = {
 				currentApiConfigName: "default",
@@ -538,7 +538,7 @@ describe("importExport", () => {
 		describe("lenient import with invalid providers", () => {
 			it("should sanitize profiles with invalid apiProvider and return warnings", async () => {
 				// Test importing a profile with a removed/invalid provider like "claude-code"
-				;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 				const mockFileContent = JSON.stringify({
 					providerProfiles: {
@@ -559,7 +559,7 @@ describe("importExport", () => {
 					globalSettings: { mode: "code" },
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 				mockProviderSettingsManager.export.mockResolvedValue({
 					currentApiConfigName: "default",
@@ -598,7 +598,7 @@ describe("importExport", () => {
 			})
 
 			it("should skip completely invalid profiles and return warnings", async () => {
-				;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 				const mockFileContent = JSON.stringify({
 					providerProfiles: {
@@ -619,7 +619,7 @@ describe("importExport", () => {
 					globalSettings: { mode: "code" },
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 				mockProviderSettingsManager.export.mockResolvedValue({
 					currentApiConfigName: "default",
@@ -652,7 +652,7 @@ describe("importExport", () => {
 			})
 
 			it("should fail when NO valid profiles can be imported", async () => {
-				;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 				const mockFileContent = JSON.stringify({
 					providerProfiles: {
@@ -673,7 +673,7 @@ describe("importExport", () => {
 					globalSettings: { mode: "code" },
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 				mockProviderSettingsManager.export.mockResolvedValue({
 					currentApiConfigName: "default",
@@ -715,8 +715,8 @@ describe("importExport", () => {
 					globalSettings: { mode: "code" },
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
-				;(fs.access as Mock).mockResolvedValue(undefined)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.access as Mock).mockResolvedValue(undefined)
 
 				mockProviderSettingsManager.export.mockResolvedValue({
 					currentApiConfigName: "default",
@@ -735,7 +735,7 @@ describe("importExport", () => {
 				const showInfoMessageSpy = vi
 					.spyOn(vscode.window, "showInformationMessage")
 					.mockResolvedValue(undefined)
-				const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
+				const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => { })
 
 				await importSettingsWithFeedback(
 					{
@@ -771,7 +771,7 @@ describe("importExport", () => {
 			})
 
 			it("should handle multiple profiles with mixed valid and invalid providers", async () => {
-				;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 				const mockFileContent = JSON.stringify({
 					providerProfiles: {
@@ -802,7 +802,7 @@ describe("importExport", () => {
 					globalSettings: { mode: "code" },
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 				mockProviderSettingsManager.export.mockResolvedValue({
 					currentApiConfigName: "default",
@@ -839,7 +839,7 @@ describe("importExport", () => {
 			})
 
 			it("should fallback currentApiConfigName when the imported current profile was skipped", async () => {
-				;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 				// Import file where currentApiConfigName points to an invalid profile that gets skipped
 				const mockFileContent = JSON.stringify({
@@ -861,7 +861,7 @@ describe("importExport", () => {
 					globalSettings: { mode: "code" },
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 				mockProviderSettingsManager.export.mockResolvedValue({
 					currentApiConfigName: "default",
@@ -907,7 +907,7 @@ describe("importExport", () => {
 			})
 
 			it("should keep previous currentApiConfigName when all imported profiles are invalid", async () => {
-				;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 				// All profiles in the import are invalid, but we have existing profiles
 				const mockFileContent = JSON.stringify({
@@ -923,7 +923,7 @@ describe("importExport", () => {
 					globalSettings: { mode: "code" },
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 				mockProviderSettingsManager.export.mockResolvedValue({
 					currentApiConfigName: "existing-profile",
@@ -969,8 +969,8 @@ describe("importExport", () => {
 					globalSettings: { mode: "code" },
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
-				;(fs.access as Mock).mockResolvedValue(undefined)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.access as Mock).mockResolvedValue(undefined)
 
 				mockProviderSettingsManager.export.mockResolvedValue({
 					currentApiConfigName: "default",
@@ -986,7 +986,7 @@ describe("importExport", () => {
 				}
 
 				const showWarningMessageSpy = vi.spyOn(vscode.window, "showWarningMessage").mockResolvedValue(undefined)
-				const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
+				const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => { })
 
 				await importSettingsWithFeedback(
 					{
@@ -1019,7 +1019,7 @@ describe("importExport", () => {
 
 	describe("exportSettings", () => {
 		it("should not export settings when user cancels file selection", async () => {
-			;(vscode.window.showSaveDialog as Mock).mockResolvedValue(undefined)
+			; (vscode.window.showSaveDialog as Mock).mockResolvedValue(undefined)
 
 			await exportSettings({
 				providerSettingsManager: mockProviderSettingsManager,
@@ -1037,7 +1037,7 @@ describe("importExport", () => {
 		})
 
 		it("should export settings to the selected file location", async () => {
-			;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+			; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 				fsPath: "/mock/path/roo-code-settings.json",
 			})
 
@@ -1072,7 +1072,7 @@ describe("importExport", () => {
 		})
 
 		it("should include globalSettings when allowedMaxRequests is null", async () => {
-			;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+			; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 				fsPath: "/mock/path/roo-code-settings.json",
 			})
 
@@ -1104,7 +1104,7 @@ describe("importExport", () => {
 		})
 
 		it("should handle errors during the export process", async () => {
-			;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+			; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 				fsPath: "/mock/path/roo-code-settings.json",
 			})
 
@@ -1115,8 +1115,8 @@ describe("importExport", () => {
 			})
 
 			mockContextProxy.export.mockResolvedValue({ mode: "code" })
-			// Simulate an error during the safeWriteJson operation
-			;(safeWriteJson as Mock).mockRejectedValueOnce(new Error("Safe write error"))
+				// Simulate an error during the safeWriteJson operation
+				; (safeWriteJson as Mock).mockRejectedValueOnce(new Error("Safe write error"))
 
 			await exportSettings({
 				providerSettingsManager: mockProviderSettingsManager,
@@ -1134,7 +1134,7 @@ describe("importExport", () => {
 		})
 
 		it("should handle errors during directory creation", async () => {
-			;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+			; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 				fsPath: "/mock/path/roo-code-settings.json",
 			})
 
@@ -1145,7 +1145,7 @@ describe("importExport", () => {
 			})
 
 			mockContextProxy.export.mockResolvedValue({ mode: "code" })
-			;(fs.mkdir as Mock).mockRejectedValue(new Error("Directory creation error"))
+				; (fs.mkdir as Mock).mockRejectedValue(new Error("Directory creation error"))
 
 			await exportSettings({
 				providerSettingsManager: mockProviderSettingsManager,
@@ -1160,7 +1160,7 @@ describe("importExport", () => {
 		})
 
 		it("should use the correct default save location", async () => {
-			;(vscode.window.showSaveDialog as Mock).mockResolvedValue(undefined)
+			; (vscode.window.showSaveDialog as Mock).mockResolvedValue(undefined)
 
 			await exportSettings({
 				providerSettingsManager: mockProviderSettingsManager,
@@ -1172,12 +1172,12 @@ describe("importExport", () => {
 				defaultUri: expect.anything(),
 			})
 
-			expect(vscode.Uri.file).toHaveBeenCalledWith(path.join("/mock/home", "Downloads", "roo-code-settings.json"))
+			expect(vscode.Uri.file).toHaveBeenCalledWith(path.join("/mock/home", "Downloads", "ladiz-settings.json"))
 		})
 
 		describe("codebase indexing export", () => {
 			it("should export correct base URL for OpenAI Compatible provider", async () => {
-				;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+				; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 					fsPath: "/mock/path/roo-code-settings.json",
 				})
 
@@ -1213,7 +1213,7 @@ describe("importExport", () => {
 
 				mockProviderSettingsManager.export.mockResolvedValue(mockProviderProfiles)
 				mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-				;(fs.mkdir as Mock).mockResolvedValue(undefined)
+					; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 				await exportSettings({
 					providerSettingsManager: mockProviderSettingsManager,
@@ -1227,7 +1227,7 @@ describe("importExport", () => {
 			})
 
 			it("should export model dimension for OpenAI Compatible provider", async () => {
-				;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+				; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 					fsPath: "/mock/path/roo-code-settings.json",
 				})
 
@@ -1258,7 +1258,7 @@ describe("importExport", () => {
 
 				mockProviderSettingsManager.export.mockResolvedValue(mockProviderProfiles)
 				mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-				;(fs.mkdir as Mock).mockResolvedValue(undefined)
+					; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 				await exportSettings({
 					providerSettingsManager: mockProviderSettingsManager,
@@ -1274,7 +1274,7 @@ describe("importExport", () => {
 			})
 
 			it("should not mix settings between different providers", async () => {
-				;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+				; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 					fsPath: "/mock/path/roo-code-settings.json",
 				})
 
@@ -1314,7 +1314,7 @@ describe("importExport", () => {
 
 				mockProviderSettingsManager.export.mockResolvedValue(mockProviderProfiles)
 				mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-				;(fs.mkdir as Mock).mockResolvedValue(undefined)
+					; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 				await exportSettings({
 					providerSettingsManager: mockProviderSettingsManager,
@@ -1334,7 +1334,7 @@ describe("importExport", () => {
 			})
 
 			it("should handle missing provider-specific settings gracefully", async () => {
-				;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+				; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 					fsPath: "/mock/path/roo-code-settings.json",
 				})
 
@@ -1365,7 +1365,7 @@ describe("importExport", () => {
 
 				mockProviderSettingsManager.export.mockResolvedValue(mockProviderProfiles)
 				mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-				;(fs.mkdir as Mock).mockResolvedValue(undefined)
+					; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 				await exportSettings({
 					providerSettingsManager: mockProviderSettingsManager,
@@ -1380,7 +1380,7 @@ describe("importExport", () => {
 			})
 
 			it("should maintain backward compatibility with existing exports", async () => {
-				;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+				; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 					fsPath: "/mock/path/roo-code-settings.json",
 				})
 
@@ -1408,7 +1408,7 @@ describe("importExport", () => {
 
 				mockProviderSettingsManager.export.mockResolvedValue(mockProviderProfiles)
 				mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-				;(fs.mkdir as Mock).mockResolvedValue(undefined)
+					; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 				await exportSettings({
 					providerSettingsManager: mockProviderSettingsManager,
@@ -1423,7 +1423,7 @@ describe("importExport", () => {
 			})
 
 			it("should handle missing current provider gracefully", async () => {
-				;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+				; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 					fsPath: "/mock/path/roo-code-settings.json",
 				})
 
@@ -1453,7 +1453,7 @@ describe("importExport", () => {
 
 				mockProviderSettingsManager.export.mockResolvedValue(mockProviderProfiles)
 				mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-				;(fs.mkdir as Mock).mockResolvedValue(undefined)
+					; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 				await exportSettings({
 					providerSettingsManager: mockProviderSettingsManager,
@@ -1470,7 +1470,7 @@ describe("importExport", () => {
 
 		describe("import with OpenAI Compatible codebase indexing settings", () => {
 			it("should properly import OpenAI Compatible settings in codebaseIndexConfig", async () => {
-				;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 				const mockFileContent = JSON.stringify({
 					providerProfiles: {
@@ -1500,7 +1500,7 @@ describe("importExport", () => {
 					},
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 				const previousProviderProfiles = {
 					currentApiConfigName: "default",
@@ -1545,7 +1545,7 @@ describe("importExport", () => {
 			})
 
 			it("should handle missing OpenAI Compatible settings gracefully during import", async () => {
-				;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 				const mockFileContent = JSON.stringify({
 					providerProfiles: {
@@ -1569,7 +1569,7 @@ describe("importExport", () => {
 					},
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 				const previousProviderProfiles = {
 					currentApiConfigName: "default",
@@ -1596,7 +1596,7 @@ describe("importExport", () => {
 			})
 
 			it("should not modify provider settings for non-openai-compatible providers during import", async () => {
-				;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
 
 				const mockFileContent = JSON.stringify({
 					providerProfiles: {
@@ -1621,7 +1621,7 @@ describe("importExport", () => {
 					},
 				})
 
-				;(fs.readFile as Mock).mockResolvedValue(mockFileContent)
+					; (fs.readFile as Mock).mockResolvedValue(mockFileContent)
 
 				const previousProviderProfiles = {
 					currentApiConfigName: "default",
@@ -1682,14 +1682,14 @@ describe("importExport", () => {
 				},
 			}
 
-			// Step 2: Mock export operation
-			;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
-				fsPath: "/mock/path/test-settings.json",
-			})
+				// Step 2: Mock export operation
+				; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
+					fsPath: "/mock/path/test-settings.json",
+				})
 
 			mockProviderSettingsManager.export.mockResolvedValue(mockProviderProfiles)
 			mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-			;(fs.mkdir as Mock).mockResolvedValue(undefined)
+				; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 			// Step 3: Export settings
 			await exportSettings({
@@ -1707,9 +1707,9 @@ describe("importExport", () => {
 			const exportedData = (safeWriteJson as Mock).mock.calls[0][1]
 			const exportedFileContent = JSON.stringify(exportedData)
 
-			// Step 6: Mock import operation
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/test-settings.json" }])
-			;(fs.readFile as Mock).mockResolvedValue(exportedFileContent)
+				// Step 6: Mock import operation
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/test-settings.json" }])
+				; (fs.readFile as Mock).mockResolvedValue(exportedFileContent)
 
 			// Reset mocks for import
 			vi.clearAllMocks()
@@ -1775,14 +1775,14 @@ describe("importExport", () => {
 				},
 			}
 
-			// Mock export operation
-			;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
-				fsPath: "/mock/path/test-settings.json",
-			})
+				// Mock export operation
+				; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
+					fsPath: "/mock/path/test-settings.json",
+				})
 
 			mockProviderSettingsManager.export.mockResolvedValue(mockProviderProfiles)
 			mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-			;(fs.mkdir as Mock).mockResolvedValue(undefined)
+				; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 			// Export settings
 			await exportSettings({
@@ -1796,8 +1796,8 @@ describe("importExport", () => {
 
 			// Test import roundtrip
 			const exportedFileContent = JSON.stringify(exportedData)
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/test-settings.json" }])
-			;(fs.readFile as Mock).mockResolvedValue(exportedFileContent)
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/test-settings.json" }])
+				; (fs.readFile as Mock).mockResolvedValue(exportedFileContent)
 
 			// Reset mocks for import
 			vi.clearAllMocks()
@@ -1858,14 +1858,14 @@ describe("importExport", () => {
 				return undefined
 			})
 
-			// Mock export operation
-			;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
-				fsPath: "/mock/path/test-settings.json",
-			})
+				// Mock export operation
+				; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
+					fsPath: "/mock/path/test-settings.json",
+				})
 
 			mockProviderSettingsManager.export.mockResolvedValue(mockProviderProfiles)
 			mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-			;(fs.mkdir as Mock).mockResolvedValue(undefined)
+				; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 			// Export settings
 			await exportSettings({
@@ -1923,9 +1923,9 @@ describe("importExport", () => {
 				},
 			}
 
-			// Step 3: Mock import operation
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
-			;(fs.readFile as Mock).mockResolvedValue(JSON.stringify(exportedSettings))
+				// Step 3: Mock import operation
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (fs.readFile as Mock).mockResolvedValue(JSON.stringify(exportedSettings))
 
 			mockProviderSettingsManager.export.mockResolvedValue(currentProviderProfiles)
 			mockProviderSettingsManager.listConfig.mockResolvedValue([
@@ -2003,8 +2003,8 @@ describe("importExport", () => {
 				},
 			}
 
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
-			;(fs.readFile as Mock).mockResolvedValue(JSON.stringify(exportedSettings))
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (fs.readFile as Mock).mockResolvedValue(JSON.stringify(exportedSettings))
 
 			mockProviderSettingsManager.export.mockResolvedValue(currentProviderProfiles)
 			mockProviderSettingsManager.listConfig.mockResolvedValue([
@@ -2088,8 +2088,8 @@ describe("importExport", () => {
 				},
 			}
 
-			;(vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
-			;(fs.readFile as Mock).mockResolvedValue(JSON.stringify(exportedSettings))
+				; (vscode.window.showOpenDialog as Mock).mockResolvedValue([{ fsPath: "/mock/path/settings.json" }])
+				; (fs.readFile as Mock).mockResolvedValue(JSON.stringify(exportedSettings))
 
 			mockProviderSettingsManager.export.mockResolvedValue(currentProviderProfiles)
 			mockProviderSettingsManager.listConfig.mockResolvedValue([
@@ -2133,7 +2133,7 @@ describe("importExport", () => {
 			// This test reproduces the bug where codebaseIndexEmbedderModelDimension is missing from exported JSON
 			// when the OpenAI Compatible settings are stored in global state via contextProxy
 
-			;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+			; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 				fsPath: "/mock/path/roo-code-settings.json",
 			})
 
@@ -2169,7 +2169,7 @@ describe("importExport", () => {
 
 			mockProviderSettingsManager.export.mockResolvedValue(mockProviderProfiles)
 			mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-			;(fs.mkdir as Mock).mockResolvedValue(undefined)
+				; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 			await exportSettings({
 				providerSettingsManager: mockProviderSettingsManager,
@@ -2213,7 +2213,7 @@ describe("importExport", () => {
 				// This test verifies that token fields are excluded when model doesn't support reasoning budget
 				// Using deepseek provider which uses apiModelId and has supportsReasoningBudget: false
 
-				;(vscode.window.showSaveDialog as Mock).mockResolvedValue({
+				; (vscode.window.showSaveDialog as Mock).mockResolvedValue({
 					fsPath: "/mock/path/roo-code-settings.json",
 				})
 
@@ -2242,7 +2242,7 @@ describe("importExport", () => {
 				}
 
 				mockContextProxy.export.mockResolvedValue(mockGlobalSettings)
-				;(fs.mkdir as Mock).mockResolvedValue(undefined)
+					; (fs.mkdir as Mock).mockResolvedValue(undefined)
 
 				await exportSettings({
 					providerSettingsManager: realProviderSettingsManager,

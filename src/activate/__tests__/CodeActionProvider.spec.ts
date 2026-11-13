@@ -2,6 +2,7 @@ import type { Mock } from "vitest"
 import * as vscode from "vscode"
 
 import { EditorUtils } from "../../integrations/editor/EditorUtils"
+import { Package } from "../../shared/package"
 
 import { CodeActionProvider, TITLES } from "../CodeActionProvider"
 
@@ -60,13 +61,13 @@ describe("CodeActionProvider", () => {
 		mockRange = new vscode.Range(0, 0, 0, 10)
 
 		mockContext = { diagnostics: [] }
-		;(EditorUtils.getEffectiveRange as Mock).mockReturnValue({
-			range: mockRange,
-			text: "test code",
-		})
-		;(EditorUtils.getFilePath as Mock).mockReturnValue("/test/file.ts")
-		;(EditorUtils.hasIntersectingRange as Mock).mockReturnValue(true)
-		;(EditorUtils.createDiagnosticData as Mock).mockImplementation((d) => d)
+			; (EditorUtils.getEffectiveRange as Mock).mockReturnValue({
+				range: mockRange,
+				text: "test code",
+			})
+			; (EditorUtils.getFilePath as Mock).mockReturnValue("/test/file.ts")
+			; (EditorUtils.hasIntersectingRange as Mock).mockReturnValue(true)
+			; (EditorUtils.createDiagnosticData as Mock).mockImplementation((d) => d)
 	})
 
 	describe("provideCodeActions", () => {
@@ -92,7 +93,7 @@ describe("CodeActionProvider", () => {
 		})
 
 		it("should return empty array when no effective range", () => {
-			;(EditorUtils.getEffectiveRange as Mock).mockReturnValue(null)
+			; (EditorUtils.getEffectiveRange as Mock).mockReturnValue(null)
 
 			const actions = provider.provideCodeActions(mockDocument, mockRange, mockContext)
 
@@ -105,27 +106,27 @@ describe("CodeActionProvider", () => {
 			const mockGetConfiguration = vi.fn().mockReturnValue({
 				get: mockGet,
 			})
-			;(vscode.workspace.getConfiguration as Mock).mockReturnValue(mockGetConfiguration())
+				; (vscode.workspace.getConfiguration as Mock).mockReturnValue(mockGetConfiguration())
 
 			const actions = provider.provideCodeActions(mockDocument, mockRange, mockContext)
 
 			expect(actions).toEqual([])
-			expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith("roo-cline")
+			expect(vscode.workspace.getConfiguration).toHaveBeenCalledWith(Package.name)
 			expect(mockGet).toHaveBeenCalledWith("enableCodeActions", true)
 		})
 
 		it("should handle errors gracefully", () => {
-			const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+			const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => { })
 
 			// Reset the workspace mock to return true for enableCodeActions
 			const mockGet = vi.fn().mockReturnValue(true)
 			const mockGetConfiguration = vi.fn().mockReturnValue({
 				get: mockGet,
 			})
-			;(vscode.workspace.getConfiguration as Mock).mockReturnValue(mockGetConfiguration())
-			;(EditorUtils.getEffectiveRange as Mock).mockImplementation(() => {
-				throw new Error("Test error")
-			})
+				; (vscode.workspace.getConfiguration as Mock).mockReturnValue(mockGetConfiguration())
+				; (EditorUtils.getEffectiveRange as Mock).mockImplementation(() => {
+					throw new Error("Test error")
+				})
 
 			const actions = provider.provideCodeActions(mockDocument, mockRange, mockContext)
 

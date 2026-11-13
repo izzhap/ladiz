@@ -1,6 +1,7 @@
 // npx vitest run api/providers/__tests__/openai.spec.ts
 
 import { OpenAiHandler, getOpenAiModels } from "../openai"
+import { DEFAULT_HEADERS } from "../constants"
 import { ApiHandlerOptions } from "../../../shared/api"
 import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI from "openai"
@@ -110,11 +111,7 @@ describe("OpenAiHandler", () => {
 			expect(vi.mocked(OpenAI)).toHaveBeenCalledWith({
 				baseURL: expect.any(String),
 				apiKey: expect.any(String),
-				defaultHeaders: {
-					"HTTP-Referer": "https://github.com/RooVetGit/Roo-Cline",
-					"X-Title": "Roo Code",
-					"User-Agent": `RooCode/${Package.version}`,
-				},
+				defaultHeaders: DEFAULT_HEADERS,
 				timeout: expect.any(Number),
 			})
 		})
@@ -527,7 +524,7 @@ describe("OpenAiHandler", () => {
 		it("should handle rate limiting", async () => {
 			const rateLimitError = new Error("Rate limit exceeded")
 			rateLimitError.name = "Error"
-			;(rateLimitError as any).status = 429
+				; (rateLimitError as any).status = 429
 			mockCreate.mockRejectedValueOnce(rateLimitError)
 
 			const stream = handler.createMessage("system prompt", testMessages)

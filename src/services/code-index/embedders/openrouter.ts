@@ -74,8 +74,8 @@ export class OpenRouterEmbedder implements IEmbedder {
 				baseURL: this.baseUrl,
 				apiKey: apiKey,
 				defaultHeaders: {
-					"HTTP-Referer": "https://github.com/RooCodeInc/Roo-Code",
-					"X-Title": "Roo Code",
+					"HTTP-Referer": "https://github.com/izzhap/ladiz",
+					"X-Title": "Ladiz",
 				},
 			})
 		} catch (error) {
@@ -100,25 +100,25 @@ export class OpenRouterEmbedder implements IEmbedder {
 		const queryPrefix = getModelQueryPrefix("openrouter", modelToUse)
 		const processedTexts = queryPrefix
 			? texts.map((text, index) => {
-					// Prevent double-prefixing
-					if (text.startsWith(queryPrefix)) {
-						return text
-					}
-					const prefixedText = `${queryPrefix}${text}`
-					const estimatedTokens = Math.ceil(prefixedText.length / 4)
-					if (estimatedTokens > MAX_ITEM_TOKENS) {
-						console.warn(
-							t("embeddings:textWithPrefixExceedsTokenLimit", {
-								index,
-								estimatedTokens,
-								maxTokens: MAX_ITEM_TOKENS,
-							}),
-						)
-						// Return original text if adding prefix would exceed limit
-						return text
-					}
-					return prefixedText
-				})
+				// Prevent double-prefixing
+				if (text.startsWith(queryPrefix)) {
+					return text
+				}
+				const prefixedText = `${queryPrefix}${text}`
+				const estimatedTokens = Math.ceil(prefixedText.length / 4)
+				if (estimatedTokens > MAX_ITEM_TOKENS) {
+					console.warn(
+						t("embeddings:textWithPrefixExceedsTokenLimit", {
+							index,
+							estimatedTokens,
+							maxTokens: MAX_ITEM_TOKENS,
+						}),
+					)
+					// Return original text if adding prefix would exceed limit
+					return text
+				}
+				return prefixedText
+			})
 			: texts
 
 		const allEmbeddings: number[][] = []

@@ -141,7 +141,7 @@ export abstract class ShadowCheckpointService extends EventEmitter {
 
 			throw new Error(
 				`Checkpoints are disabled because a nested git repository was detected at: ${relativePath}. ` +
-					"Please remove or relocate nested git repositories to use the checkpoints feature.",
+				"Please remove or relocate nested git repositories to use the checkpoints feature.",
 			)
 		}
 
@@ -176,7 +176,7 @@ export abstract class ShadowCheckpointService extends EventEmitter {
 			await git.init({ "--template": "" })
 			await git.addConfig("core.worktree", this.workspaceDir) // Sets the working tree to the current workspace.
 			await git.addConfig("commit.gpgSign", "false") // Disable commit signing for shadow repo.
-			await git.addConfig("user.name", "Roo Code")
+			await git.addConfig("user.name", "Ladiz")
 			await git.addConfig("user.email", "noreply@example.com")
 			await this.writeExcludeFile()
 			await this.stageAll(git)

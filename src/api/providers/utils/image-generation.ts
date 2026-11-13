@@ -70,8 +70,8 @@ export async function generateImageWithProvider(options: ImageGenerationOptions)
 			headers: {
 				Authorization: `Bearer ${authToken}`,
 				"Content-Type": "application/json",
-				"HTTP-Referer": "https://github.com/RooVetGit/Roo-Code",
-				"X-Title": "Roo Code",
+				"HTTP-Referer": "https://github.com/izzhap/ladiz",
+				"X-Title": "Ladiz",
 			},
 			body: JSON.stringify({
 				model,
@@ -80,17 +80,17 @@ export async function generateImageWithProvider(options: ImageGenerationOptions)
 						role: "user",
 						content: inputImage
 							? [
-									{
-										type: "text",
-										text: prompt,
+								{
+									type: "text",
+									text: prompt,
+								},
+								{
+									type: "image_url",
+									image_url: {
+										url: inputImage,
 									},
-									{
-										type: "image_url",
-										image_url: {
-											url: inputImage,
-										},
-									},
-								]
+								},
+							]
 							: prompt,
 					},
 				],
@@ -216,8 +216,8 @@ export async function generateImageWithImagesApi(options: ImagesApiOptions): Pro
 			headers: {
 				Authorization: `Bearer ${authToken}`,
 				"Content-Type": "application/json",
-				"HTTP-Referer": "https://github.com/RooVetGit/Roo-Code",
-				"X-Title": "Roo Code",
+				"HTTP-Referer": "https://github.com/izzhap/ladiz",
+				"X-Title": "Ladiz",
 			},
 			body: JSON.stringify(requestBody),
 		}

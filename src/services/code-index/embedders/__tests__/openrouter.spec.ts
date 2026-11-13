@@ -33,8 +33,8 @@ describe("OpenRouterEmbedder", () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks()
-		vi.spyOn(console, "warn").mockImplementation(() => {})
-		vi.spyOn(console, "error").mockImplementation(() => {})
+		vi.spyOn(console, "warn").mockImplementation(() => { })
+		vi.spyOn(console, "error").mockImplementation(() => { })
 
 		// Setup mock OpenAI instance
 		mockEmbeddingsCreate = vi.fn()
@@ -80,8 +80,8 @@ describe("OpenRouterEmbedder", () => {
 				baseURL: "https://openrouter.ai/api/v1",
 				apiKey: mockApiKey,
 				defaultHeaders: {
-					"HTTP-Referer": "https://github.com/RooCodeInc/Roo-Code",
-					"X-Title": "Roo Code",
+					"HTTP-Referer": "https://github.com/izzhap/ladiz",
+					"X-Title": "Ladiz",
 				},
 			})
 		})
@@ -316,7 +316,7 @@ describe("OpenRouterEmbedder", () => {
 
 		it("should handle validation failure", async () => {
 			const authError = new Error("Invalid API key")
-			;(authError as any).status = 401
+				; (authError as any).status = 401
 
 			mockEmbeddingsCreate.mockRejectedValue(authError)
 

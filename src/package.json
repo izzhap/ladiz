@@ -3,7 +3,7 @@
 	"displayName": "%extension.displayName%",
 	"description": "%extension.description%",
 	"publisher": "ladiz",
-	"version": "3.53.11",
+	"version": "3.53.12",
 	"icon": "assets/icons/icon.png",
 	"galleryBanner": {
 		"color": "#0f172a",
@@ -42,8 +42,8 @@
 		"sonnet",
 		"ai",
 		"llama",
-		"roo code",
-		"roocode"
+		"ladiz",
+		"ladiz ai"
 	],
 	"activationEvents": [
 		"onLanguage",

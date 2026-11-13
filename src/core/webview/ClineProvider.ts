@@ -112,8 +112,7 @@ interface PendingEditOperation {
 
 export class ClineProvider
 	extends EventEmitter<TaskProviderEvents>
-	implements vscode.WebviewViewProvider, TaskProviderLike
-{
+	implements vscode.WebviewViewProvider, TaskProviderLike {
 	// Used in package.json as the view's id. This value cannot be changed due
 	// to how VSCode caches views based on their id, and updating the id would
 	// break existing instances of the extension.
@@ -235,8 +234,7 @@ export class ClineProvider
 					}
 				} catch (error) {
 					this.log(
-						`[onTaskAborted] Failed to rehydrate after streaming failure: ${
-							error instanceof Error ? error.message : String(error)
+						`[onTaskAborted] Failed to rehydrate after streaming failure: ${error instanceof Error ? error.message : String(error)
 						}`,
 					)
 				}
@@ -442,8 +440,7 @@ export class ClineProvider
 				} catch (err) {
 					// Non-fatal: log but do not block the pop operation.
 					this.log(
-						`[ClineProvider#removeClineFromStack] Failed to repair parent metadata for ${parentTaskId} (non-fatal): ${
-							err instanceof Error ? err.message : String(err)
+						`[ClineProvider#removeClineFromStack] Failed to repair parent metadata for ${parentTaskId} (non-fatal): ${err instanceof Error ? err.message : String(err)
 						}`,
 					)
 				}
@@ -890,8 +887,7 @@ export class ClineProvider
 						} catch (error) {
 							// Log the error but continue with task restoration.
 							this.log(
-								`Failed to restore API configuration for mode '${historyItem.mode}': ${
-									error instanceof Error ? error.message : String(error)
+								`Failed to restore API configuration for mode '${historyItem.mode}': ${error instanceof Error ? error.message : String(error)
 								}. Continuing with default configuration.`,
 							)
 							// The task will continue with the current/default configuration.
@@ -919,8 +915,7 @@ export class ClineProvider
 				} catch (error) {
 					// Log the error but continue with task restoration.
 					this.log(
-						`Failed to restore API configuration '${historyItem.apiConfigName}' for task: ${
-							error instanceof Error ? error.message : String(error)
+						`Failed to restore API configuration '${historyItem.apiConfigName}' for task: ${error instanceof Error ? error.message : String(error)
 						}. Continuing with current configuration.`,
 					)
 				}
@@ -1270,7 +1265,7 @@ export class ClineProvider
 				}
 
 				// Only update the task's mode after successful persistence.
-				;(task as any)._taskMode = newMode
+				; (task as any)._taskMode = newMode
 			} catch (error) {
 				// If persistence fails, log the error but don't update the in-memory state.
 				this.log(
@@ -1374,7 +1369,7 @@ export class ClineProvider
 			task.updateApiConfiguration(providerSettings)
 		} else {
 			// No rebuild needed, just sync apiConfiguration
-			;(task as any).apiConfiguration = providerSettings
+			; (task as any).apiConfiguration = providerSettings
 		}
 	}
 
@@ -1489,8 +1484,7 @@ export class ClineProvider
 		} catch (error) {
 			// If persistence fails, log the error but don't fail the profile switch.
 			this.log(
-				`Failed to persist provider profile switch for task ${task.taskId}: ${
-					error instanceof Error ? error.message : String(error)
+				`Failed to persist provider profile switch for task ${task.taskId}: ${error instanceof Error ? error.message : String(error)
 				}`,
 			)
 		}
@@ -2036,7 +2030,7 @@ export class ClineProvider
 			ttsSpeed: ttsSpeed ?? 1.0,
 			enableCheckpoints: enableCheckpoints ?? true,
 			checkpointTimeout: checkpointTimeout ?? DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
-			shouldShowAnnouncement: lastShownAnnouncementId !== this.latestAnnouncementId,
+			shouldShowAnnouncement: false,
 			allowedCommands: mergedAllowedCommands,
 			deniedCommands: mergedDeniedCommands,
 			soundVolume: soundVolume ?? 0.5,
@@ -2831,8 +2825,7 @@ export class ClineProvider
 			}
 		} catch (error) {
 			this.log(
-				`[delegateParentAndOpenChild] Error flushing pending tool results (non-fatal): ${
-					error instanceof Error ? error.message : String(error)
+				`[delegateParentAndOpenChild] Error flushing pending tool results (non-fatal): ${error instanceof Error ? error.message : String(error)
 				}`,
 			)
 		}
@@ -2844,8 +2837,7 @@ export class ClineProvider
 			await this.removeClineFromStack({ skipDelegationRepair: true })
 		} catch (error) {
 			this.log(
-				`[delegateParentAndOpenChild] Error during parent disposal (non-fatal): ${
-					error instanceof Error ? error.message : String(error)
+				`[delegateParentAndOpenChild] Error during parent disposal (non-fatal): ${error instanceof Error ? error.message : String(error)
 				}`,
 			)
 			// Non-fatal: proceed with child creation even if parent cleanup had issues
@@ -2859,8 +2851,7 @@ export class ClineProvider
 			await this.handleModeSwitch(mode as any)
 		} catch (e) {
 			this.log(
-				`[delegateParentAndOpenChild] handleModeSwitch failed for mode '${mode}': ${
-					(e as Error)?.message ?? String(e)
+				`[delegateParentAndOpenChild] handleModeSwitch failed for mode '${mode}': ${(e as Error)?.message ?? String(e)
 				}`,
 			)
 		}
@@ -2896,8 +2887,7 @@ export class ClineProvider
 			await this.updateTaskHistory(updatedHistory)
 		} catch (err) {
 			this.log(
-				`[delegateParentAndOpenChild] Failed to persist parent metadata for ${parentTaskId} -> ${child.taskId}: ${
-					(err as Error)?.message ?? String(err)
+				`[delegateParentAndOpenChild] Failed to persist parent metadata for ${parentTaskId} -> ${child.taskId}: ${(err as Error)?.message ?? String(err)
 				}`,
 			)
 		}
@@ -3060,8 +3050,7 @@ export class ClineProvider
 			})
 		} catch (err) {
 			this.log(
-				`[reopenParentFromDelegation] Failed to persist child completed status for ${childTaskId}: ${
-					(err as Error)?.message ?? String(err)
+				`[reopenParentFromDelegation] Failed to persist child completed status for ${childTaskId}: ${(err as Error)?.message ?? String(err)
 				}`,
 			)
 		}
