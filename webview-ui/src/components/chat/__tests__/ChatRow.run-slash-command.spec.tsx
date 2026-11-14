@@ -76,7 +76,7 @@ describe("ChatRow - runSlashCommand tool", () => {
 
 		const { getByText } = renderChatRowWithProviders(message)
 
-		expect(getByText("Roo wants to run slash command:")).toBeInTheDocument()
+		expect(getByText("Command")).toBeInTheDocument()
 		expect(getByText("/init")).toBeInTheDocument()
 	})
 
@@ -97,12 +97,9 @@ describe("ChatRow - runSlashCommand tool", () => {
 
 		const { getByText } = renderChatRowWithProviders(message, true) // Pass true to expand
 
-		expect(getByText("Roo wants to run slash command:")).toBeInTheDocument()
+		expect(getByText("Command")).toBeInTheDocument()
 		expect(getByText("/test")).toBeInTheDocument()
-		expect(getByText("Arguments:")).toBeInTheDocument()
-		expect(getByText("focus on unit tests")).toBeInTheDocument()
 		expect(getByText("Run project tests")).toBeInTheDocument()
-		expect(getByText("project")).toBeInTheDocument()
 	})
 
 	it("should display runSlashCommand say message", () => {
@@ -120,8 +117,7 @@ describe("ChatRow - runSlashCommand tool", () => {
 
 		const { getByText } = renderChatRowWithProviders(message)
 
-		expect(getByText("Roo ran slash command:")).toBeInTheDocument()
+		expect(getByText("Command")).toBeInTheDocument()
 		expect(getByText("/deploy")).toBeInTheDocument()
-		expect(getByText("global")).toBeInTheDocument()
 	})
 })

@@ -1,6 +1,6 @@
 import { memo, useEffect, useMemo, useState, useCallback, useRef } from "react"
 import { useTranslation } from "react-i18next"
-import { ChevronDown, ChevronRight, FileDiff } from "lucide-react"
+import { ChevronRight, FileDiff } from "lucide-react"
 import { createTwoFilesPatch } from "diff"
 
 import type { ClineMessage, ExtensionMessage } from "@roo-code/types"

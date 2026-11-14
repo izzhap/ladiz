@@ -67,34 +67,25 @@ describe("ModelPicker", () => {
 	})
 
 	it("calls setApiConfigurationField when a model is selected", async () => {
-		await act(async () => renderModelPicker())
+		renderModelPicker()
 
-		await act(async () => {
-			// Open the popover by clicking the button.
-			const button = screen.getByTestId("model-picker-button")
-			fireEvent.click(button)
-		})
+		const button = screen.getByTestId("model-picker-button")
+		fireEvent.click(button)
 
 		// Wait for popover to open and animations to complete.
-		await act(async () => {
+		act(() => {
 			vi.advanceTimersByTime(100)
 		})
 
-		await act(async () => {
-			// Find and set the input value
-			const modelInput = screen.getByTestId("model-input")
-			fireEvent.input(modelInput, { target: { value: "model2" } })
-		})
+		const modelInput = screen.getByTestId("model-input")
+		fireEvent.input(modelInput, { target: { value: "model2" } })
 
 		// Need to find and click the CommandItem to trigger onSelect
-		await act(async () => {
-			// Find the CommandItem for model2 and click it
-			const modelItem = screen.getByTestId("model-option-model2")
-			fireEvent.click(modelItem)
-		})
+		const modelItem = screen.getByTestId("model-option-model2")
+		fireEvent.click(modelItem)
 
 		// Advance timers to trigger the setTimeout in onSelect
-		await act(async () => {
+		act(() => {
 			vi.advanceTimersByTime(100)
 		})
 
@@ -103,41 +94,32 @@ describe("ModelPicker", () => {
 	})
 
 	it("allows setting a custom model ID that's not in the predefined list", async () => {
-		await act(async () => renderModelPicker())
+		renderModelPicker()
 
-		await act(async () => {
-			// Open the popover by clicking the button.
-			const button = screen.getByTestId("model-picker-button")
-			fireEvent.click(button)
-		})
+		const button = screen.getByTestId("model-picker-button")
+		fireEvent.click(button)
 
 		// Wait for popover to open and animations to complete.
-		await act(async () => {
+		act(() => {
 			vi.advanceTimersByTime(100)
 		})
 
 		const customModelId = "custom-model-id"
 
-		await act(async () => {
-			// Find and set the input value to a custom model ID
-			const modelInput = screen.getByTestId("model-input")
-			fireEvent.input(modelInput, { target: { value: customModelId } })
-		})
+		const modelInput = screen.getByTestId("model-input")
+		fireEvent.input(modelInput, { target: { value: customModelId } })
 
 		// Wait for the UI to update
-		await act(async () => {
+		act(() => {
 			vi.advanceTimersByTime(100)
 		})
 
 		// Find and click the "Use custom" option
-		await act(async () => {
-			// Look for text containing our custom model ID
-			const customOption = screen.getByTestId("use-custom-model")
-			fireEvent.click(customOption)
-		})
+		const customOption = screen.getByTestId("use-custom-model")
+		fireEvent.click(customOption)
 
 		// Advance timers to trigger the setTimeout in onSelect
-		await act(async () => {
+		act(() => {
 			vi.advanceTimersByTime(100)
 		})
 
@@ -153,13 +135,11 @@ describe("ModelPicker", () => {
 				errorMessage,
 			}
 
-			await act(async () => {
-				render(
-					<QueryClientProvider client={queryClient}>
-						<ModelPicker {...propsWithError} />
-					</QueryClientProvider>,
-				)
-			})
+			render(
+				<QueryClientProvider client={queryClient}>
+					<ModelPicker {...propsWithError} />
+				</QueryClientProvider>,
+			)
 
 			// Check that the error message is displayed
 			expect(screen.getByTestId("api-error-message")).toBeInTheDocument()
@@ -167,7 +147,7 @@ describe("ModelPicker", () => {
 		})
 
 		it("does not display error message when errorMessage prop is undefined", async () => {
-			await act(async () => renderModelPicker())
+			renderModelPicker()
 
 			// Check that no error message is displayed
 			expect(screen.queryByTestId("api-error-message")).not.toBeInTheDocument()
@@ -180,13 +160,11 @@ describe("ModelPicker", () => {
 				errorMessage,
 			}
 
-			await act(async () => {
-				render(
-					<QueryClientProvider client={queryClient}>
-						<ModelPicker {...propsWithError} />
-					</QueryClientProvider>,
-				)
-			})
+			render(
+				<QueryClientProvider client={queryClient}>
+					<ModelPicker {...propsWithError} />
+				</QueryClientProvider>,
+			)
 
 			// Check that both the model selector and error message are present
 			const modelSelector = screen.getByTestId("model-picker-button")

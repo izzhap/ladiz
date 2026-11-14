@@ -306,6 +306,7 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 		<Popover open={open} onOpenChange={setOpen}>
 			<StandardTooltip content={`Model: ${currentModelId || ladizDefaultModelId} (${providerLabel})`}>
 				<PopoverTrigger
+					data-testid="dropdown-trigger"
 					disabled={disabled}
 					className={cn(
 						"inline-flex items-center gap-1.5 relative whitespace-nowrap px-2.5 py-1 text-xs font-mono font-medium rounded-full",

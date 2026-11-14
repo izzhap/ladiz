@@ -1,7 +1,8 @@
 // npx vitest src/components/welcome/__tests__/WelcomeViewProvider.spec.tsx
 
+import React from "react"
 import { render, screen, fireEvent } from "@/utils/test-utils"
-import { openRouterDefaultModelId } from "@roo-code/types"
+import { ladizDefaultModelId } from "@roo-code/types"
 
 import * as ExtensionStateContext from "@src/context/ExtensionStateContext"
 const { ExtensionStateContextProvider } = ExtensionStateContext
@@ -22,7 +23,7 @@ vi.mock("../../settings/ApiOptions", () => ({
 		<div
 			data-testid="api-options"
 			data-provider={apiConfiguration.apiProvider}
-			data-model={apiConfiguration.openRouterModelId}>
+			data-model={apiConfiguration.apiModelId || apiConfiguration.openRouterModelId}>
 			API Options Component
 		</div>
 	),
@@ -102,11 +103,12 @@ describe("WelcomeViewProvider", () => {
 		fireEvent.click(screen.getByTestId("button-primary"))
 
 		expect(screen.getByTestId("api-options")).toBeInTheDocument()
-		expect(screen.getByTestId("api-options")).toHaveAttribute("data-provider", "openrouter")
-		expect(screen.getByTestId("api-options")).toHaveAttribute("data-model", openRouterDefaultModelId)
+		expect(screen.getByTestId("api-options")).toHaveAttribute("data-provider", "ladiz")
+		expect(screen.getByTestId("api-options")).toHaveAttribute("data-model", ladizDefaultModelId)
 		expect(setApiConfiguration).toHaveBeenCalledWith({
-			apiProvider: "openrouter",
-			openRouterModelId: openRouterDefaultModelId,
+			apiProvider: "ladiz",
+			ladizBaseUrl: "https://api.ladizai.com/v1",
+			apiModelId: ladizDefaultModelId,
 		})
 		expect(screen.getByTestId("trans-welcome:providerSignup.chooseProvider")).toBeInTheDocument()
 		expect(vscode.postMessage).not.toHaveBeenCalledWith(expect.objectContaining({ type: "upsertApiConfiguration" }))
@@ -122,11 +124,12 @@ describe("WelcomeViewProvider", () => {
 
 		fireEvent.click(screen.getByTestId("button-primary"))
 
-		expect(screen.getByTestId("api-options")).toHaveAttribute("data-provider", "openrouter")
-		expect(screen.getByTestId("api-options")).toHaveAttribute("data-model", openRouterDefaultModelId)
+		expect(screen.getByTestId("api-options")).toHaveAttribute("data-provider", "ladiz")
+		expect(screen.getByTestId("api-options")).toHaveAttribute("data-model", ladizDefaultModelId)
 		expect(setApiConfiguration).toHaveBeenCalledWith({
-			apiProvider: "openrouter",
-			openRouterModelId: openRouterDefaultModelId,
+			apiProvider: "ladiz",
+			ladizBaseUrl: "https://api.ladizai.com/v1",
+			apiModelId: ladizDefaultModelId,
 		})
 	})
 

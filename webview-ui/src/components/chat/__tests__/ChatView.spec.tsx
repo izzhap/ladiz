@@ -77,13 +77,13 @@ vi.mock("react-virtuoso", () => ({
 	},
 }))
 
-// Mock VersionIndicator - returns null by default to prevent rendering in tests
-vi.mock("../../common/VersionIndicator", () => ({
-	default: vi.fn(() => null),
+const { mockVersionIndicator } = vi.hoisted(() => ({
+	mockVersionIndicator: vi.fn((_props?: any) => null as any),
 }))
 
-// Get the mock function after the module is mocked
-const mockVersionIndicator = vi.mocked((await import("../../common/VersionIndicator")).default)
+vi.mock("../../common/VersionIndicator", () => ({
+	default: mockVersionIndicator,
+}))
 
 vi.mock("../Announcement", () => ({
 	default: function MockAnnouncement({ hideAnnouncement }: { hideAnnouncement: () => void }) {
@@ -142,8 +142,13 @@ vi.mock("@src/components/welcome/RooTips", () => ({
 
 // Mock RooHero component
 vi.mock("@src/components/welcome/RooHero", () => ({
-	default: function MockRooHero() {
-		return <div data-testid="roo-hero">Hero content</div>
+	default: function MockRooHero({ onVersionClick }: { onVersionClick?: () => void }) {
+		return (
+			<div data-testid="roo-hero">
+				Hero content
+				{onVersionClick && mockVersionIndicator({ onClick: onVersionClick })}
+			</div>
+		)
 	},
 }))
 
@@ -694,7 +699,7 @@ describe("ChatView - Welcome Content Display Tests", () => {
 		})
 
 		expect(queryByTestId("dismissible-upsell")).not.toBeInTheDocument()
-		expect(queryByTestId("roo-tips")).toBeInTheDocument()
+		expect(queryByTestId("roo-hero")).toBeInTheDocument()
 	})
 
 	it("does not show removed cloud upsell when user has run 6 or more tasks", async () => {
@@ -761,7 +766,7 @@ describe("ChatView - Welcome Content Display Tests", () => {
 		})
 
 		expect(queryByTestId("dismissible-upsell")).not.toBeInTheDocument()
-		expect(getByTestId("roo-tips")).toBeInTheDocument()
+		expect(getByTestId("roo-hero")).toBeInTheDocument()
 	})
 
 	it("shows RooTips when user has fewer than 6 tasks", () => {
@@ -777,7 +782,7 @@ describe("ChatView - Welcome Content Display Tests", () => {
 		})
 
 		expect(queryByTestId("dismissible-upsell")).not.toBeInTheDocument()
-		expect(getByTestId("roo-tips")).toBeInTheDocument()
+		expect(getByTestId("roo-hero")).toBeInTheDocument()
 	})
 })
 

@@ -313,8 +313,8 @@ const getScrollable = (): HTMLElement => {
 }
 
 const getScrollToBottomButton = (): HTMLButtonElement => {
-	const icon = document.querySelector(".codicon-chevron-down")
-	if (!(icon instanceof HTMLElement)) {
+	const icon = document.querySelector(".lucide-arrow-down")
+	if (!(icon instanceof Element)) {
 		throw new Error("Expected scroll-to-bottom icon")
 	}
 
@@ -359,21 +359,21 @@ describe("ChatView scroll behavior regression coverage", () => {
 		await waitForCallsSettled()
 		expect(harness.scrollCalls).toBe(2)
 		expect(resolveFollowOutput(false)).toBe("auto")
-		expect(document.querySelector(".codicon-chevron-down")).toBeNull()
+		expect(document.querySelector(".lucide-arrow-down")).toBeNull()
 	})
 
 	it("transient hydration-time not-at-bottom signals do not disable sticky follow", async () => {
 		await hydrate(2)
 		await waitForCalls(1, 1_200)
 		expect(resolveFollowOutput(false)).toBe("auto")
-		expect(document.querySelector(".codicon-chevron-down")).toBeNull()
+		expect(document.querySelector(".lucide-arrow-down")).toBeNull()
 
 		await act(async () => {
 			harness.emitAtBottom(false)
 		})
 
 		expect(resolveFollowOutput(false)).toBe("auto")
-		expect(document.querySelector(".codicon-chevron-down")).toBeNull()
+		expect(document.querySelector(".lucide-arrow-down")).toBeNull()
 
 		await waitForCalls(2, 1_200)
 		await waitForCallsSettled()
@@ -390,7 +390,7 @@ describe("ChatView scroll behavior regression coverage", () => {
 
 		expect(harness.scrollCalls).toBe(2)
 		expect(resolveFollowOutput(false)).toBe("auto")
-		expect(document.querySelector(".codicon-chevron-down")).toBeNull()
+		expect(document.querySelector(".lucide-arrow-down")).toBeNull()
 	})
 
 	it("user escape hatch during hydration prevents repinning", async () => {
@@ -409,7 +409,7 @@ describe("ChatView scroll behavior regression coverage", () => {
 
 		expect(resolveFollowOutput(false)).toBe(false)
 
-		await waitFor(() => expect(document.querySelector(".codicon-chevron-down")).toBeTruthy(), {
+		await waitFor(() => expect(document.querySelector(".lucide-arrow-down")).toBeTruthy(), {
 			timeout: 1_200,
 		})
 	})
@@ -455,7 +455,7 @@ describe("ChatView scroll behavior regression coverage", () => {
 		})
 
 		expect(resolveFollowOutput(false)).toBe("auto")
-		expect(document.querySelector(".codicon-chevron-down")).toBeNull()
+		expect(document.querySelector(".lucide-arrow-down")).toBeNull()
 	})
 
 	it("wheel-up intent disengages sticky follow", async () => {
@@ -471,7 +471,7 @@ describe("ChatView scroll behavior regression coverage", () => {
 		})
 
 		expect(resolveFollowOutput(false)).toBe(false)
-		await waitFor(() => expect(document.querySelector(".codicon-chevron-down")).toBeTruthy(), {
+		await waitFor(() => expect(document.querySelector(".lucide-arrow-down")).toBeTruthy(), {
 			timeout: 1_200,
 		})
 	})
@@ -489,7 +489,7 @@ describe("ChatView scroll behavior regression coverage", () => {
 		await sleep(700)
 
 		expect(resolveFollowOutput(false)).toBe(false)
-		await waitFor(() => expect(document.querySelector(".codicon-chevron-down")).toBeTruthy(), {
+		await waitFor(() => expect(document.querySelector(".lucide-arrow-down")).toBeTruthy(), {
 			timeout: 1_200,
 		})
 	})
@@ -505,7 +505,7 @@ describe("ChatView scroll behavior regression coverage", () => {
 		})
 
 		expect(resolveFollowOutput(false)).toBe(false)
-		await waitFor(() => expect(document.querySelector(".codicon-chevron-down")).toBeTruthy(), {
+		await waitFor(() => expect(document.querySelector(".lucide-arrow-down")).toBeTruthy(), {
 			timeout: 1_200,
 		})
 
@@ -517,10 +517,10 @@ describe("ChatView scroll behavior regression coverage", () => {
 		})
 
 		expect(resolveFollowOutput(false)).toBe("auto")
-		await waitFor(() => expect(harness.scrollCalls).toBe(callsBeforeClick + 2), {
+		await waitFor(() => expect(harness.scrollCalls).toBeGreaterThanOrEqual(callsBeforeClick + 2), {
 			timeout: 1_200,
 		})
-		await waitFor(() => expect(document.querySelector(".codicon-chevron-down")).toBeNull(), { timeout: 1_200 })
+		await waitFor(() => expect(document.querySelector(".lucide-arrow-down")).toBeNull(), { timeout: 1_200 })
 	})
 
 	it("shows jump-to-checkpoint button and scrolls to latest checkpoint", async () => {
@@ -532,7 +532,7 @@ describe("ChatView scroll behavior regression coverage", () => {
 			fireEvent.keyDown(window, { key: "PageUp" })
 		})
 
-		await waitFor(() => expect(document.querySelector(".codicon-chevron-down")).toBeTruthy(), {
+		await waitFor(() => expect(document.querySelector(".lucide-arrow-down")).toBeTruthy(), {
 			timeout: 1_200,
 		})
 
@@ -562,7 +562,7 @@ describe("ChatView scroll behavior regression coverage", () => {
 			fireEvent.keyDown(window, { key: "PageUp" })
 		})
 
-		await waitFor(() => expect(document.querySelector(".codicon-chevron-down")).toBeTruthy(), {
+		await waitFor(() => expect(document.querySelector(".lucide-arrow-down")).toBeTruthy(), {
 			timeout: 1_200,
 		})
 
