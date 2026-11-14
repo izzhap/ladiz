@@ -1,6 +1,6 @@
 import { useCallback, useState, useMemo } from "react"
 import { useEvent } from "react-use"
-import { t } from "i18next"
+import { useAppTranslation } from "@src/i18n/TranslationContext"
 import { ChevronDown, OctagonX, Terminal } from "lucide-react"
 
 import { type ExtensionMessage, type CommandExecutionStatus, commandExecutionStatusSchema } from "@roo-code/types"
@@ -37,10 +37,11 @@ interface CommandExecutionProps {
 export const CommandExecution = ({
 	executionId,
 	text,
-	icon: _icon,
-	title: _title,
+	icon,
+	title,
 	initialExpanded = false,
 }: CommandExecutionProps) => {
+	const { t } = useAppTranslation()
 	const { allowedCommands = [], deniedCommands = [], setAllowedCommands, setDeniedCommands } = useExtensionState()
 
 	const { command, output: parsedOutput } = useMemo(() => parseCommandAndOutput(text), [text])
@@ -156,26 +157,34 @@ export const CommandExecution = ({
 		<TimelineItem
 			status={isRunning ? "running" : isExited && !isExitOk ? "error" : "command"}
 			customDot={
-				<div
-					className={cn(
-						"flex items-center justify-center size-3.5 rounded-full",
-						isRunning
-							? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 animate-pulse"
-							: isExited && !isExitOk
-								? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
-								: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30",
-					)}>
-					<Terminal className="size-2.5" />
-				</div>
+				icon ? (
+					icon
+				) : (
+					<div
+						className={cn(
+							"flex items-center justify-center size-3.5 rounded-full",
+							isRunning
+								? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 animate-pulse"
+								: isExited && !isExitOk
+									? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+									: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30",
+						)}>
+						<Terminal className="size-2.5" />
+					</div>
+				)
 			}
 			action={
-				<span>
-					{isRunning
-						? t("chat:commandExecution.running")
-						: isExited && !isExitOk
-							? t("chat:error", "Failed")
-							: t("chat:commandExecution.title", "Command")}
-				</span>
+				title ? (
+					title
+				) : (
+					<span>
+						{isRunning
+							? t("chat:commandExecution.running")
+							: isExited && !isExitOk
+								? t("chat:error", { defaultValue: "Failed" })
+								: t("chat:commandExecution.title", { defaultValue: "Command" })}
+					</span>
+				)
 			}
 			target={<span title={command}>{command}</span>}
 			subtext={
@@ -217,8 +226,8 @@ export const CommandExecution = ({
 						}}
 						aria-label={
 							isExpanded
-								? t("chat:commandExecution.collapseOutput", "Collapse")
-								: t("chat:commandExecution.expandOutput", "Expand")
+								? t("chat:commandExecution.collapseOutput") || "Collapse"
+								: t("chat:commandExecution.expandOutput") || "Expand"
 						}>
 						<ChevronDown
 							className={cn("size-3.5 transition-transform duration-200", isExpanded && "rotate-180")}

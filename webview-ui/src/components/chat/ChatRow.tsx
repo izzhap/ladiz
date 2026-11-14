@@ -460,9 +460,11 @@ export const ChatRowContent = ({
 						subtext={
 							tool.isProtected
 								? t("chat:fileOperations.wantsToEditProtected")
-								: tool.diffStats
-									? `Modified (+${tool.diffStats.added} -${tool.diffStats.removed})`
-									: "Modified"
+								: tool.isOutsideWorkspace
+									? t("chat:fileOperations.wantsToEditOutsideWorkspace")
+									: tool.diffStats
+										? `Modified (+${tool.diffStats.added} -${tool.diffStats.removed})`
+										: "Modified"
 						}
 						actions={
 							<button

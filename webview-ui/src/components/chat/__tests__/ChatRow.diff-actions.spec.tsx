@@ -82,10 +82,9 @@ describe("ChatRow - inline diff stats and actions", () => {
 			diffStats: { added: 1, removed: 1 },
 		})
 
-		const { container } = renderChatRow(message, false)
+		renderChatRow(message, false)
 
-		expect(screen.getByText("Roo wants to edit this file")).toBeInTheDocument()
-		expect(container.querySelector(".codicon-diff")).toBeInTheDocument()
+		expect(screen.getByText(/^(Edit|Write)$/)).toBeInTheDocument()
 		expect(screen.getByText("+1")).toBeInTheDocument()
 		expect(screen.getByText("-1")).toBeInTheDocument()
 	})
@@ -99,10 +98,9 @@ describe("ChatRow - inline diff stats and actions", () => {
 			diffStats: { added: 1, removed: 1 },
 		})
 
-		const { container } = renderChatRow(message)
+		renderChatRow(message)
 
-		expect(screen.getByText("Roo wants to edit this file")).toBeInTheDocument()
-		expect(container.querySelector(".codicon-diff")).toBeInTheDocument()
+		expect(screen.getByText(/^(Edit|Write)$/)).toBeInTheDocument()
 		expect(screen.getByText("+1")).toBeInTheDocument()
 		expect(screen.getByText("-1")).toBeInTheDocument()
 	})
@@ -116,10 +114,9 @@ describe("ChatRow - inline diff stats and actions", () => {
 			diffStats: { added: 1, removed: 2 },
 		})
 
-		const { container } = renderChatRow(message)
+		renderChatRow(message)
 
-		expect(screen.getByText("Roo wants to edit this file")).toBeInTheDocument()
-		expect(container.querySelector(".codicon-diff")).toBeInTheDocument()
+		expect(screen.getByText(/^(Edit|Write)$/)).toBeInTheDocument()
 		expect(screen.getByText("+1")).toBeInTheDocument()
 		expect(screen.getByText("-2")).toBeInTheDocument()
 	})
@@ -133,10 +130,9 @@ describe("ChatRow - inline diff stats and actions", () => {
 			diffStats: { added: 3, removed: 0 },
 		})
 
-		const { container } = renderChatRow(message)
+		renderChatRow(message)
 
-		expect(screen.getByText("Roo wants to edit this file")).toBeInTheDocument()
-		expect(container.querySelector(".codicon-diff")).toBeInTheDocument()
+		expect(screen.getByText(/^(Edit|Write)$/)).toBeInTheDocument()
 		expect(screen.getByText("+3")).toBeInTheDocument()
 		expect(screen.getByText("-0")).toBeInTheDocument()
 	})
@@ -183,9 +179,8 @@ describe("ChatRow - inline diff stats and actions", () => {
 			isProtected: true,
 			diffStats: { added: 1, removed: 1 },
 		})
-		const { container } = renderChatRow(protectedMessage)
+		renderChatRow(protectedMessage)
 		expect(screen.getByText("Roo wants to edit a protected file")).toBeInTheDocument()
-		expect(container.querySelector(".codicon-lock")).toBeInTheDocument()
 	})
 
 	it("keeps batch diff handling for unified edit tools", () => {

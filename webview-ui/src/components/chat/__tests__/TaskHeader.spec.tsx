@@ -252,7 +252,7 @@ describe("TaskHeader", () => {
 
 			// The percentage should be rendered in the collapsed header state
 			// Verify that 25% is displayed (correct formula) and NOT 40% (old incorrect formula)
-			expect(screen.getByText("25%")).toBeInTheDocument()
+			expect(screen.getByText("25% context")).toBeInTheDocument()
 			expect(screen.queryByText("40%")).not.toBeInTheDocument()
 		})
 
@@ -265,7 +265,7 @@ describe("TaskHeader", () => {
 			renderTaskHeader({ contextTokens: 100 })
 
 			// Should show 0% when available input space is 0
-			expect(screen.getByText("0%")).toBeInTheDocument()
+			expect(screen.getByText("0% context")).toBeInTheDocument()
 		})
 	})
 })

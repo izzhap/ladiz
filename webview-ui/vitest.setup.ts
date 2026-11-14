@@ -1,3 +1,40 @@
+import Module from "module"
+
+// Normalize Windows drive letter casing to avoid duplicate module instances in require.cache
+const originalResolveFilename = (Module as any)._resolveFilename
+if (originalResolveFilename) {
+	;(Module as any)._resolveFilename = function (request: string, parent: any, isMain: boolean, options: any) {
+		const filename = originalResolveFilename.call(this, request, parent, isMain, options)
+		if (typeof filename === "string" && /^[a-zA-Z]:[\\\/]/.test(filename)) {
+			return filename[0].toLowerCase() + filename.slice(1)
+		}
+		return filename
+	}
+}
+
+// Also sync require.cache if any module was cached with uppercase drive letter
+const cacheProxy = new Proxy(require.cache, {
+	get(target, prop: string) {
+		if (typeof prop === "string" && /^[a-zA-Z]:[\\\/]/.test(prop)) {
+			const lower = prop[0].toLowerCase() + prop.slice(1)
+			const upper = prop[0].toUpperCase() + prop.slice(1)
+			return target[lower] ?? target[upper]
+		}
+		return target[prop]
+	},
+	set(target, prop: string, value) {
+		target[prop] = value
+		if (typeof prop === "string" && /^[a-zA-Z]:[\\\/]/.test(prop)) {
+			const lower = prop[0].toLowerCase() + prop.slice(1)
+			const upper = prop[0].toUpperCase() + prop.slice(1)
+			target[lower] = value
+			target[upper] = value
+		}
+		return true
+	},
+})
+;(Module as any)._cache = cacheProxy
+
 import "@testing-library/jest-dom"
 import "@testing-library/jest-dom/vitest"
 

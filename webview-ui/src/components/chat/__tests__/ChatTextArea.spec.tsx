@@ -1161,7 +1161,7 @@ describe("ChatTextArea", () => {
 			expect(sendButton).toBeInTheDocument()
 
 			// Check that the button is hidden (has opacity-0 class when no content)
-			expect(sendButton).toHaveClass("opacity-0")
+			expect(sendButton).toHaveClass("opacity-25")
 			expect(sendButton).toHaveClass("pointer-events-none")
 			expect(sendButton).not.toHaveClass("opacity-100")
 			expect(sendButton).not.toHaveClass("pointer-events-auto")

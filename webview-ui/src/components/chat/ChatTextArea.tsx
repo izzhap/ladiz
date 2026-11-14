@@ -61,7 +61,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		{
 			inputValue,
 			setInputValue,
-			selectApiConfigDisabled: _selectApiConfigDisabled,
+			selectApiConfigDisabled,
 			placeholderText,
 			selectedImages,
 			setSelectedImages,
@@ -1133,7 +1133,10 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 								customModes={customModes}
 								customModePrompts={customModePrompts}
 							/>
-							<ModelSelector triggerClassName="text-ellipsis overflow-hidden flex-shrink-0" />
+							<ModelSelector
+								disabled={selectApiConfigDisabled}
+								triggerClassName="text-ellipsis overflow-hidden flex-shrink-0"
+							/>
 						</div>
 
 						{/* Right: YOLO status, Attach image, Enhance prompt, Queue, Cancel, Send/Stop */}
