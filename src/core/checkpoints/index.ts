@@ -297,6 +297,14 @@ export async function checkpointRestore(
 	}
 }
 
+export async function checkpointRestoreFile(task: Task, filePath: string): Promise<boolean> {
+	const service = await getCheckpointService(task)
+	if (!service || !service.isInitialized) {
+		return false
+	}
+	return service.restoreFile(filePath)
+}
+
 export type CheckpointDiffOptions = {
 	ts?: number
 	previousCommitHash?: string

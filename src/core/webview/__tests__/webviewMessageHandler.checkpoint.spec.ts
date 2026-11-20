@@ -7,12 +7,19 @@ import { MessageManager } from "../../message-manager"
 // Mock dependencies
 vi.mock("../../task-persistence")
 vi.mock("../checkpointRestoreHandler")
+vi.mock("../../../utils/pathUtils", () => ({
+	isPathOutsideWorkspace: () => false,
+}))
 vi.mock("vscode", () => ({
 	window: {
 		showErrorMessage: vi.fn(),
+		showInformationMessage: vi.fn(),
+		createTextEditorDecorationType: vi.fn().mockReturnValue({
+			dispose: vi.fn(),
+		}),
 	},
 	workspace: {
-		workspaceFolders: undefined,
+		workspaceFolders: [{ uri: { fsPath: "/test/workspace" } }],
 	},
 }))
 
@@ -43,8 +50,11 @@ describe("webviewMessageHandler - checkpoint operations", () => {
 		}
 		mockCline.messageManager = new MessageManager(mockCline)
 
+		mockCline.cwd = "/test/workspace"
+
 		// Setup mock provider
 		mockProvider = {
+			cwd: "/test/workspace",
 			getCurrentTask: vi.fn(() => mockCline),
 			postMessageToWebview: vi.fn(),
 			getTaskWithId: vi.fn(() => ({
@@ -131,6 +141,41 @@ describe("webviewMessageHandler - checkpoint operations", () => {
 					images: [],
 					apiConversationHistoryIndex: 0,
 				},
+			})
+		})
+	})
+
+	describe("revert file operations", () => {
+		it("should revert file via checkpointRestoreFile", async () => {
+			mockCline.checkpointRestoreFile = vi.fn().mockResolvedValue(true)
+			mockCline.cwd = "/test/workspace"
+
+			await webviewMessageHandler(mockProvider, {
+				type: "revertFile",
+				text: "foo.ts",
+			})
+
+			expect(mockCline.checkpointRestoreFile).toHaveBeenCalledWith("foo.ts")
+			expect(mockProvider.postMessageToWebview).toHaveBeenCalledWith({
+				type: "fileReverted",
+				fileReverted: { path: "foo.ts", success: true },
+			})
+		})
+
+		it("should revert all files via checkpointRestoreFile", async () => {
+			mockCline.checkpointRestoreFile = vi.fn().mockResolvedValue(true)
+			mockCline.cwd = "/test/workspace"
+
+			await webviewMessageHandler(mockProvider, {
+				type: "revertAllFiles",
+				values: {
+					files: [{ filePath: "a.ts" }, { filePath: "b.ts" }],
+				},
+			})
+
+			expect(mockProvider.postMessageToWebview).toHaveBeenCalledWith({
+				type: "fileReverted",
+				fileReverted: { paths: ["a.ts", "b.ts"], success: true },
 			})
 		})
 	})

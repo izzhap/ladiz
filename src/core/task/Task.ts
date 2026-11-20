@@ -119,6 +119,7 @@ import {
 	getCheckpointService,
 	checkpointSave,
 	checkpointRestore,
+	checkpointRestoreFile,
 	checkpointDiff,
 } from "../checkpoints"
 import { processUserContentMentions } from "../mentions/processUserContentMentions"
@@ -4490,6 +4491,10 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 	}
 	public async checkpointRestore(options: CheckpointRestoreOptions) {
 		return checkpointRestore(this, options)
+	}
+
+	public async checkpointRestoreFile(filePath: string) {
+		return checkpointRestoreFile(this, filePath)
 	}
 
 	public async checkpointDiff(options: CheckpointDiffOptions) {

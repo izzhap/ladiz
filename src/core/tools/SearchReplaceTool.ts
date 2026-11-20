@@ -182,6 +182,7 @@ export class SearchReplaceTool extends BaseTool<"search_replace"> {
 			const completeMessage = JSON.stringify({
 				...sharedMessageProps,
 				content: sanitizedDiff,
+				originalContent: task.diffViewProvider.originalContent,
 				isProtected: isWriteProtected,
 				diffStats,
 			} satisfies ClineSayTool)

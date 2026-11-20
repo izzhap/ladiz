@@ -92,9 +92,12 @@ export interface ExtensionMessage {
 		| "folderSelected"
 		| "skills"
 		| "fileContent"
+		| "fileReverted"
 	text?: string
 	/** For fileContent: { path, content, error? } */
 	fileContent?: { path: string; content: string | null; error?: string }
+	/** For fileReverted: { path?: string; paths?: string[]; success: boolean; error?: string } */
+	fileReverted?: { path?: string; paths?: string[]; success: boolean; error?: string }
 	payload?: any // eslint-disable-line @typescript-eslint/no-explicit-any
 	checkpointWarning?: {
 		type: "WAIT_TIMEOUT" | "INIT_TIMEOUT"
@@ -521,6 +524,8 @@ export interface WebviewMessage {
 		| "moveSkill"
 		| "updateSkillModes"
 		| "openSkillFile"
+		| "revertFile"
+		| "revertAllFiles"
 	text?: string
 	taskId?: string
 	editedMessageContent?: string

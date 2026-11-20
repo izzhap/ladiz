@@ -27,7 +27,14 @@
 	"unpin": "Lepas Pin",
 	"pin": "Pin",
 	"fileChangesInConversation": {
-		"header": "{{count}} file diubah dalam percakapan ini"
+		"header": "{{count}} file diubah dalam percakapan ini",
+		"revertAll": "Revert semua",
+		"revertAllConfirmTitle": "Revert Semua Perubahan",
+		"revertAllConfirmDescription": "Apakah kamu yakin ingin membatalkan semua perubahan pada {{count}} file dalam percakapan ini? File akan dikembalikan ke kondisi sebelum percakapan dimulai.",
+		"revertFileConfirmTitle": "Revert Perubahan File",
+		"revertFileConfirmDescription": "Apakah kamu yakin ingin membatalkan perubahan pada {{path}} dalam percakapan ini? File akan dikembalikan ke kondisi sebelum percakapan dimulai.",
+		"revertFile": "Revert file",
+		"reverted": "Dibatalkan"
 	},
 	"retry": {
 		"title": "Coba Lagi",

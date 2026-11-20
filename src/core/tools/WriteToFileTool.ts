@@ -124,6 +124,7 @@ export class WriteToFileTool extends BaseTool<"write_to_file"> {
 				const completeMessage = JSON.stringify({
 					...sharedMessageProps,
 					content: unified,
+					originalContent: task.diffViewProvider.originalContent,
 					diffStats: computeDiffStats(unified) || undefined,
 				} satisfies ClineSayTool)
 
@@ -156,6 +157,7 @@ export class WriteToFileTool extends BaseTool<"write_to_file"> {
 				const completeMessage = JSON.stringify({
 					...sharedMessageProps,
 					content: unified,
+					originalContent: task.diffViewProvider.originalContent,
 					diffStats: computeDiffStats(unified) || undefined,
 				} satisfies ClineSayTool)
 

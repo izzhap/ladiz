@@ -169,6 +169,27 @@ describe.each([[RepoPerTaskCheckpointService, "RepoPerTaskCheckpointService"]])(
 				expect(await fs.readFile(testFile, "utf-8")).toBe("Hello, world!")
 			})
 
+			it("restores individual file to base commit", async () => {
+				await fs.writeFile(testFile, "Modified text")
+				await service.saveCheckpoint("modified testFile")
+				expect(await fs.readFile(testFile, "utf-8")).toBe("Modified text")
+
+				// Restore testFile only to base commit
+				await service.restoreFile("test.txt")
+				expect(await fs.readFile(testFile, "utf-8")).toBe("Hello, world!")
+			})
+
+			it("deletes newly created file when restoring to base commit where it did not exist", async () => {
+				const newFile = path.join(service.workspaceDir, "newFile.txt")
+				await fs.writeFile(newFile, "Brand new file")
+				await service.saveCheckpoint("added new file")
+				expect(await fs.readFile(newFile, "utf-8")).toBe("Brand new file")
+
+				// Restoring newFile.txt to baseHash deletes it
+				await service.restoreFile("newFile.txt")
+				await expect(fs.readFile(newFile, "utf-8")).rejects.toThrow()
+			})
+
 			it("preserves workspace and index state after saving checkpoint", async () => {
 				// Create three files with different states: staged, unstaged, and mixed.
 				const unstagedFile = path.join(service.workspaceDir, "unstaged.txt")

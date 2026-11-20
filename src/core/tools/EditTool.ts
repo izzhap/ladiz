@@ -186,6 +186,7 @@ export class EditTool extends BaseTool<"edit"> {
 			const completeMessage = JSON.stringify({
 				...sharedMessageProps,
 				content: sanitizedDiff,
+				originalContent: task.diffViewProvider.originalContent,
 				isProtected: isWriteProtected,
 				diffStats,
 			} satisfies ClineSayTool)
