@@ -2,7 +2,7 @@ import { EventEmitter } from "events"
 
 import { v4 as uuidv4 } from "uuid"
 
-import { QueuedMessage } from "@roo-code/types"
+import { QueuedMessage } from "@ladiz/types"
 
 export interface MessageQueueState {
 	messages: QueuedMessage[]
@@ -75,6 +75,10 @@ export class MessageQueueService extends EventEmitter<QueueEvents> {
 		message.images = images
 		this.emit("stateChanged", this._messages)
 		return true
+	}
+
+	public seedMessages(messages: QueuedMessage[]): void {
+		this._messages = messages.map((msg) => ({ ...msg }))
 	}
 
 	public dequeueMessage(): QueuedMessage | undefined {

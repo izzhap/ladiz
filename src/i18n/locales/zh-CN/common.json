@@ -19,6 +19,11 @@
 		"delete_config_profile": "您确定要删除此配置文件吗？",
 		"delete_custom_mode_with_rules": "您确定要删除此 {scope} 模式吗？\n\n这也将删除位于以下位置的关联规则文件夹：\n{rulesFolderPath}"
 	},
+	"revert": {
+		"fileSuccess": "已还原对 {{path}} 的更改",
+		"fileError": "无法还原 {{path}}",
+		"allSuccess": "已还原此对话中的所有 {{count}} 个文件"
+	},
 	"errors": {
 		"invalid_mcp_config": "项目MCP配置格式无效",
 		"invalid_mcp_settings_format": "MCP设置JSON格式无效。请确保您的设置遵循正确的JSON格式。",
@@ -232,6 +237,6 @@
 	},
 	"docsLink": {
 		"label": "Docs",
-		"url": "https://github.com/RooCodeInc/Roo-Code"
+		"url": "https://github.com/izzhap/ladiz"
 	}
 }

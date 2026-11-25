@@ -25,6 +25,7 @@ import {
 	type CreateTaskOptions,
 	type TokenUsage,
 	type ToolUsage,
+	type QueuedMessage,
 	type ExtensionMessage,
 	type ExtensionState,
 	RooCodeEventName,
@@ -37,7 +38,7 @@ import {
 	DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
 	getModelId,
 	isRetiredProvider,
-} from "@roo-code/types"
+} from "@ladiz/types"
 import { aggregateTaskCostsRecursive, type AggregatedCosts } from "./aggregateTaskCosts"
 
 import { Package } from "../../shared/package"
@@ -83,7 +84,7 @@ import { CustomModesManager } from "../config/CustomModesManager"
 import { Task } from "../task/Task"
 
 import { webviewMessageHandler } from "./webviewMessageHandler"
-import type { ClineMessage, TodoItem } from "@roo-code/types"
+import type { ClineMessage, TodoItem } from "@ladiz/types"
 import { readApiMessages, saveApiMessages, saveTaskMessages, TaskHistoryStore } from "../task-persistence"
 import { readTaskMessages } from "../task-persistence/taskMessages"
 import { getNonce } from "./getNonce"
@@ -112,7 +113,8 @@ interface PendingEditOperation {
 
 export class ClineProvider
 	extends EventEmitter<TaskProviderEvents>
-	implements vscode.WebviewViewProvider, TaskProviderLike {
+	implements vscode.WebviewViewProvider, TaskProviderLike
+{
 	// Used in package.json as the view's id. This value cannot be changed due
 	// to how VSCode caches views based on their id, and updating the id would
 	// break existing instances of the extension.
@@ -149,7 +151,7 @@ export class ClineProvider
 
 	public isViewLaunched = false
 	public settingsImportedAt?: number
-	public readonly latestAnnouncementId = "may-2026-final-roo-code-release" // Final Roo Code release announcement.
+	public readonly latestAnnouncementId = "may-2026-final-ladiz-release" // Final Ladiz release announcement.
 	public readonly providerSettingsManager: ProviderSettingsManager
 	public readonly customModesManager: CustomModesManager
 
@@ -234,7 +236,8 @@ export class ClineProvider
 					}
 				} catch (error) {
 					this.log(
-						`[onTaskAborted] Failed to rehydrate after streaming failure: ${error instanceof Error ? error.message : String(error)
+						`[onTaskAborted] Failed to rehydrate after streaming failure: ${
+							error instanceof Error ? error.message : String(error)
 						}`,
 					)
 				}
@@ -440,7 +443,8 @@ export class ClineProvider
 				} catch (err) {
 					// Non-fatal: log but do not block the pop operation.
 					this.log(
-						`[ClineProvider#removeClineFromStack] Failed to repair parent metadata for ${parentTaskId} (non-fatal): ${err instanceof Error ? err.message : String(err)
+						`[ClineProvider#removeClineFromStack] Failed to repair parent metadata for ${parentTaskId} (non-fatal): ${
+							err instanceof Error ? err.message : String(err)
 						}`,
 					)
 				}
@@ -822,7 +826,7 @@ export class ClineProvider
 
 	public async createTaskWithHistoryItem(
 		historyItem: HistoryItem & { rootTask?: Task; parentTask?: Task },
-		options?: { startTask?: boolean },
+		options?: { startTask?: boolean; initialQueuedMessages?: QueuedMessage[] },
 	) {
 		const isCliRuntime = process.env.ROO_CLI_RUNTIME === "1"
 		// CLI injects runtime provider settings from command flags/env at startup.
@@ -887,7 +891,8 @@ export class ClineProvider
 						} catch (error) {
 							// Log the error but continue with task restoration.
 							this.log(
-								`Failed to restore API configuration for mode '${historyItem.mode}': ${error instanceof Error ? error.message : String(error)
+								`Failed to restore API configuration for mode '${historyItem.mode}': ${
+									error instanceof Error ? error.message : String(error)
 								}. Continuing with default configuration.`,
 							)
 							// The task will continue with the current/default configuration.
@@ -915,7 +920,8 @@ export class ClineProvider
 				} catch (error) {
 					// Log the error but continue with task restoration.
 					this.log(
-						`Failed to restore API configuration '${historyItem.apiConfigName}' for task: ${error instanceof Error ? error.message : String(error)
+						`Failed to restore API configuration '${historyItem.apiConfigName}' for task: ${
+							error instanceof Error ? error.message : String(error)
 						}. Continuing with current configuration.`,
 					)
 				}
@@ -949,6 +955,7 @@ export class ClineProvider
 			startTask: options?.startTask ?? true,
 			// Preserve the status from the history item to avoid overwriting it when the task saves messages
 			initialStatus: historyItem.status,
+			initialQueuedMessages: options?.initialQueuedMessages,
 		})
 
 		if (isRehydratingCurrentTask) {
@@ -1265,7 +1272,7 @@ export class ClineProvider
 				}
 
 				// Only update the task's mode after successful persistence.
-				; (task as any)._taskMode = newMode
+				;(task as any)._taskMode = newMode
 			} catch (error) {
 				// If persistence fails, log the error but don't update the in-memory state.
 				this.log(
@@ -1369,7 +1376,7 @@ export class ClineProvider
 			task.updateApiConfiguration(providerSettings)
 		} else {
 			// No rebuild needed, just sync apiConfiguration
-			; (task as any).apiConfiguration = providerSettings
+			;(task as any).apiConfiguration = providerSettings
 		}
 	}
 
@@ -1484,7 +1491,8 @@ export class ClineProvider
 		} catch (error) {
 			// If persistence fails, log the error but don't fail the profile switch.
 			this.log(
-				`Failed to persist provider profile switch for task ${task.taskId}: ${error instanceof Error ? error.message : String(error)
+				`Failed to persist provider profile switch for task ${task.taskId}: ${
+					error instanceof Error ? error.message : String(error)
 				}`,
 			)
 		}
@@ -1540,21 +1548,21 @@ export class ClineProvider
 		// Get platform-specific application data directory
 		let mcpServersDir: string
 		if (process.platform === "win32") {
-			// Windows: %APPDATA%\Roo-Code\MCP
-			mcpServersDir = path.join(os.homedir(), "AppData", "Roaming", "Roo-Code", "MCP")
+			// Windows: %APPDATA%\Ladiz\MCP
+			mcpServersDir = path.join(os.homedir(), "AppData", "Roaming", "Ladiz", "MCP")
 		} else if (process.platform === "darwin") {
-			// macOS: ~/Documents/Cline/MCP
-			mcpServersDir = path.join(os.homedir(), "Documents", "Cline", "MCP")
+			// macOS: ~/Documents/Ladiz/MCP
+			mcpServersDir = path.join(os.homedir(), "Documents", "Ladiz", "MCP")
 		} else {
-			// Linux: ~/.local/share/Cline/MCP
-			mcpServersDir = path.join(os.homedir(), ".local", "share", "Roo-Code", "MCP")
+			// Linux: ~/.local/share/Ladiz/MCP
+			mcpServersDir = path.join(os.homedir(), ".local", "share", "Ladiz", "MCP")
 		}
 
 		try {
 			await fs.mkdir(mcpServersDir, { recursive: true })
 		} catch (error) {
 			// Fallback to a relative path if directory creation fails
-			return path.join(os.homedir(), ".roo-code", "mcp")
+			return path.join(os.homedir(), ".ladiz", "mcp")
 		}
 		return mcpServersDir
 	}
@@ -2623,7 +2631,7 @@ export class ClineProvider
 		return task
 	}
 
-	public async cancelTask(): Promise<void> {
+	public async cancelTask(options?: { initialQueuedMessages?: QueuedMessage[] }): Promise<void> {
 		const task = this.getCurrentTask()
 
 		if (!task) {
@@ -2708,7 +2716,37 @@ export class ClineProvider
 		}
 
 		// Clears task again, so we need to abortTask manually above.
-		await this.createTaskWithHistoryItem({ ...historyItem, rootTask, parentTask })
+		await this.createTaskWithHistoryItem(
+			{ ...historyItem, rootTask, parentTask },
+			options?.initialQueuedMessages?.length
+				? { initialQueuedMessages: options.initialQueuedMessages }
+				: undefined,
+		)
+	}
+
+	public async sendQueuedMessage(id: string): Promise<void> {
+		const task = this.getCurrentTask()
+		if (!task || !id) {
+			return
+		}
+
+		const target = task.messageQueueService.messages.find((msg) => msg.id === id)
+		if (!target) {
+			return
+		}
+
+		const remaining = task.messageQueueService.messages.filter((msg) => msg.id !== id)
+		const lastAsk = task.clineMessages.at(-1)
+		const canSubmitDirectly =
+			task.isWaitingForAsk && !task.isStreaming && lastAsk?.type === "ask" && lastAsk.ask !== "command_output"
+
+		if (canSubmitDirectly) {
+			task.messageQueueService.removeMessage(id)
+			await task.submitUserMessage(target.text, target.images)
+			return
+		}
+
+		await this.cancelTask({ initialQueuedMessages: [target, ...remaining] })
 	}
 
 	// Clear the current task without treating it as a subtask.
@@ -2825,7 +2863,8 @@ export class ClineProvider
 			}
 		} catch (error) {
 			this.log(
-				`[delegateParentAndOpenChild] Error flushing pending tool results (non-fatal): ${error instanceof Error ? error.message : String(error)
+				`[delegateParentAndOpenChild] Error flushing pending tool results (non-fatal): ${
+					error instanceof Error ? error.message : String(error)
 				}`,
 			)
 		}
@@ -2837,7 +2876,8 @@ export class ClineProvider
 			await this.removeClineFromStack({ skipDelegationRepair: true })
 		} catch (error) {
 			this.log(
-				`[delegateParentAndOpenChild] Error during parent disposal (non-fatal): ${error instanceof Error ? error.message : String(error)
+				`[delegateParentAndOpenChild] Error during parent disposal (non-fatal): ${
+					error instanceof Error ? error.message : String(error)
 				}`,
 			)
 			// Non-fatal: proceed with child creation even if parent cleanup had issues
@@ -2851,7 +2891,8 @@ export class ClineProvider
 			await this.handleModeSwitch(mode as any)
 		} catch (e) {
 			this.log(
-				`[delegateParentAndOpenChild] handleModeSwitch failed for mode '${mode}': ${(e as Error)?.message ?? String(e)
+				`[delegateParentAndOpenChild] handleModeSwitch failed for mode '${mode}': ${
+					(e as Error)?.message ?? String(e)
 				}`,
 			)
 		}
@@ -2887,7 +2928,8 @@ export class ClineProvider
 			await this.updateTaskHistory(updatedHistory)
 		} catch (err) {
 			this.log(
-				`[delegateParentAndOpenChild] Failed to persist parent metadata for ${parentTaskId} -> ${child.taskId}: ${(err as Error)?.message ?? String(err)
+				`[delegateParentAndOpenChild] Failed to persist parent metadata for ${parentTaskId} -> ${child.taskId}: ${
+					(err as Error)?.message ?? String(err)
 				}`,
 			)
 		}
@@ -3050,7 +3092,8 @@ export class ClineProvider
 			})
 		} catch (err) {
 			this.log(
-				`[reopenParentFromDelegation] Failed to persist child completed status for ${childTaskId}: ${(err as Error)?.message ?? String(err)
+				`[reopenParentFromDelegation] Failed to persist child completed status for ${childTaskId}: ${
+					(err as Error)?.message ?? String(err)
 				}`,
 			)
 		}

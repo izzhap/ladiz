@@ -19,6 +19,11 @@
 		"delete_config_profile": "Bạn có chắc chắn muốn xóa hồ sơ cấu hình này không?",
 		"delete_custom_mode_with_rules": "Bạn có chắc chắn muốn xóa chế độ {scope} này không?\n\nThao tác này cũng sẽ xóa thư mục quy tắc liên quan tại:\n{rulesFolderPath}"
 	},
+	"revert": {
+		"fileSuccess": "Đã hoàn tác thay đổi cho {{path}}",
+		"fileError": "Không thể hoàn tác {{path}}",
+		"allSuccess": "Đã hoàn tác tất cả {{count}} tệp trong cuộc hội thoại này"
+	},
 	"errors": {
 		"invalid_data_uri": "Định dạng URI dữ liệu không hợp lệ",
 		"error_copying_image": "Lỗi khi sao chép hình ảnh: {{errorMessage}}",
@@ -234,6 +239,6 @@
 	},
 	"docsLink": {
 		"label": "Docs",
-		"url": "https://github.com/RooCodeInc/Roo-Code"
+		"url": "https://github.com/izzhap/ladiz"
 	}
 }

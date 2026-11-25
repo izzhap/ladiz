@@ -24,7 +24,14 @@
 	"unpin": "ピン留めを解除",
 	"pin": "ピン留め",
 	"fileChangesInConversation": {
-		"header": "この会話で {{count}} 個のファイルが変更されました"
+		"header": "この会話で {{count}} 個のファイルが変更されました",
+		"revertAll": "すべて元に戻す",
+		"revertAllConfirmTitle": "すべての変更を元に戻す",
+		"revertAllConfirmDescription": "この会話で行われた {{count}} 個のファイルへのすべての変更を元に戻してもよろしいですか？ファイルはこの会話が始まる前の状態に戻ります。",
+		"revertFileConfirmTitle": "ファイルの変更を元に戻す",
+		"revertFileConfirmDescription": "この会話で行われた {{path}} への変更を元に戻してもよろしいですか？ファイルはこの会話が始まる前の状態に戻ります。",
+		"revertFile": "ファイルを元に戻す",
+		"reverted": "元に戻しました"
 	},
 	"tokenProgress": {
 		"availableSpace": "利用可能な空き容量: {{amount}} トークン",
@@ -457,7 +464,29 @@
 	},
 	"queuedMessages": {
 		"title": "キューメッセージ",
-		"clickToEdit": "クリックしてメッセージを編集"
+		"clickToEdit": "クリックしてメッセージを編集",
+		"sendNow": "今すぐ送信",
+		"edit": "メッセージを編集",
+		"delete": "メッセージを削除",
+		"save": "保存",
+		"cancel": "キャンセル"
+	},
+	"loadingTips": {
+		"hide": "ヒントを非表示",
+		"show": "ヒントを表示",
+		"status": {
+			"thinking": "思考中...",
+			"responding": "応答中...",
+			"executing": "実行中...",
+			"executingMcp": "MCP 実行中...",
+			"editing": "編集中...",
+			"reading": "読み込み中...",
+			"searching": "検索中...",
+			"condensing": "コンテキストを圧縮中...",
+			"truncating": "コンテキストを切り詰め中...",
+			"rateLimiting": "レート制限中...",
+			"retrying": "再試行中..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Rooはスラッシュコマンドを実行したい",

@@ -1,4 +1,4 @@
-import { RooCodeEventName, TodoItem } from "@roo-code/types"
+import { RooCodeEventName, TodoItem } from "@ladiz/types"
 
 import { AttemptCompletionToolUse } from "../../../shared/tools"
 

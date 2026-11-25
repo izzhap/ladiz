@@ -2,7 +2,7 @@ import path from "path"
 import delay from "delay"
 import fs from "fs/promises"
 
-import { type ClineSayTool, DEFAULT_WRITE_DELAY_MS } from "@roo-code/types"
+import { type ClineSayTool, DEFAULT_WRITE_DELAY_MS } from "@ladiz/types"
 
 import { Task } from "../task/Task"
 import { formatResponse } from "../prompts/responses"
@@ -124,6 +124,7 @@ export class WriteToFileTool extends BaseTool<"write_to_file"> {
 				const completeMessage = JSON.stringify({
 					...sharedMessageProps,
 					content: unified,
+					originalContent: task.diffViewProvider.originalContent,
 					diffStats: computeDiffStats(unified) || undefined,
 				} satisfies ClineSayTool)
 
@@ -156,6 +157,7 @@ export class WriteToFileTool extends BaseTool<"write_to_file"> {
 				const completeMessage = JSON.stringify({
 					...sharedMessageProps,
 					content: unified,
+					originalContent: task.diffViewProvider.originalContent,
 					diffStats: computeDiffStats(unified) || undefined,
 				} satisfies ClineSayTool)
 
@@ -181,8 +183,6 @@ export class WriteToFileTool extends BaseTool<"write_to_file"> {
 
 			await task.diffViewProvider.reset()
 			this.resetPartialState()
-
-			task.processQueuedMessages()
 
 			return
 		} catch (error) {

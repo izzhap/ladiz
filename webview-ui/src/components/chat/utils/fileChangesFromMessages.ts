@@ -1,4 +1,4 @@
-import type { ClineMessage, ClineSayTool } from "@roo-code/types"
+import type { ClineMessage, ClineSayTool } from "@ladiz/types"
 import { safeJsonParse } from "@roo/core"
 
 /** File-edit tool names from ClineSayTool["tool"] (packages/types). */
@@ -10,6 +10,8 @@ export interface FileChangeEntry {
 	diffStats?: { added: number; removed: number }
 	/** Original file content before first edit (for merged diff display) */
 	originalContent?: string
+	/** Whether the file was created as a new file in this conversation */
+	isNewFile?: boolean
 }
 
 /**
@@ -59,6 +61,7 @@ export function fileChangesFromMessages(messages: ClineMessage[] | undefined): F
 				diff,
 				diffStats: tool.diffStats,
 				originalContent: tool.originalContent,
+				...(tool.tool === "newFileCreated" ? { isNewFile: true } : {}),
 			})
 		}
 	}

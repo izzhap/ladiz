@@ -19,6 +19,11 @@
 		"delete_config_profile": "क्या आप वाकई इस कॉन्फ़िगरेशन प्रोफ़ाइल को हटाना चाहते हैं?",
 		"delete_custom_mode_with_rules": "क्या आप वाकई इस {scope} मोड को हटाना चाहते हैं?\n\nयह संबंधित नियम फ़ोल्डर को भी यहाँ हटा देगा:\n{rulesFolderPath}"
 	},
+	"revert": {
+		"fileSuccess": "{{path}} में किए गए बदलाव वापस कर दिए गए",
+		"fileError": "{{path}} को वापस नहीं किया जा सका",
+		"allSuccess": "इस वार्तालाप की सभी {{count}} फ़ाइल(ें) वापस कर दी गईं"
+	},
 	"errors": {
 		"invalid_data_uri": "अमान्य डेटा URI फॉर्मेट",
 		"error_copying_image": "छवि कॉपी करने में त्रुटि: {{errorMessage}}",
@@ -227,6 +232,6 @@
 	},
 	"docsLink": {
 		"label": "Docs",
-		"url": "https://github.com/RooCodeInc/Roo-Code"
+		"url": "https://github.com/izzhap/ladiz"
 	}
 }

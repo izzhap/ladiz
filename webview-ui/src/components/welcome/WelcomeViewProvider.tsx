@@ -2,7 +2,7 @@ import { useCallback, useState } from "react"
 import { Trans } from "react-i18next"
 import { ArrowLeft, Brain } from "lucide-react"
 
-import { ladizDefaultModelId, type ProviderSettings } from "@roo-code/types"
+import { ladizDefaultModelId, type ProviderSettings } from "@ladiz/types"
 
 import { useExtensionState } from "@src/context/ExtensionStateContext"
 import { validateApiConfiguration } from "@src/utils/validate"

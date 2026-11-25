@@ -1,4 +1,4 @@
-import type { ClineMessage } from "@roo-code/types"
+import type { ClineMessage } from "@ladiz/types"
 
 import { safeJsonParse } from "./safeJsonParse.js"
 

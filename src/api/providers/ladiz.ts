@@ -1,7 +1,7 @@
 import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI from "openai"
 import { OpenAiHandler } from "./openai"
-import { ladizModels, ladizDefaultModelId, type ModelInfo } from "@roo-code/types"
+import { ladizModels, ladizDefaultModelId, type ModelInfo } from "@ladiz/types"
 import type { ApiHandlerOptions } from "../../shared/api"
 import { TagMatcher } from "../../utils/tag-matcher"
 import { convertToOpenAiMessages } from "../transform/openai-format"

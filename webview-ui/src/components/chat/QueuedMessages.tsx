@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { QueuedMessage } from "@roo-code/types"
+import { QueuedMessage } from "@ladiz/types"
 
-import { Button } from "@src/components/ui"
+import { Button, StandardTooltip } from "@src/components/ui"
 
 import Thumbnails from "../common/Thumbnails"
 
@@ -13,9 +13,10 @@ interface QueuedMessagesProps {
 	queue: QueuedMessage[]
 	onRemove: (index: number) => void
 	onUpdate: (index: number, newText: string) => void
+	onSendNow?: (index: number) => void
 }
 
-export const QueuedMessages = ({ queue, onRemove, onUpdate }: QueuedMessagesProps) => {
+export const QueuedMessages = ({ queue, onRemove, onUpdate, onSendNow }: QueuedMessagesProps) => {
 	const { t } = useTranslation("chat")
 	const [editingStates, setEditingStates] = useState<Record<string, { isEditing: boolean; value: string }>>({})
 
@@ -89,17 +90,84 @@ export const QueuedMessages = ({ queue, onRemove, onUpdate }: QueuedMessagesProp
 										</div>
 									)}
 								</div>
-								<div className="flex">
-									<Button
-										variant="ghost"
-										size="icon"
-										className="shrink-0"
-										onClick={(e) => {
-											e.stopPropagation()
-											onRemove(index)
-										}}>
-										<span className="codicon codicon-trash" />
-									</Button>
+								<div className="flex items-center shrink-0">
+									{editState.isEditing ? (
+										<>
+											<StandardTooltip content={t("queuedMessages.save")}>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="shrink-0"
+													aria-label={t("queuedMessages.save")}
+													onMouseDown={(e) => e.preventDefault()}
+													onClick={(e) => {
+														e.stopPropagation()
+														handleSaveEdit(index, message.id, editState.value)
+													}}>
+													<span className="codicon codicon-check" />
+												</Button>
+											</StandardTooltip>
+											<StandardTooltip content={t("queuedMessages.cancel")}>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="shrink-0"
+													aria-label={t("queuedMessages.cancel")}
+													onMouseDown={(e) => e.preventDefault()}
+													onClick={(e) => {
+														e.stopPropagation()
+														setEditState(message.id, false, message.text)
+													}}>
+													<span className="codicon codicon-close" />
+												</Button>
+											</StandardTooltip>
+										</>
+									) : (
+										<>
+											{onSendNow && (
+												<StandardTooltip content={t("queuedMessages.sendNow")}>
+													<Button
+														variant="ghost"
+														size="icon"
+														className="shrink-0"
+														aria-label={t("queuedMessages.sendNow")}
+														onClick={(e) => {
+															e.stopPropagation()
+															onSendNow(index)
+														}}>
+														<span className="codicon codicon-send" />
+													</Button>
+												</StandardTooltip>
+											)}
+											<StandardTooltip content={t("queuedMessages.edit")}>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="shrink-0"
+													aria-label={t("queuedMessages.edit")}
+													onClick={(e) => {
+														e.stopPropagation()
+														setEditState(message.id, true, message.text)
+													}}>
+													<span className="codicon codicon-edit" />
+												</Button>
+											</StandardTooltip>
+										</>
+									)}
+									<StandardTooltip content={t("queuedMessages.delete")}>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="shrink-0"
+											aria-label={t("queuedMessages.delete")}
+											onMouseDown={(e) => e.preventDefault()}
+											onClick={(e) => {
+												e.stopPropagation()
+												onRemove(index)
+											}}>
+											<span className="codicon codicon-trash" />
+										</Button>
+									</StandardTooltip>
 								</div>
 							</div>
 							{message.images && message.images.length > 0 && (

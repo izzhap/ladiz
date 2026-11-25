@@ -1,7 +1,7 @@
 import pWaitFor from "p-wait-for"
 import * as vscode from "vscode"
 
-import type { ClineApiReqInfo } from "@roo-code/types"
+import type { ClineApiReqInfo } from "@ladiz/types"
 
 import { Task } from "../task/Task"
 
@@ -295,6 +295,14 @@ export async function checkpointRestore(
 		provider?.log("[checkpointRestore] disabling checkpoints for this task")
 		task.enableCheckpoints = false
 	}
+}
+
+export async function checkpointRestoreFile(task: Task, filePath: string): Promise<boolean> {
+	const service = await getCheckpointService(task)
+	if (!service || !service.isInitialized) {
+		return false
+	}
+	return service.restoreFile(filePath)
 }
 
 export type CheckpointDiffOptions = {

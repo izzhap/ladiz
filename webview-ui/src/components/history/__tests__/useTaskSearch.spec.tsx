@@ -1,6 +1,6 @@
 import { renderHook, act } from "@/utils/test-utils"
 
-import type { HistoryItem } from "@roo-code/types"
+import type { HistoryItem } from "@ladiz/types"
 
 import { useTaskSearch } from "../useTaskSearch"
 

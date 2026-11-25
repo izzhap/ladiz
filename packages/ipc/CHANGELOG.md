@@ -1,3 +1,3 @@
-# @roo-code/ipc
+# @ladiz/ipc
 
 ## 0.0.1

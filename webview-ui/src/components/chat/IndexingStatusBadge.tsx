@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react"
 
-import type { IndexingStatus, IndexingStatusUpdateMessage } from "@roo-code/types"
+import type { IndexingStatus, IndexingStatusUpdateMessage } from "@ladiz/types"
 
 import { cn } from "@src/lib/utils"
 import { vscode } from "@src/utils/vscode"

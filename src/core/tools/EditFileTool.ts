@@ -1,7 +1,7 @@
 import fs from "fs/promises"
 import path from "path"
 
-import { type ClineSayTool, DEFAULT_WRITE_DELAY_MS } from "@roo-code/types"
+import { type ClineSayTool, DEFAULT_WRITE_DELAY_MS } from "@ladiz/types"
 
 import { getReadablePath } from "../../utils/path"
 import { isPathOutsideWorkspace } from "../../utils/pathUtils"
@@ -411,6 +411,7 @@ export class EditFileTool extends BaseTool<"edit_file"> {
 			const completeMessage = JSON.stringify({
 				...sharedMessageProps,
 				content: sanitizedDiff,
+				originalContent: task.diffViewProvider.originalContent,
 				isProtected: isWriteProtected,
 				diffStats,
 			} satisfies ClineSayTool)
@@ -467,9 +468,6 @@ export class EditFileTool extends BaseTool<"edit_file"> {
 			task.recordToolUsage("edit_file")
 			await task.diffViewProvider.reset()
 			this.resetPartialState()
-
-			// Process any queued messages after file edit completes
-			task.processQueuedMessages()
 		} catch (error) {
 			if (relPathForErrorHandling) {
 				await finalizePartialToolAskIfNeeded(relPathForErrorHandling)

@@ -9,8 +9,8 @@ import {
 	vertexModels,
 	ANTHROPIC_DEFAULT_MAX_TOKENS,
 	VERTEX_1M_CONTEXT_MODEL_IDS,
-} from "@roo-code/types"
-import { safeJsonParse } from "@roo-code/core"
+} from "@ladiz/types"
+import { safeJsonParse } from "@ladiz/core"
 
 import { ApiHandlerOptions } from "../../shared/api"
 

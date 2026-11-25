@@ -1,6 +1,6 @@
 import * as vscode from "vscode"
 
-import { RooCodeEventName, type HistoryItem } from "@roo-code/types"
+import { RooCodeEventName, type HistoryItem } from "@ladiz/types"
 
 import { Task } from "../task/Task"
 import { formatResponse } from "../prompts/responses"

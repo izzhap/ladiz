@@ -24,7 +24,14 @@
 	"unpin": "Bỏ ghim khỏi đầu",
 	"pin": "Ghim lên đầu",
 	"fileChangesInConversation": {
-		"header": "{{count}} tệp đã thay đổi trong cuộc hội thoại này"
+		"header": "{{count}} tệp đã thay đổi trong cuộc hội thoại này",
+		"revertAll": "Hoàn tác tất cả",
+		"revertAllConfirmTitle": "Hoàn tác tất cả thay đổi",
+		"revertAllConfirmDescription": "Bạn có chắc chắn muốn hoàn tác tất cả thay đổi trên {{count}} tệp trong cuộc hội thoại này không? Thao tác này sẽ khôi phục các tệp về trạng thái trước khi cuộc hội thoại này bắt đầu.",
+		"revertFileConfirmTitle": "Hoàn tác thay đổi tệp",
+		"revertFileConfirmDescription": "Bạn có chắc chắn muốn hoàn tác các thay đổi đối với {{path}} trong cuộc hội thoại này không? Thao tác này sẽ khôi phục tệp về trạng thái trước khi cuộc hội thoại này bắt đầu.",
+		"revertFile": "Hoàn tác tệp",
+		"reverted": "Đã hoàn tác"
 	},
 	"tokenProgress": {
 		"availableSpace": "Không gian khả dụng: {{amount}} tokens",
@@ -458,7 +465,29 @@
 	},
 	"queuedMessages": {
 		"title": "Tin nhắn trong hàng đợi",
-		"clickToEdit": "Nhấp để chỉnh sửa tin nhắn"
+		"clickToEdit": "Nhấp để chỉnh sửa tin nhắn",
+		"sendNow": "Gửi ngay",
+		"edit": "Chỉnh sửa tin nhắn",
+		"delete": "Xóa tin nhắn",
+		"save": "Lưu",
+		"cancel": "Hủy"
+	},
+	"loadingTips": {
+		"hide": "Ẩn mẹo",
+		"show": "Hiện mẹo",
+		"status": {
+			"thinking": "Đang suy nghĩ...",
+			"responding": "Đang phản hồi...",
+			"executing": "Đang thực thi...",
+			"executingMcp": "Đang thực thi MCP...",
+			"editing": "Đang chỉnh sửa...",
+			"reading": "Đang đọc...",
+			"searching": "Đang tìm kiếm...",
+			"condensing": "Đang nén ngữ cảnh...",
+			"truncating": "Đang cắt ngắn ngữ cảnh...",
+			"rateLimiting": "Đang giới hạn tốc độ...",
+			"retrying": "Đang thử lại..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz muốn chạy lệnh slash",

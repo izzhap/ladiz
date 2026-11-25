@@ -20,8 +20,8 @@ import {
 	IpcOrigin,
 	IpcMessageType,
 	openRouterDefaultModelId,
-} from "@roo-code/types"
-import { IpcServer } from "@roo-code/ipc"
+} from "@ladiz/types"
+import { IpcServer } from "@ladiz/ipc"
 
 import { Package } from "../shared/package"
 import { ClineProvider } from "../core/webview/ClineProvider"
@@ -55,7 +55,7 @@ export class API extends EventEmitter<RooCodeEvents> implements RooCodeAPI {
 				console.log(args)
 			}
 
-			this.logfile = path.join(os.tmpdir(), "roo-code-messages.log")
+			this.logfile = path.join(os.tmpdir(), "ladiz-messages.log")
 		} else {
 			this.log = () => {}
 		}

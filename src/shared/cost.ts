@@ -1,5 +1,5 @@
-import type { ModelInfo } from "@roo-code/types"
-import type { ServiceTier } from "@roo-code/types"
+import type { ModelInfo } from "@ladiz/types"
+import type { ServiceTier } from "@ladiz/types"
 
 export interface ApiCostResult {
 	totalInputTokens: number

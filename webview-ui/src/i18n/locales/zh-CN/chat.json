@@ -24,7 +24,14 @@
 	"unpin": "取消置顶",
 	"pin": "置顶",
 	"fileChangesInConversation": {
-		"header": "此对话中已更改 {{count}} 个文件"
+		"header": "此对话中已更改 {{count}} 个文件",
+		"revertAll": "全部还原",
+		"revertAllConfirmTitle": "还原所有更改",
+		"revertAllConfirmDescription": "确定要还原此对话中对 {{count}} 个文件所做的所有更改吗？这将把文件恢复到此对话开始前的状态。",
+		"revertFileConfirmTitle": "还原文件更改",
+		"revertFileConfirmDescription": "确定要还原此对话中对 {{path}} 所做的更改吗？这将把文件恢复到此对话开始前的状态。",
+		"revertFile": "还原文件",
+		"reverted": "已还原"
 	},
 	"tokenProgress": {
 		"availableSpace": "可用: {{amount}}",
@@ -458,7 +465,29 @@
 	},
 	"queuedMessages": {
 		"title": "队列消息",
-		"clickToEdit": "点击编辑消息"
+		"clickToEdit": "点击编辑消息",
+		"sendNow": "立即发送",
+		"edit": "编辑消息",
+		"delete": "删除消息",
+		"save": "保存",
+		"cancel": "取消"
+	},
+	"loadingTips": {
+		"hide": "隐藏提示",
+		"show": "显示提示",
+		"status": {
+			"thinking": "思考中...",
+			"responding": "回复中...",
+			"executing": "执行中...",
+			"executingMcp": "执行 MCP 中...",
+			"editing": "编辑中...",
+			"reading": "读取中...",
+			"searching": "搜索中...",
+			"condensing": "压缩上下文中...",
+			"truncating": "截断上下文中...",
+			"rateLimiting": "限流中...",
+			"retrying": "重试中..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz 想要运行斜杠命令",

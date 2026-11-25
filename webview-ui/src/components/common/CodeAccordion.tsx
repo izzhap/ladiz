@@ -1,6 +1,7 @@
 import { memo, useMemo } from "react"
 import { VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react"
-import { type ToolProgressStatus } from "@roo-code/types"
+import { cn } from "@/lib/utils"
+import { type ToolProgressStatus } from "@ladiz/types"
 import { getLanguageFromPath } from "@src/utils/getLanguageFromPath"
 import { formatPathTooltip } from "@src/utils/formatPathTooltip"
 
@@ -22,6 +23,8 @@ interface CodeAccordionProps {
 	onJumpToFile?: () => void
 	// New props for diff stats
 	diffStats?: { added: number; removed: number }
+	onRevert?: () => void
+	isReverted?: boolean
 }
 
 const CodeAccordion = ({
@@ -36,6 +39,8 @@ const CodeAccordion = ({
 	header,
 	onJumpToFile,
 	diffStats,
+	onRevert,
+	isReverted,
 }: CodeAccordionProps) => {
 	const inferredLanguage = useMemo(() => language ?? (path ? getLanguageFromPath(path) : "txt"), [path, language])
 	const source = useMemo(() => code.trim(), [code])
@@ -107,6 +112,35 @@ const CodeAccordion = ({
 								onJumpToFile()
 							}}
 							aria-label={`Open file: ${path}`}
+						/>
+					)}
+					{onRevert && (
+						<span
+							role="button"
+							tabIndex={0}
+							className={cn(
+								"codicon mr-1",
+								isReverted
+									? "codicon-check text-vscode-charts-green cursor-default"
+									: "codicon-discard hover:text-vscode-errorForeground cursor-pointer",
+							)}
+							style={{ fontSize: 13.5 }}
+							onClick={(e) => {
+								e.stopPropagation()
+								if (!isReverted) {
+									onRevert()
+								}
+							}}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									e.stopPropagation()
+									if (!isReverted) {
+										onRevert()
+									}
+								}
+							}}
+							aria-label={isReverted ? "Reverted" : `Revert file: ${path}`}
+							title={isReverted ? "Reverted" : "Revert file changes"}
 						/>
 					)}
 					{!onJumpToFile && (

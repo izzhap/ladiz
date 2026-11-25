@@ -24,7 +24,14 @@
 	"unpin": "Desfixar",
 	"pin": "Fixar",
 	"fileChangesInConversation": {
-		"header": "{{count}} fitxer(s) canviat(s) en aquesta conversa"
+		"header": "{{count}} fitxer(s) canviat(s) en aquesta conversa",
+		"revertAll": "Reverteix-ho tot",
+		"revertAllConfirmTitle": "Reverteix tots els canvis",
+		"revertAllConfirmDescription": "Segur que vols revertir tots els canvis fets en {{count}} fitxer(s) en aquesta conversa? Això restaurarà els fitxers a l'estat anterior a l'inici d'aquesta conversa.",
+		"revertFileConfirmTitle": "Reverteix els canvis del fitxer",
+		"revertFileConfirmDescription": "Segur que vols revertir els canvis a {{path}} fets en aquesta conversa? Això restaurarà el fitxer a l'estat anterior a l'inici d'aquesta conversa.",
+		"revertFile": "Reverteix el fitxer",
+		"reverted": "Revertit"
 	},
 	"tokenProgress": {
 		"availableSpace": "Espai disponible: {{amount}} tokens",
@@ -451,7 +458,29 @@
 	},
 	"queuedMessages": {
 		"title": "Missatges en cua",
-		"clickToEdit": "Feu clic per editar el missatge"
+		"clickToEdit": "Feu clic per editar el missatge",
+		"sendNow": "Envia immediatament",
+		"edit": "Edita el missatge",
+		"delete": "Elimina el missatge",
+		"save": "Desa",
+		"cancel": "Cancel·la"
+	},
+	"loadingTips": {
+		"hide": "Amaga els consells",
+		"show": "Mostra els consells",
+		"status": {
+			"thinking": "Pensant...",
+			"responding": "Responent...",
+			"executing": "Executant...",
+			"executingMcp": "Executant MCP...",
+			"editing": "Editant...",
+			"reading": "Llegint...",
+			"searching": "Cercant...",
+			"condensing": "Condensant el context...",
+			"truncating": "Truncant el context...",
+			"rateLimiting": "Limitant la taxa...",
+			"retrying": "Tornant a intentar..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz vol executar una comanda slash",

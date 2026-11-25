@@ -3,7 +3,7 @@ import { useEvent } from "react-use"
 import { useAppTranslation } from "@src/i18n/TranslationContext"
 import { ChevronDown, OctagonX, Terminal } from "lucide-react"
 
-import { type ExtensionMessage, type CommandExecutionStatus, commandExecutionStatusSchema } from "@roo-code/types"
+import { type ExtensionMessage, type CommandExecutionStatus, commandExecutionStatusSchema } from "@ladiz/types"
 
 import { safeJsonParse } from "@roo/core"
 import { COMMAND_OUTPUT_STRING } from "@roo/combineCommandSequences"

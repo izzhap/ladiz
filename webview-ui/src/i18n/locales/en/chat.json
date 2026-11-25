@@ -24,7 +24,14 @@
 	"unpin": "Unpin",
 	"pin": "Pin",
 	"fileChangesInConversation": {
-		"header": "{{count}} file(s) changed in this conversation"
+		"header": "{{count}} file(s) changed in this conversation",
+		"revertAll": "Revert all",
+		"revertAllConfirmTitle": "Revert All Changes",
+		"revertAllConfirmDescription": "Are you sure you want to revert all changes across {{count}} file(s) made in this conversation? This will restore files to their state before this conversation started.",
+		"revertFileConfirmTitle": "Revert File Changes",
+		"revertFileConfirmDescription": "Are you sure you want to revert changes to {{path}} made in this conversation? This will restore the file to its state before this conversation started.",
+		"revertFile": "Revert file",
+		"reverted": "Reverted"
 	},
 	"retry": {
 		"title": "Retry",
@@ -448,7 +455,29 @@
 	},
 	"queuedMessages": {
 		"title": "Queued Messages",
-		"clickToEdit": "Click to edit message"
+		"clickToEdit": "Click to edit message",
+		"sendNow": "Send immediately",
+		"edit": "Edit message",
+		"delete": "Delete message",
+		"save": "Save",
+		"cancel": "Cancel"
+	},
+	"loadingTips": {
+		"hide": "Hide tips",
+		"show": "Show tips",
+		"status": {
+			"thinking": "Thinking...",
+			"responding": "Responding...",
+			"executing": "Executing...",
+			"executingMcp": "Executing MCP...",
+			"editing": "Editing...",
+			"reading": "Reading...",
+			"searching": "Searching...",
+			"condensing": "Condensing context...",
+			"truncating": "Truncating context...",
+			"rateLimiting": "Rate limiting...",
+			"retrying": "Retrying..."
+		}
 	},
 	"contextMenu": {
 		"noResults": "No results",

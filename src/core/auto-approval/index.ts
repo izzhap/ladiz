@@ -5,7 +5,7 @@ import {
 	type FollowUpData,
 	type ExtensionState,
 	isNonBlockingAsk,
-} from "@roo-code/types"
+} from "@ladiz/types"
 
 import { ClineAskResponse } from "../../shared/WebviewMessage"
 
@@ -166,9 +166,7 @@ export async function checkAutoApproval({
 		const isOutsideWorkspace = !!tool.isOutsideWorkspace
 
 		if (isReadOnlyToolAction(tool)) {
-			return state.alwaysAllowReadOnly !== false
-				? { decision: "approve" }
-				: { decision: "ask" }
+			return state.alwaysAllowReadOnly !== false ? { decision: "approve" } : { decision: "ask" }
 		}
 
 		if (isWriteToolAction(tool)) {

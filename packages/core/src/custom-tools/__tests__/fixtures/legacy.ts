@@ -1,4 +1,4 @@
-import { parametersSchema, defineCustomTool } from "@roo-code/types"
+import { parametersSchema, defineCustomTool } from "@ladiz/types"
 
 export default defineCustomTool({
 	name: "legacy",

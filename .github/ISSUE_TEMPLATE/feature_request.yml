@@ -54,11 +54,11 @@ body:
           required: true
 
   - type: textarea
-    id: roo-code-tasks
+    id: ladiz-tasks
     attributes:
-      label: Roo Code Task Links (optional)
-      description: If you explored this with Roo Code, share public task links for context.
-      placeholder: Paste your Roo Code share links here, one per line
+      label: Ladiz Task Links (optional)
+      description: If you explored this with Ladiz, share public task links for context.
+      placeholder: Paste your Ladiz share links here, one per line
 
   - type: markdown
     attributes:

@@ -1,10 +1,10 @@
-# @roo-code/cli
+# @ladiz/cli
 
 Command Line Interface for Roo Code - Run the Roo Code agent from the terminal without VSCode.
 
 ## Overview
 
-This CLI uses the `@roo-code/vscode-shim` package to provide a VSCode API compatibility layer, allowing the main Roo Code extension to run in a Node.js environment.
+This CLI uses the `@ladiz/vscode-shim` package to provide a VSCode API compatibility layer, allowing the main Roo Code extension to run in a Node.js environment.
 
 ## Installation
 
@@ -13,7 +13,7 @@ This CLI uses the `@roo-code/vscode-shim` package to provide a VSCode API compat
 Install the Roo Code CLI with a single command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/apps/cli/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/izzhap/ladiz/main/apps/cli/install.sh | sh
 ```
 
 **Requirements:**
@@ -24,13 +24,13 @@ curl -fsSL https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/apps/cli/i
 **Custom installation directory:**
 
 ```bash
-ROO_INSTALL_DIR=/opt/roo-code ROO_BIN_DIR=/usr/local/bin curl -fsSL ... | sh
+ROO_INSTALL_DIR=/opt/ladiz ROO_BIN_DIR=/usr/local/bin curl -fsSL ... | sh
 ```
 
 **Install a specific version:**
 
 ```bash
-ROO_VERSION=0.1.0 curl -fsSL https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/apps/cli/install.sh | sh
+ROO_VERSION=0.1.0 curl -fsSL https://raw.githubusercontent.com/izzhap/ladiz/main/apps/cli/install.sh | sh
 ```
 
 ### Updating
@@ -38,7 +38,7 @@ ROO_VERSION=0.1.0 curl -fsSL https://raw.githubusercontent.com/RooCodeInc/Roo-Co
 Re-run the install script to update to the latest version:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/RooCodeInc/Roo-Code/main/apps/cli/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/izzhap/ladiz/main/apps/cli/install.sh | sh
 ```
 
 Or run:
@@ -181,7 +181,7 @@ The CLI will look for API keys in environment variables if not provided via `--a
 
 2. **ExtensionHost** (`extension-host.ts`):
 
-    - Creates a VSCode API mock using `@roo-code/vscode-shim`
+    - Creates a VSCode API mock using `@ladiz/vscode-shim`
     - Intercepts `require('vscode')` to return the mock
     - Loads and activates the extension bundle
     - Manages bidirectional message flow

@@ -19,6 +19,11 @@
 		"delete_config_profile": "Apakah kamu yakin ingin menghapus profil konfigurasi ini?",
 		"delete_custom_mode_with_rules": "Anda yakin ingin menghapus mode {scope} ini?\n\nIni juga akan menghapus folder aturan terkait di:\n{rulesFolderPath}"
 	},
+	"revert": {
+		"fileSuccess": "Perubahan pada {{path}} telah dibatalkan",
+		"fileError": "Gagal membatalkan perubahan pada {{path}}",
+		"allSuccess": "Semua {{count}} file dalam percakapan ini telah dibatalkan"
+	},
 	"errors": {
 		"invalid_data_uri": "Format data URI tidak valid",
 		"error_copying_image": "Error menyalin gambar: {{errorMessage}}",
@@ -227,6 +232,6 @@
 	},
 	"docsLink": {
 		"label": "Docs",
-		"url": "https://github.com/RooCodeInc/Roo-Code"
+		"url": "https://github.com/izzhap/ladiz"
 	}
 }

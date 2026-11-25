@@ -23,8 +23,8 @@ import {
 	isInteractiveAsk,
 	isResumableAsk,
 	isNonBlockingAsk,
-} from "@roo-code/types"
-import { debugLog } from "@roo-code/core/cli"
+} from "@ladiz/types"
+import { debugLog } from "@ladiz/core/cli"
 
 import { FOLLOWUP_TIMEOUT_SECONDS } from "@/types/index.js"
 

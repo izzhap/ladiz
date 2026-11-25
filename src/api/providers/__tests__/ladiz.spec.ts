@@ -1,6 +1,6 @@
 import { LadizHandler, LADIZ_DEFAULT_BASE_URL } from "../ladiz"
 import OpenAI from "openai"
-import { ladizModels, type LadizModelId } from "@roo-code/types"
+import { ladizModels, type LadizModelId } from "@ladiz/types"
 
 const mockConstructor = vi.fn()
 

@@ -1,5 +1,5 @@
 import stringify from "safe-stable-stringify"
-import { DEFAULT_CONSECUTIVE_MISTAKE_LIMIT, type ToolName } from "@roo-code/types"
+import { DEFAULT_CONSECUTIVE_MISTAKE_LIMIT, type ToolName } from "@ladiz/types"
 import { ToolUse } from "../../shared/tools"
 import { t } from "../../i18n"
 

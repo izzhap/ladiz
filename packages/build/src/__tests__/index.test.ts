@@ -108,19 +108,19 @@ describe("generatePackageJson", () => {
 				},
 			},
 			overrideJson: {
-				name: "roo-code-nightly",
-				displayName: "Roo Code Nightly",
+				name: "ladiz-nightly",
+				displayName: "Ladiz Nightly",
 				publisher: "RooVeterinaryInc",
 				version: "0.0.1",
 				icon: "assets/icons/icon-nightly.png",
 				scripts: {},
 			},
-			substitution: ["roo-cline", "roo-code-nightly"],
+			substitution: ["roo-cline", "ladiz-nightly"],
 		})
 
 		expect(generatedPackageJson).toStrictEqual({
-			name: "roo-code-nightly",
-			displayName: "Roo Code Nightly",
+			name: "ladiz-nightly",
+			displayName: "Ladiz Nightly",
 			description: "%extension.description%",
 			publisher: "RooVeterinaryInc",
 			version: "0.0.1",
@@ -129,29 +129,29 @@ describe("generatePackageJson", () => {
 				viewsContainers: {
 					activitybar: [
 						{
-							id: "roo-code-nightly-ActivityBar",
+							id: "ladiz-nightly-ActivityBar",
 							title: "%views.activitybar.title%",
 							icon: "assets/icons/icon.svg",
 						},
 					],
 				},
 				views: {
-					"roo-code-nightly-ActivityBar": [
+					"ladiz-nightly-ActivityBar": [
 						{
 							type: "webview",
-							id: "roo-code-nightly.SidebarProvider",
+							id: "ladiz-nightly.SidebarProvider",
 							name: "",
 						},
 					],
 				},
 				commands: [
 					{
-						command: "roo-code-nightly.plusButtonClicked",
+						command: "ladiz-nightly.plusButtonClicked",
 						title: "%command.newTask.title%",
 						icon: "$(edit)",
 					},
 					{
-						command: "roo-code-nightly.openInNewTab",
+						command: "ladiz-nightly.openInNewTab",
 						title: "%command.openInNewTab.title%",
 						category: "%configuration.title%",
 					},
@@ -159,48 +159,48 @@ describe("generatePackageJson", () => {
 				menus: {
 					"editor/context": [
 						{
-							submenu: "roo-code-nightly.contextMenu",
+							submenu: "ladiz-nightly.contextMenu",
 							group: "navigation",
 						},
 					],
-					"roo-code-nightly.contextMenu": [
+					"ladiz-nightly.contextMenu": [
 						{
-							command: "roo-code-nightly.addToContext",
+							command: "ladiz-nightly.addToContext",
 							group: "1_actions@1",
 						},
 					],
 					"editor/title": [
 						{
-							command: "roo-code-nightly.plusButtonClicked",
+							command: "ladiz-nightly.plusButtonClicked",
 							group: "navigation@1",
-							when: "activeWebviewPanelId == roo-code-nightly.TabPanelProvider",
+							when: "activeWebviewPanelId == ladiz-nightly.TabPanelProvider",
 						},
 						{
-							command: "roo-code-nightly.settingsButtonClicked",
+							command: "ladiz-nightly.settingsButtonClicked",
 							group: "navigation@6",
-							when: "activeWebviewPanelId == roo-code-nightly.TabPanelProvider",
+							when: "activeWebviewPanelId == ladiz-nightly.TabPanelProvider",
 						},
 						{
-							command: "roo-code-nightly.accountButtonClicked",
+							command: "ladiz-nightly.accountButtonClicked",
 							group: "navigation@6",
-							when: "activeWebviewPanelId == roo-code-nightly.TabPanelProvider",
+							when: "activeWebviewPanelId == ladiz-nightly.TabPanelProvider",
 						},
 					],
 				},
 				submenus: [
 					{
-						id: "roo-code-nightly.contextMenu",
+						id: "ladiz-nightly.contextMenu",
 						label: "%views.contextMenu.label%",
 					},
 					{
-						id: "roo-code-nightly.terminalMenu",
+						id: "ladiz-nightly.terminalMenu",
 						label: "%views.terminalMenu.label%",
 					},
 				],
 				configuration: {
 					title: "%configuration.title%",
 					properties: {
-						"roo-code-nightly.allowedCommands": {
+						"ladiz-nightly.allowedCommands": {
 							type: "array",
 							items: {
 								type: "string",
@@ -208,7 +208,7 @@ describe("generatePackageJson", () => {
 							default: ["npm test", "npm install", "tsc", "git log", "git diff", "git show"],
 							description: "%commands.allowedCommands.description%",
 						},
-						"roo-code-nightly.customStoragePath": {
+						"ladiz-nightly.customStoragePath": {
 							type: "string",
 							default: "",
 							description: "%settings.customStoragePath.description%",

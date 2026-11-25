@@ -24,7 +24,14 @@
 	"unpin": "Désépingler",
 	"pin": "Épingler",
 	"fileChangesInConversation": {
-		"header": "{{count}} fichier(s) modifié(s) dans cette conversation"
+		"header": "{{count}} fichier(s) modifié(s) dans cette conversation",
+		"revertAll": "Tout annuler",
+		"revertAllConfirmTitle": "Annuler toutes les modifications",
+		"revertAllConfirmDescription": "Es-tu sûr de vouloir annuler toutes les modifications sur {{count}} fichier(s) effectuées dans cette conversation ? Les fichiers retrouveront leur état d'avant le début de la conversation.",
+		"revertFileConfirmTitle": "Annuler les modifications du fichier",
+		"revertFileConfirmDescription": "Es-tu sûr de vouloir annuler les modifications de {{path}} effectuées dans cette conversation ? Le fichier retrouvera son état d'avant le début de la conversation.",
+		"revertFile": "Annuler le fichier",
+		"reverted": "Annulé"
 	},
 	"tokenProgress": {
 		"availableSpace": "Espace disponible : {{amount}} tokens",
@@ -457,7 +464,29 @@
 	},
 	"queuedMessages": {
 		"title": "Messages en file d'attente",
-		"clickToEdit": "Cliquez pour modifier le message"
+		"clickToEdit": "Cliquez pour modifier le message",
+		"sendNow": "Envoyer immédiatement",
+		"edit": "Modifier le message",
+		"delete": "Supprimer le message",
+		"save": "Enregistrer",
+		"cancel": "Annuler"
+	},
+	"loadingTips": {
+		"hide": "Masquer les astuces",
+		"show": "Afficher les astuces",
+		"status": {
+			"thinking": "Réflexion...",
+			"responding": "Réponse...",
+			"executing": "Exécution...",
+			"executingMcp": "Exécution MCP...",
+			"editing": "Modification...",
+			"reading": "Lecture...",
+			"searching": "Recherche...",
+			"condensing": "Condensation du contexte...",
+			"truncating": "Troncature du contexte...",
+			"rateLimiting": "Limitation de débit...",
+			"retrying": "Nouvelle tentative..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz veut exécuter une commande slash",

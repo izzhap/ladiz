@@ -1,22 +1,22 @@
 {
-	"name": "@roo-code/types",
+	"name": "@ladiz/types",
 	"version": "1.115.0",
-	"description": "TypeScript type definitions for Roo Code.",
+	"description": "TypeScript type definitions for Ladiz.",
 	"publishConfig": {
 		"access": "public",
-		"name": "@roo-code/types",
+		"name": "@ladiz/types",
 		"registry": "https://registry.npmjs.org/"
 	},
-	"author": "Roo Code Team",
+	"author": "Ladiz Team",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/RooCodeInc/Roo-Code.git"
+		"url": "git+https://github.com/izzhap/ladiz.git"
 	},
 	"bugs": {
-		"url": "https://github.com/RooCodeInc/Roo-Code/issues"
+		"url": "https://github.com/izzhap/ladiz/issues"
 	},
-	"homepage": "https://roocode.com",
-	"keywords": ["roo", "roo-code", "ai"],
+	"homepage": "https://ladizai.com",
+	"keywords": ["ladiz", "ai"],
 	"files": ["dist"]
 }

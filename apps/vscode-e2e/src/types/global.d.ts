@@ -1,4 +1,4 @@
-import type { RooCodeAPI } from "@roo-code/types"
+import type { RooCodeAPI } from "@ladiz/types"
 
 declare global {
 	// eslint-disable-next-line no-var

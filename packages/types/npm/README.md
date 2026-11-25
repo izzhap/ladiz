@@ -1,16 +1,16 @@
-# Roo Code API
+# Ladiz API
 
-The Roo Code extension exposes an API that can be used by other extensions.
+The Ladiz extension exposes an API that can be used by other extensions.
 To use this API in your extension:
 
-1. Install `@roo-code/types` with npm, pnpm, or yarn.
+1. Install `@ladiz/types` with npm, pnpm, or yarn.
 2. Import the `RooCodeAPI` type.
 3. Load the extension API.
 
 ```typescript
-import { RooCodeAPI } from "@roo-code/types"
+import { RooCodeAPI } from "@ladiz/types"
 
-const extension = vscode.extensions.getExtension<RooCodeAPI>("RooVeterinaryInc.roo-cline")
+const extension = vscode.extensions.getExtension<RooCodeAPI>("ladiz.ladiz")
 
 if (!extension?.isActive) {
 	throw new Error("Extension is not activated")
@@ -23,7 +23,7 @@ if (!api) {
 }
 
 // Start a new task with an initial message.
-await api.startNewTask("Hello, Roo Code API! Let's make a new project...")
+await api.startNewTask("Hello, Ladiz API! Let's make a new project...")
 
 // Start a new task with an initial message and images.
 await api.startNewTask("Use this design language", ["data:image/webp;base64,..."])
@@ -38,10 +38,10 @@ await api.pressPrimaryButton()
 await api.pressSecondaryButton()
 ```
 
-**NOTE:** To ensure that the `RooVeterinaryInc.roo-cline` extension is activated before your extension, add it to the `extensionDependencies` in your `package.json`:
+**NOTE:** To ensure that the `ladiz.ladiz` extension is activated before your extension, add it to the `extensionDependencies` in your `package.json`:
 
 ```json
-"extensionDependencies": ["RooVeterinaryInc.roo-cline"]
+"extensionDependencies": ["ladiz.ladiz"]
 ```
 
-For detailed information on the available methods and their usage, refer to the `roo-code.d.ts` file.
+For detailed information on the available methods and their usage, refer to the `ladiz.d.ts` file.

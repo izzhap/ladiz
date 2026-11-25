@@ -27,7 +27,14 @@
 	"unpin": "Lepas Pin",
 	"pin": "Pin",
 	"fileChangesInConversation": {
-		"header": "{{count}} file diubah dalam percakapan ini"
+		"header": "{{count}} file diubah dalam percakapan ini",
+		"revertAll": "Revert semua",
+		"revertAllConfirmTitle": "Revert Semua Perubahan",
+		"revertAllConfirmDescription": "Apakah kamu yakin ingin membatalkan semua perubahan pada {{count}} file dalam percakapan ini? File akan dikembalikan ke kondisi sebelum percakapan dimulai.",
+		"revertFileConfirmTitle": "Revert Perubahan File",
+		"revertFileConfirmDescription": "Apakah kamu yakin ingin membatalkan perubahan pada {{path}} dalam percakapan ini? File akan dikembalikan ke kondisi sebelum percakapan dimulai.",
+		"revertFile": "Revert file",
+		"reverted": "Dibatalkan"
 	},
 	"retry": {
 		"title": "Coba Lagi",
@@ -463,7 +470,29 @@
 	},
 	"queuedMessages": {
 		"title": "Pesan Antrian",
-		"clickToEdit": "Klik untuk mengedit pesan"
+		"clickToEdit": "Klik untuk mengedit pesan",
+		"sendNow": "Kirim langsung",
+		"edit": "Edit pesan",
+		"delete": "Hapus pesan",
+		"save": "Simpan",
+		"cancel": "Batal"
+	},
+	"loadingTips": {
+		"hide": "Sembunyikan tips",
+		"show": "Tampilkan tips",
+		"status": {
+			"thinking": "Thinking...",
+			"responding": "Responding...",
+			"executing": "Executing...",
+			"executingMcp": "Executing MCP...",
+			"editing": "Editing...",
+			"reading": "Reading...",
+			"searching": "Searching...",
+			"condensing": "Condensing context...",
+			"truncating": "Truncating context...",
+			"rateLimiting": "Rate limiting...",
+			"retrying": "Retrying..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz ingin menjalankan perintah slash",

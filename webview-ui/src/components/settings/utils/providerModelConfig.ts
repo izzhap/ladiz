@@ -1,4 +1,4 @@
-import type { ProviderName, ModelInfo, ProviderSettings } from "@roo-code/types"
+import type { ProviderName, ModelInfo, ProviderSettings } from "@ladiz/types"
 import {
 	ladizDefaultModelId,
 	anthropicDefaultModelId,
@@ -17,7 +17,7 @@ import {
 	fireworksDefaultModelId,
 	minimaxDefaultModelId,
 	basetenDefaultModelId,
-} from "@roo-code/types"
+} from "@ladiz/types"
 
 import { MODELS_BY_PROVIDER } from "../constants"
 

@@ -1,7 +1,7 @@
 import fs from "fs/promises"
 import path from "path"
 
-import { type ClineSayTool, DEFAULT_WRITE_DELAY_MS } from "@roo-code/types"
+import { type ClineSayTool, DEFAULT_WRITE_DELAY_MS } from "@ladiz/types"
 
 import { getReadablePath } from "../../utils/path"
 import { isPathOutsideWorkspace } from "../../utils/pathUtils"
@@ -227,7 +227,6 @@ export class ApplyPatchTool extends BaseTool<"apply_patch"> {
 		const message = await task.diffViewProvider.pushToolWriteResult(task, task.cwd, true)
 		pushToolResult(message)
 		await task.diffViewProvider.reset()
-		task.processQueuedMessages()
 	}
 
 	private async handleDeleteFile(
@@ -284,7 +283,6 @@ export class ApplyPatchTool extends BaseTool<"apply_patch"> {
 
 		task.didEditFile = true
 		pushToolResult(`Successfully deleted ${relPath}`)
-		task.processQueuedMessages()
 	}
 
 	private async handleUpdateFile(
@@ -447,7 +445,6 @@ export class ApplyPatchTool extends BaseTool<"apply_patch"> {
 		const message = await task.diffViewProvider.pushToolWriteResult(task, task.cwd, false)
 		pushToolResult(message)
 		await task.diffViewProvider.reset()
-		task.processQueuedMessages()
 	}
 
 	override async handlePartial(task: Task, block: ToolUse<"apply_patch">): Promise<void> {

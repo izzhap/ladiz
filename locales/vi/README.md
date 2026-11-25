@@ -28,7 +28,7 @@
 - [简体中文](../zh-CN/README.md)
 - [繁體中文](../zh-TW/README.md)
 - ...
-    </details>
+      </details>
 
 ---
 
@@ -52,12 +52,12 @@ Roo Code thích ứng với cách bạn làm việc, chứ không phải ngượ
 - Chế độ Gỡ lỗi: theo dõi sự cố, thêm nhật ký, cô lập nguyên nhân gốc rễ
 - Chế độ Tùy chỉnh: xây dựng các chế độ chuyên biệt cho nhóm hoặc quy trình làm việc của bạn
 
-Xem thêm: [Sử dụng Chế độ](https://roocodeinc.github.io/Roo-Code/basic-usage/using-modes) • [Chế độ tùy chỉnh](https://roocodeinc.github.io/Roo-Code/advanced-usage/custom-modes)
+Xem thêm: [Sử dụng Chế độ](https://ladizai.com/basic-usage/using-modes) • [Chế độ tùy chỉnh](https://ladizai.com/advanced-usage/custom-modes)
 
 ## Tài nguyên
 
-- **[Tài liệu](https://roocodeinc.github.io/Roo-Code/):** Hướng dẫn chính thức để cài đặt, cấu hình và sử dụng thành thạo Roo Code.
-- **[Vấn đề trên GitHub](https://github.com/RooCodeInc/Roo-Code/issues):** Báo cáo lỗi và theo dõi quá trình phát triển.
+- **[Tài liệu](https://ladizai.com/):** Hướng dẫn chính thức để cài đặt, cấu hình và sử dụng thành thạo Roo Code.
+- **[Vấn đề trên GitHub](https://github.com/izzhap/ladiz/issues):** Báo cáo lỗi và theo dõi quá trình phát triển.
 
 ---
 

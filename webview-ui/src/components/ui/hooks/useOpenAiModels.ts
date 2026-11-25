@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { type ModelRecord, type ExtensionMessage, openAiModelInfoSaneDefaults } from "@roo-code/types"
+import { type ModelRecord, type ExtensionMessage, openAiModelInfoSaneDefaults } from "@ladiz/types"
 import { vscode } from "@src/utils/vscode"
 
 const getOpenAiModels = (baseUrl?: string, apiKey?: string, headers?: Record<string, string>) =>

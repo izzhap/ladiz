@@ -141,7 +141,7 @@ export abstract class ShadowCheckpointService extends EventEmitter {
 
 			throw new Error(
 				`Checkpoints are disabled because a nested git repository was detected at: ${relativePath}. ` +
-				"Please remove or relocate nested git repositories to use the checkpoints feature.",
+					"Please remove or relocate nested git repositories to use the checkpoints feature.",
 			)
 		}
 
@@ -367,6 +367,45 @@ export abstract class ShadowCheckpointService extends EventEmitter {
 			const error = e instanceof Error ? e : new Error(String(e))
 			this.log(`[${this.constructor.name}#restoreCheckpoint] failed to restore checkpoint: ${error.message}`)
 			this.emit("error", { type: "error", error })
+			throw error
+		}
+	}
+
+	public async restoreFile(filePath: string, commitHash?: string): Promise<boolean> {
+		try {
+			this.log(`[${this.constructor.name}#restoreFile] starting file restore: ${filePath}`)
+
+			if (!this.git) {
+				throw new Error("Shadow git repo not initialized")
+			}
+
+			const targetCommit = commitHash || this.baseHash
+			if (!targetCommit) {
+				throw new Error("No base commit available")
+			}
+
+			const cwdPath = (await this.getShadowGitConfigWorktree(this.git)) || this.workspaceDir || ""
+			const absPath = path.resolve(cwdPath, filePath)
+			const relPath = path.relative(cwdPath, absPath).replace(/\\/g, "/")
+
+			// Check if file exists in the target commit without loading content into memory
+			const existsInCommit = await this.git
+				.raw(["cat-file", "-e", `${targetCommit}:${relPath}`])
+				.then(() => true)
+				.catch(() => false)
+
+			if (existsInCommit) {
+				await this.git.checkout([targetCommit, "--", relPath])
+			} else {
+				await fs.rm(absPath, { force: true })
+				await this.git.raw(["rm", "--cached", "-f", "--ignore-unmatch", relPath]).catch(() => {})
+			}
+
+			this.log(`[${this.constructor.name}#restoreFile] restored file ${relPath} from ${targetCommit}`)
+			return true
+		} catch (e) {
+			const error = e instanceof Error ? e : new Error(String(e))
+			this.log(`[${this.constructor.name}#restoreFile] failed to restore file: ${error.message}`)
 			throw error
 		}
 	}

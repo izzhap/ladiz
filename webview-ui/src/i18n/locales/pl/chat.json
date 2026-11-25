@@ -24,7 +24,14 @@
 	"unpin": "Odepnij",
 	"pin": "Przypnij",
 	"fileChangesInConversation": {
-		"header": "{{count}} plik(ów) zmienionych w tej rozmowie"
+		"header": "{{count}} plik(ów) zmienionych w tej rozmowie",
+		"revertAll": "Cofnij wszystko",
+		"revertAllConfirmTitle": "Cofnij wszystkie zmiany",
+		"revertAllConfirmDescription": "Czy na pewno chcesz cofnąć wszystkie zmiany w {{count}} plik(ach) wprowadzone w tej rozmowie? Przywróci to pliki do stanu sprzed rozpoczęcia rozmowy.",
+		"revertFileConfirmTitle": "Cofnij zmiany pliku",
+		"revertFileConfirmDescription": "Czy na pewno chcesz cofnąć zmiany w {{path}} wprowadzone w tej rozmowie? Przywróci to plik do stanu sprzed rozpoczęcia rozmowy.",
+		"revertFile": "Cofnij plik",
+		"reverted": "Cofnięto"
 	},
 	"tokenProgress": {
 		"availableSpace": "Dostępne miejsce: {{amount}} tokenów",
@@ -457,7 +464,29 @@
 	},
 	"queuedMessages": {
 		"title": "Wiadomości w kolejce",
-		"clickToEdit": "Kliknij, aby edytować wiadomość"
+		"clickToEdit": "Kliknij, aby edytować wiadomość",
+		"sendNow": "Wyślij teraz",
+		"edit": "Edytuj wiadomość",
+		"delete": "Usuń wiadomość",
+		"save": "Zapisz",
+		"cancel": "Anuluj"
+	},
+	"loadingTips": {
+		"hide": "Ukryj wskazówki",
+		"show": "Pokaż wskazówki",
+		"status": {
+			"thinking": "Myślenie...",
+			"responding": "Odpowiadanie...",
+			"executing": "Wykonywanie...",
+			"executingMcp": "Wykonywanie MCP...",
+			"editing": "Edytowanie...",
+			"reading": "Czytanie...",
+			"searching": "Wyszukiwanie...",
+			"condensing": "Kondensacja kontekstu...",
+			"truncating": "Skracanie kontekstu...",
+			"rateLimiting": "Ograniczenie zapytań...",
+			"retrying": "Ponawianie..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz chce uruchomić komendę slash",

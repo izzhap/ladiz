@@ -10,7 +10,7 @@ import type {
 	ClineApiReqInfo,
 	ClineAskUseMcpServer,
 	ClineSayTool,
-} from "@roo-code/types"
+} from "@ladiz/types"
 
 import { Mode } from "@roo/modes"
 
@@ -893,7 +893,13 @@ export const ChatRowContent = ({
 						apiReqCancelReason === undefined && apiRequestFailedMessage === undefined && cost === undefined
 
 					if (isApiRequestInProgress) {
-						return <TimelineItem status="running" isLast={isLast} action={<ApiRequestLoading />} />
+						return (
+							<TimelineItem
+								status="running"
+								isLast={isLast}
+								action={<ApiRequestLoading lastModifiedMessage={lastModifiedMessage} />}
+							/>
+						)
 					}
 
 					const hasApiError =

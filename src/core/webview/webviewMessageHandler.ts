@@ -18,8 +18,8 @@ import {
 	ExperimentId,
 	checkoutDiffPayloadSchema,
 	checkoutRestorePayloadSchema,
-} from "@roo-code/types"
-import { customToolRegistry } from "@roo-code/core"
+} from "@ladiz/types"
+import { customToolRegistry } from "@ladiz/core"
 
 import { type ApiMessage } from "../task-persistence/apiMessages"
 import { saveTaskMessages } from "../task-persistence"
@@ -885,15 +885,15 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			const routerModels: Record<RouterName, ModelRecord> = providerFilter
 				? ({} as Record<RouterName, ModelRecord>)
 				: {
-					openrouter: {},
-					"vercel-ai-gateway": {},
-					litellm: {},
-					requesty: {},
-					unbound: {},
-					ollama: {},
-					lmstudio: {},
-					poe: {},
-				}
+						openrouter: {},
+						"vercel-ai-gateway": {},
+						litellm: {},
+						requesty: {},
+						unbound: {},
+						ollama: {},
+						lmstudio: {},
+						poe: {},
+					}
 
 			const safeGetModels = async (options: GetModelsOptions): Promise<ModelRecord> => {
 				try {
@@ -1159,6 +1159,117 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 				vscode.env.openExternal(vscode.Uri.parse(message.url))
 			}
 			break
+		case "revertFile": {
+			const relPath = message.text || message.values?.filePath || ""
+			const originalContent = message.values?.originalContent as string | undefined
+			const isNewFile = message.values?.isNewFile as boolean | undefined
+			if (!relPath) {
+				vscode.window.showErrorMessage("No file path provided to revert.")
+				break
+			}
+			try {
+				const cwd = getCurrentCwd()
+				if (!cwd) {
+					vscode.window.showErrorMessage("No workspace path available.")
+					break
+				}
+				const absPath = path.resolve(cwd, relPath)
+				if (isPathOutsideWorkspace(absPath)) {
+					vscode.window.showErrorMessage("File is outside workspace.")
+					break
+				}
+
+				let reverted = false
+				const task = provider.getCurrentTask()
+				if (task) {
+					try {
+						reverted = await task.checkpointRestoreFile(relPath)
+					} catch (err) {
+						console.warn(`[revertFile] checkpoint restore failed for ${relPath}:`, err)
+					}
+				}
+
+				if (!reverted && originalContent !== undefined) {
+					if (isNewFile || !originalContent) {
+						await fs.rm(absPath, { force: true })
+					} else {
+						await fs.mkdir(path.dirname(absPath), { recursive: true })
+						await fs.writeFile(absPath, originalContent, "utf-8")
+					}
+					reverted = true
+				}
+
+				if (reverted) {
+					vscode.window.showInformationMessage(t("common:revert.fileSuccess", { path: relPath }))
+					provider.postMessageToWebview({
+						type: "fileReverted",
+						fileReverted: { path: relPath, success: true },
+					})
+				} else {
+					vscode.window.showErrorMessage(t("common:revert.fileError", { path: relPath }))
+				}
+			} catch (err) {
+				const errorMsg = err instanceof Error ? err.message : String(err)
+				vscode.window.showErrorMessage(`Failed to revert ${relPath}: ${errorMsg}`)
+			}
+			break
+		}
+		case "revertAllFiles": {
+			const files = (message.values?.files || []) as Array<{
+				filePath: string
+				originalContent?: string
+				isNewFile?: boolean
+			}>
+			try {
+				const cwd = getCurrentCwd()
+				if (!cwd) {
+					vscode.window.showErrorMessage("No workspace path available.")
+					break
+				}
+
+				const task = provider.getCurrentTask()
+				const revertedPaths: string[] = []
+
+				for (const file of files) {
+					const relPath = file.filePath
+					const absPath = path.resolve(cwd, relPath)
+					if (isPathOutsideWorkspace(absPath)) continue
+
+					let fileReverted = false
+					if (task) {
+						try {
+							fileReverted = await task.checkpointRestoreFile(relPath)
+						} catch {}
+					}
+					if (!fileReverted && file.originalContent !== undefined) {
+						if (file.isNewFile || !file.originalContent) {
+							await fs.rm(absPath, { force: true })
+						} else {
+							await fs.mkdir(path.dirname(absPath), { recursive: true })
+							await fs.writeFile(absPath, file.originalContent, "utf-8")
+						}
+						fileReverted = true
+					}
+					if (fileReverted) {
+						revertedPaths.push(relPath)
+					}
+				}
+
+				if (revertedPaths.length > 0) {
+					vscode.window.showInformationMessage(t("common:revert.allSuccess", { count: revertedPaths.length }))
+					provider.postMessageToWebview({
+						type: "fileReverted",
+						fileReverted: { paths: revertedPaths, success: true },
+					})
+				} else {
+					vscode.window.showErrorMessage("No files could be reverted.")
+				}
+			} catch (err) {
+				const errorMsg = err instanceof Error ? err.message : String(err)
+				vscode.window.showErrorMessage(`Failed to revert files: ${errorMsg}`)
+			}
+			break
+		}
 		case "checkpointDiff":
 			const result = checkoutDiffPayloadSchema.safeParse(message.payload)
 
@@ -2357,13 +2468,13 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			const status = manager
 				? manager.getCurrentStatus()
 				: {
-					systemStatus: "Standby",
-					message: "No workspace folder open",
-					processedItems: 0,
-					totalItems: 0,
-					currentItemUnit: "items",
-					workspacePath: undefined,
-				}
+						systemStatus: "Standby",
+						message: "No workspace folder open",
+						processedItems: 0,
+						totalItems: 0,
+						currentItemUnit: "items",
+						workspacePath: undefined,
+					}
 
 			provider.postMessageToWebview({
 				type: "indexingStatusUpdate",
@@ -2794,6 +2905,10 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 				provider.getCurrentTask()?.messageQueueService.updateMessage(id, text, images)
 			}
 
+			break
+		}
+		case "sendQueuedMessage": {
+			await provider.sendQueuedMessage(message.text ?? "")
 			break
 		}
 

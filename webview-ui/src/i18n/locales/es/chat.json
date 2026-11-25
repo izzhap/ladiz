@@ -24,7 +24,14 @@
 	"unpin": "Desfijar",
 	"pin": "Fijar",
 	"fileChangesInConversation": {
-		"header": "{{count}} archivo(s) modificado(s) en esta conversación"
+		"header": "{{count}} archivo(s) modificado(s) en esta conversación",
+		"revertAll": "Revertir todo",
+		"revertAllConfirmTitle": "Revertir todos los cambios",
+		"revertAllConfirmDescription": "¿Seguro que quieres revertir todos los cambios en {{count}} archivo(s) hechos en esta conversación? Esto restaurará los archivos a su estado anterior al inicio de la conversación.",
+		"revertFileConfirmTitle": "Revertir cambios del archivo",
+		"revertFileConfirmDescription": "¿Seguro que quieres revertir los cambios en {{path}} hechos en esta conversación? Esto restaurará el archivo a su estado anterior al inicio de la conversación.",
+		"revertFile": "Revertir archivo",
+		"reverted": "Revertido"
 	},
 	"retry": {
 		"title": "Reintentar",
@@ -457,7 +464,29 @@
 	},
 	"queuedMessages": {
 		"title": "Mensajes en cola",
-		"clickToEdit": "Haz clic para editar el mensaje"
+		"clickToEdit": "Haz clic para editar el mensaje",
+		"sendNow": "Enviar inmediatamente",
+		"edit": "Editar mensaje",
+		"delete": "Eliminar mensaje",
+		"save": "Guardar",
+		"cancel": "Cancelar"
+	},
+	"loadingTips": {
+		"hide": "Ocultar consejos",
+		"show": "Mostrar consejos",
+		"status": {
+			"thinking": "Pensando...",
+			"responding": "Respondiendo...",
+			"executing": "Ejecutando...",
+			"executingMcp": "Ejecutando MCP...",
+			"editing": "Editando...",
+			"reading": "Leyendo...",
+			"searching": "Buscando...",
+			"condensing": "Condensando contexto...",
+			"truncating": "Truncando contexto...",
+			"rateLimiting": "Limitando velocidad...",
+			"retrying": "Reintentando..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz quiere ejecutar un comando slash",

@@ -1,6 +1,6 @@
 import React from "react"
 import { fireEvent, render, screen } from "@/utils/test-utils"
-import type { ClineMessage } from "@roo-code/types"
+import type { ClineMessage } from "@ladiz/types"
 import { TranslationProvider } from "@/i18n/__mocks__/TranslationContext"
 import FileChangesPanel from "../components/chat/FileChangesPanel"
 
@@ -30,13 +30,22 @@ vi.mock("@src/components/common/CodeAccordion", () => ({
 		path,
 		isExpanded,
 		onToggleExpand,
+		onRevert,
+		isReverted,
 	}: {
 		path?: string
 		isExpanded: boolean
 		onToggleExpand: () => void
+		onRevert?: () => void
+		isReverted?: boolean
 	}) => (
 		<div data-testid="code-accordian">
 			<span data-testid="accordian-path">{path}</span>
+			{onRevert && (
+				<button type="button" onClick={onRevert} data-testid={`accordian-revert-${path}`}>
+					{isReverted ? "reverted" : "revert"}
+				</button>
+			)}
 			<button type="button" onClick={onToggleExpand} data-testid="accordian-toggle">
 				{isExpanded ? "expanded" : "collapsed"}
 			</button>
@@ -195,5 +204,86 @@ describe("FileChangesPanel", () => {
 
 		expect(screen.getByTestId("total-added")).toHaveTextContent("+5")
 		expect(screen.getByTestId("total-removed")).toHaveTextContent("-6")
+	})
+
+	it("shows revert all button and opens confirmation dialog when clicked", () => {
+		const messages = [createFileEditMessage("src/foo.ts", "diff")]
+		renderPanel(messages)
+
+		const revertAllBtn = screen.getByTestId("revert-all-btn")
+		expect(revertAllBtn).toBeInTheDocument()
+
+		fireEvent.click(revertAllBtn)
+		const confirmBtn = screen.getByTestId("confirm-revert-all-btn")
+		expect(confirmBtn).toBeInTheDocument()
+
+		fireEvent.click(confirmBtn)
+		expect(mockPostMessage).toHaveBeenCalledWith({
+			type: "revertAllFiles",
+			values: {
+				files: [{ filePath: "src/foo.ts", originalContent: undefined }],
+			},
+		})
+	})
+
+	it("triggers revert file and opens confirmation dialog", () => {
+		const messages = [createFileEditMessage("src/foo.ts", "diff")]
+		renderPanel(messages)
+
+		// Expand panel
+		fireEvent.click(screen.getByText("1 file(s) changed in this conversation").closest("button")!)
+
+		const revertFileBtn = screen.getByTestId("accordian-revert-src/foo.ts")
+		expect(revertFileBtn).toBeInTheDocument()
+		expect(revertFileBtn).toHaveTextContent("revert")
+
+		fireEvent.click(revertFileBtn)
+		const confirmBtn = screen.getByTestId("confirm-revert-file-btn")
+		expect(confirmBtn).toBeInTheDocument()
+
+		fireEvent.click(confirmBtn)
+		expect(mockPostMessage).toHaveBeenCalledWith({
+			type: "revertFile",
+			text: "src/foo.ts",
+			values: { originalContent: undefined },
+		})
+	})
+
+	it("removes a single reverted file from list when fileReverted event is received", () => {
+		const messages = [createFileEditMessage("src/a.ts", "diff a"), createFileEditMessage("src/b.ts", "diff b")]
+		renderPanel(messages)
+
+		expect(screen.getByText("2 file(s) changed in this conversation")).toBeInTheDocument()
+
+		fireEvent(
+			window,
+			new MessageEvent("message", {
+				data: {
+					type: "fileReverted",
+					fileReverted: { path: "src/a.ts", success: true },
+				},
+			}),
+		)
+
+		expect(screen.getByText("1 file(s) changed in this conversation")).toBeInTheDocument()
+	})
+
+	it("disappears completely when all files are reverted", () => {
+		const messages = [createFileEditMessage("src/a.ts", "diff a"), createFileEditMessage("src/b.ts", "diff b")]
+		const { container } = renderPanel(messages)
+
+		expect(screen.getByText("2 file(s) changed in this conversation")).toBeInTheDocument()
+
+		fireEvent(
+			window,
+			new MessageEvent("message", {
+				data: {
+					type: "fileReverted",
+					fileReverted: { paths: ["src/a.ts", "src/b.ts"], success: true },
+				},
+			}),
+		)
+
+		expect(container.firstChild).toBeNull()
 	})
 })

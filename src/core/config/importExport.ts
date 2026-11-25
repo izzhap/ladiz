@@ -11,7 +11,7 @@ import {
 	providerSettingsWithIdSchema,
 	isProviderName,
 	type ProviderSettingsWithId,
-} from "@roo-code/types"
+} from "@ladiz/types"
 
 import { ProviderSettingsManager, providerProfilesSchema } from "./ProviderSettingsManager"
 import { ContextProxy } from "./ContextProxy"
