@@ -45,4 +45,6 @@ runs:
         - name: Install dependencies
           if: ${{ inputs.skip-install != 'true' }}
           shell: bash
+          env:
+              GITHUB_TOKEN: ${{ env.GITHUB_TOKEN || github.token }}
           run: pnpm install ${{ inputs.install-args }}
