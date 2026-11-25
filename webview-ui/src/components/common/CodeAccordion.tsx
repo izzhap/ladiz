@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react"
 import { VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react"
 import { cn } from "@/lib/utils"
-import { type ToolProgressStatus } from "@roo-code/types"
+import { type ToolProgressStatus } from "@ladiz/types"
 import { getLanguageFromPath } from "@src/utils/getLanguageFromPath"
 import { formatPathTooltip } from "@src/utils/formatPathTooltip"
 

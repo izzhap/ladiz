@@ -24,7 +24,14 @@
 	"unpin": "고정 해제하기",
 	"pin": "고정하기",
 	"fileChangesInConversation": {
-		"header": "이 대화에서 {{count}}개 파일이 변경됨"
+		"header": "이 대화에서 {{count}}개 파일이 변경됨",
+		"revertAll": "모두 되돌리기",
+		"revertAllConfirmTitle": "모든 변경 사항 되돌리기",
+		"revertAllConfirmDescription": "이 대화에서 {{count}}개 파일에 적용한 모든 변경 사항을 되돌리시겠습니까? 이 대화가 시작되기 전 상태로 파일이 복원됩니다.",
+		"revertFileConfirmTitle": "파일 변경 사항 되돌리기",
+		"revertFileConfirmDescription": "이 대화에서 {{path}}에 적용한 변경 사항을 되돌리시겠습니까? 이 대화가 시작되기 전 상태로 파일이 복원됩니다.",
+		"revertFile": "파일 되돌리기",
+		"reverted": "되돌림"
 	},
 	"tokenProgress": {
 		"availableSpace": "사용 가능한 공간: {{amount}} 토큰",
@@ -457,7 +464,29 @@
 	},
 	"queuedMessages": {
 		"title": "대기열 메시지",
-		"clickToEdit": "클릭하여 메시지 편집"
+		"clickToEdit": "클릭하여 메시지 편집",
+		"sendNow": "즉시 보내기",
+		"edit": "메시지 편집",
+		"delete": "메시지 삭제",
+		"save": "저장",
+		"cancel": "취소"
+	},
+	"loadingTips": {
+		"hide": "팁 숨기기",
+		"show": "팁 표시",
+		"status": {
+			"thinking": "생각 중...",
+			"responding": "응답 중...",
+			"executing": "실행 중...",
+			"executingMcp": "MCP 실행 중...",
+			"editing": "편집 중...",
+			"reading": "읽는 중...",
+			"searching": "검색 중...",
+			"condensing": "컨텍스트 압축 중...",
+			"truncating": "컨텍스트 자르는 중...",
+			"rateLimiting": "속도 제한 중...",
+			"retrying": "재시도 중..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Roo가 슬래시 명령어를 실행하려고 합니다",

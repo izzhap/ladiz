@@ -9,7 +9,7 @@ import {
 	type ProviderSettings,
 	type ModelInfo,
 	isDynamicProvider,
-} from "@roo-code/types"
+} from "@ladiz/types"
 import { cn } from "@src/lib/utils"
 import { useExtensionState } from "@src/context/ExtensionStateContext"
 import { useRooPortal } from "@src/components/ui/hooks/useRooPortal"

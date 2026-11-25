@@ -26,7 +26,7 @@ import type {
 	McpServer,
 	McpTool,
 	McpToolCallResponse,
-} from "@roo-code/types"
+} from "@ladiz/types"
 
 import { t } from "../../i18n"
 
@@ -171,7 +171,7 @@ export class McpHub {
 		this.initializationPromise = Promise.all([
 			this.initializeGlobalMcpServers(),
 			this.initializeProjectMcpServers(),
-		]).then(() => { })
+		]).then(() => {})
 	}
 
 	/**
@@ -854,7 +854,7 @@ export class McpHub {
 
 			// Only override transport.start for stdio transports that have already been started
 			if (configInjected.type === "stdio") {
-				transport.start = async () => { }
+				transport.start = async () => {}
 			}
 
 			// Create a connected connection

@@ -24,7 +24,14 @@
 	"unpin": "Losmaken",
 	"pin": "Vastmaken",
 	"fileChangesInConversation": {
-		"header": "{{count}} bestand(en) gewijzigd in dit gesprek"
+		"header": "{{count}} bestand(en) gewijzigd in dit gesprek",
+		"revertAll": "Alles terugdraaien",
+		"revertAllConfirmTitle": "Alle wijzigingen terugdraaien",
+		"revertAllConfirmDescription": "Weet je zeker dat je alle wijzigingen in {{count}} bestand(en) uit dit gesprek wilt terugdraaien? De bestanden worden hersteld naar hun staat vóór dit gesprek.",
+		"revertFileConfirmTitle": "Bestandswijzigingen terugdraaien",
+		"revertFileConfirmDescription": "Weet je zeker dat je de wijzigingen aan {{path}} uit dit gesprek wilt terugdraaien? Het bestand wordt hersteld naar de staat vóór dit gesprek.",
+		"revertFile": "Bestand terugdraaien",
+		"reverted": "Teruggedraaid"
 	},
 	"retry": {
 		"title": "Opnieuw proberen",
@@ -457,7 +464,29 @@
 	},
 	"queuedMessages": {
 		"title": "Berichten in wachtrij",
-		"clickToEdit": "Klik om bericht te bewerken"
+		"clickToEdit": "Klik om bericht te bewerken",
+		"sendNow": "Direct verzenden",
+		"edit": "Bericht bewerken",
+		"delete": "Bericht verwijderen",
+		"save": "Opslaan",
+		"cancel": "Annuleren"
+	},
+	"loadingTips": {
+		"hide": "Tips verbergen",
+		"show": "Tips tonen",
+		"status": {
+			"thinking": "Aan het denken...",
+			"responding": "Aan het antwoorden...",
+			"executing": "Aan het uitvoeren...",
+			"executingMcp": "MCP aan het uitvoeren...",
+			"editing": "Aan het bewerken...",
+			"reading": "Aan het lezen...",
+			"searching": "Aan het zoeken...",
+			"condensing": "Context comprimeren...",
+			"truncating": "Context inkorten...",
+			"rateLimiting": "Snelheidslimiet...",
+			"retrying": "Opnieuw proberen..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz wil een slash commando uitvoeren",

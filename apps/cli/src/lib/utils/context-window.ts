@@ -1,4 +1,4 @@
-import type { ProviderSettings } from "@roo-code/types"
+import type { ProviderSettings } from "@ladiz/types"
 
 import type { RouterModels } from "@/ui/store.js"
 

@@ -455,7 +455,29 @@
 	},
 	"queuedMessages": {
 		"title": "Queued Messages",
-		"clickToEdit": "Click to edit message"
+		"clickToEdit": "Click to edit message",
+		"sendNow": "Send immediately",
+		"edit": "Edit message",
+		"delete": "Delete message",
+		"save": "Save",
+		"cancel": "Cancel"
+	},
+	"loadingTips": {
+		"hide": "Hide tips",
+		"show": "Show tips",
+		"status": {
+			"thinking": "Thinking...",
+			"responding": "Responding...",
+			"executing": "Executing...",
+			"executingMcp": "Executing MCP...",
+			"editing": "Editing...",
+			"reading": "Reading...",
+			"searching": "Searching...",
+			"condensing": "Condensing context...",
+			"truncating": "Truncating context...",
+			"rateLimiting": "Rate limiting...",
+			"retrying": "Retrying..."
+		}
 	},
 	"contextMenu": {
 		"noResults": "No results",

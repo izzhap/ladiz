@@ -28,7 +28,7 @@
 - [简体中文](../zh-CN/README.md)
 - [繁體中文](../zh-TW/README.md)
 - ...
-    </details>
+      </details>
 
 ---
 
@@ -52,12 +52,12 @@ Roo Code si adatta al tuo modo di lavorare, non il contrario:
 - Modalità Debug: traccia problemi, aggiungi log, isola le cause principali
 - Modalità Personalizzate: crea modalità specializzate per il tuo team o flusso di lavoro
 
-Scopri di più: [Usare le Modalità](https://roocodeinc.github.io/Roo-Code/basic-usage/using-modes) • [Modalità personalizzate](https://roocodeinc.github.io/Roo-Code/advanced-usage/custom-modes)
+Scopri di più: [Usare le Modalità](https://ladizai.com/basic-usage/using-modes) • [Modalità personalizzate](https://ladizai.com/advanced-usage/custom-modes)
 
 ## Risorse
 
-- **[Documentazione](https://roocodeinc.github.io/Roo-Code/):** La guida ufficiale per installare, configurare e padroneggiare Roo Code.
-- **[Problemi GitHub](https://github.com/RooCodeInc/Roo-Code/issues):** Segnala bug e tieni traccia dello sviluppo.
+- **[Documentazione](https://ladizai.com/):** La guida ufficiale per installare, configurare e padroneggiare Roo Code.
+- **[Problemi GitHub](https://github.com/izzhap/ladiz/issues):** Segnala bug e tieni traccia dello sviluppo.
 
 ---
 

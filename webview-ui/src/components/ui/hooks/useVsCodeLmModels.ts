@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { type ExtensionMessage, type ModelRecord } from "@roo-code/types"
+import { type ExtensionMessage, type ModelRecord } from "@ladiz/types"
 import { vscode } from "@src/utils/vscode"
 
 const getVsCodeLmModels = () =>

@@ -19,6 +19,11 @@
 		"delete_config_profile": "Вы уверены, что хотите удалить этот профиль конфигурации?",
 		"delete_custom_mode_with_rules": "Вы уверены, что хотите удалить этот режим {scope}?\n\nЭто также приведет к удалению соответствующей папки правил по адресу:\n{rulesFolderPath}"
 	},
+	"revert": {
+		"fileSuccess": "Изменения в {{path}} отменены",
+		"fileError": "Не удалось отменить изменения в {{path}}",
+		"allSuccess": "Отменены изменения во всех {{count}} файл(ах) в этом разговоре"
+	},
 	"errors": {
 		"invalid_data_uri": "Неверный формат URI данных",
 		"error_copying_image": "Ошибка копирования изображения: {{errorMessage}}",
@@ -227,6 +232,6 @@
 	},
 	"docsLink": {
 		"label": "Docs",
-		"url": "https://github.com/RooCodeInc/Roo-Code"
+		"url": "https://github.com/izzhap/ladiz"
 	}
 }

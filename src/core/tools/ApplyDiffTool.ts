@@ -1,7 +1,7 @@
 import path from "path"
 import fs from "fs/promises"
 
-import { type ClineSayTool, DEFAULT_WRITE_DELAY_MS } from "@roo-code/types"
+import { type ClineSayTool, DEFAULT_WRITE_DELAY_MS } from "@ladiz/types"
 
 import { getReadablePath } from "../../utils/path"
 import { Task } from "../task/Task"
@@ -214,7 +214,6 @@ export class ApplyDiffTool extends BaseTool<"apply_diff"> {
 
 				if (!didApprove) {
 					await task.diffViewProvider.revertChanges()
-					task.processQueuedMessages()
 					return
 				}
 
@@ -254,15 +253,11 @@ export class ApplyDiffTool extends BaseTool<"apply_diff"> {
 			await task.diffViewProvider.reset()
 			this.resetPartialState()
 
-			// Process any queued messages after file edit completes
-			task.processQueuedMessages()
-
 			return
 		} catch (error) {
 			await handleError("applying diff", error as Error)
 			await task.diffViewProvider.reset()
 			this.resetPartialState()
-			task.processQueuedMessages()
 			return
 		}
 	}

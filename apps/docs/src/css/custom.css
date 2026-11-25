@@ -808,7 +808,7 @@ body {
    ============================================ */
 
 /* Code blocks */
-.roo-code-block {
+.ladiz-block {
 	font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 	font-size: 0.75rem; /* text-xs */
 	color: hsl(var(--muted-foreground));
@@ -819,13 +819,13 @@ body {
 }
 
 @media (min-width: 640px) {
-	.roo-code-block {
+	.ladiz-block {
 		font-size: 0.875rem; /* sm:text-sm */
 	}
 }
 
 @media (min-width: 1024px) {
-	.roo-code-block {
+	.ladiz-block {
 		max-height: 50vh; /* lg:max-h-[50vh] */
 	}
 }

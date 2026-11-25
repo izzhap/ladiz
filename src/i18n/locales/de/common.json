@@ -19,6 +19,11 @@
 		"delete_config_profile": "Möchtest du dieses Konfigurationsprofil wirklich löschen?",
 		"delete_custom_mode_with_rules": "Bist du sicher, dass du diesen {scope}-Modus löschen möchtest?\n\nDadurch wird auch der zugehörige Regelordner unter folgender Adresse gelöscht:\n{rulesFolderPath}"
 	},
+	"revert": {
+		"fileSuccess": "Änderungen an {{path}} rückgängig gemacht",
+		"fileError": "{{path}} konnte nicht rückgängig gemacht werden",
+		"allSuccess": "Alle {{count}} Datei(en) in dieser Unterhaltung rückgängig gemacht"
+	},
 	"errors": {
 		"invalid_data_uri": "Ungültiges Daten-URI-Format",
 		"error_copying_image": "Fehler beim Kopieren des Bildes: {{errorMessage}}",
@@ -227,6 +232,6 @@
 	},
 	"docsLink": {
 		"label": "Docs",
-		"url": "https://github.com/RooCodeInc/Roo-Code"
+		"url": "https://github.com/izzhap/ladiz"
 	}
 }

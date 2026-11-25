@@ -3,12 +3,7 @@ import { createPoe, type PoeProvider, type PoeScopedProviderOptions } from "ai-s
 import { extractUsageMetrics, mapToolChoice } from "ai-sdk-provider-poe/code"
 import { streamText, generateText, type ToolSet } from "ai"
 
-import {
-	poeDefaultModelId,
-	getPoeDefaultModelInfo,
-	type ModelInfo,
-	type ReasoningEffortExtended,
-} from "@roo-code/types"
+import { poeDefaultModelId, getPoeDefaultModelInfo, type ModelInfo, type ReasoningEffortExtended } from "@ladiz/types"
 
 import { shouldUseReasoningBudget, shouldUseReasoningEffort, type ApiHandlerOptions } from "../../shared/api"
 

@@ -19,6 +19,11 @@
 		"delete_config_profile": "Bu yapılandırma profilini silmek istediğinizden emin misiniz?",
 		"delete_custom_mode_with_rules": "Bu {scope} modunu silmek istediğinizden emin misiniz?\n\nBu işlem, ilişkili kurallar klasörünü de şu konumdan silecektir:\n{rulesFolderPath}"
 	},
+	"revert": {
+		"fileSuccess": "{{path}} dosyasındaki değişiklikler geri alındı",
+		"fileError": "{{path}} geri alınamadı",
+		"allSuccess": "Bu sohbetteki tüm {{count}} dosya geri alındı"
+	},
 	"errors": {
 		"invalid_data_uri": "Geçersiz veri URI formatı",
 		"error_copying_image": "Resim kopyalanırken hata oluştu: {{errorMessage}}",
@@ -227,6 +232,6 @@
 	},
 	"docsLink": {
 		"label": "Docs",
-		"url": "https://github.com/RooCodeInc/Roo-Code"
+		"url": "https://github.com/izzhap/ladiz"
 	}
 }

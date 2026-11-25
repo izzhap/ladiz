@@ -1,4 +1,4 @@
-import type { Command } from "@roo-code/types"
+import type { Command } from "@ladiz/types"
 
 import { render, screen, fireEvent } from "@/utils/test-utils"
 

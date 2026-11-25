@@ -20,14 +20,14 @@ const config: Config = {
 	favicon: "img/favicon.ico",
 
 	// Set the production url of your site here
-	url: "https://roocodeinc.github.io",
+	url: "https://ladizai.com",
 	// Set the /<baseUrl>/ pathname under which your site is served
 	// For GitHub pages deployment, it is often '/<projectName>/'
-	baseUrl: "/Roo-Code/",
+	baseUrl: "/ladiz/",
 
 	// GitHub pages deployment config (if needed)
 	organizationName: "RooCodeInc",
-	projectName: "Roo-Code",
+	projectName: "ladiz",
 
 	onBrokenLinks: "warn",
 	markdown: {
@@ -259,7 +259,7 @@ const config: Config = {
 						from: ["/features/tools/write-to-file"],
 					},
 					{
-						to: "/advanced-usage/roo-code-nightly",
+						to: "/advanced-usage/ladiz-nightly",
 						from: ["/advanced-usage/prerelease-build"],
 					},
 					// Redirect removed Roo Code Router provider aliases
@@ -269,41 +269,41 @@ const config: Config = {
 					},
 					{
 						to: "/providers",
-						from: ["/providers/roo-code-cloud"],
+						from: ["/providers/ladiz-cloud"],
 					},
 					{
 						to: "/providers",
-						from: ["/roo-code-provider", "/roo-code-provider/overview"],
+						from: ["/ladiz-provider", "/ladiz-provider/overview"],
 					},
 					// Redirect removed Cloud, Router, Credits, and billing pages
 					{
 						to: "/",
 						from: [
 							"/sunset",
-							"/roo-code-cloud",
-							"/roo-code-cloud/overview",
-							"/roo-code-cloud/login",
-							"/roo-code-cloud/connect",
-							"/roo-code-cloud/cloud-agents",
-							"/roo-code-cloud/environments",
-							"/roo-code-cloud/task-sync",
-							"/roo-code-cloud/task-sharing",
-							"/roo-code-cloud/analytics",
-							"/roo-code-cloud/github-integration",
-							"/roo-code-cloud/slack-integration",
-							"/roo-code-cloud/team-plan",
-							"/roo-code-cloud/what-is-roo-code-cloud",
-							"/roo-code-cloud/dashboard",
-							"/roo-code-cloud/roomote-control",
+							"/ladiz-cloud",
+							"/ladiz-cloud/overview",
+							"/ladiz-cloud/login",
+							"/ladiz-cloud/connect",
+							"/ladiz-cloud/cloud-agents",
+							"/ladiz-cloud/environments",
+							"/ladiz-cloud/task-sync",
+							"/ladiz-cloud/task-sharing",
+							"/ladiz-cloud/analytics",
+							"/ladiz-cloud/github-integration",
+							"/ladiz-cloud/slack-integration",
+							"/ladiz-cloud/team-plan",
+							"/ladiz-cloud/what-is-ladiz-cloud",
+							"/ladiz-cloud/dashboard",
+							"/ladiz-cloud/roomote-control",
 						],
 					},
 					{
 						to: "/providers",
-						from: ["/roo-code-router", "/roo-code-router/overview", "/providers/roo-code-router"],
+						from: ["/ladiz-router", "/ladiz-router/overview", "/providers/ladiz-router"],
 					},
 					{
 						to: "/advanced-usage/rate-limits-costs",
-						from: ["/credits", "/credits/overview", "/roo-code-cloud/billing-subscriptions"],
+						from: ["/credits", "/credits/overview", "/ladiz-cloud/billing-subscriptions"],
 					},
 					// Redirect removed Human Relay provider page
 					{
@@ -371,8 +371,8 @@ const config: Config = {
 		navbar: {
 			logo: {
 				alt: "Roo Code Logo",
-				src: "img/roo-code-logo-dark.svg",
-				srcDark: "img/roo-code-logo-white.svg",
+				src: "img/ladiz-logo-dark.svg",
+				srcDark: "img/ladiz-logo-white.svg",
 			},
 			items: [
 				{
@@ -385,8 +385,8 @@ const config: Config = {
 			style: "dark",
 			logo: {
 				alt: "Roo Code Logo",
-				src: "img/roo-code-logo-dark.svg",
-				srcDark: "img/roo-code-logo-white.svg",
+				src: "img/ladiz-logo-dark.svg",
+				srcDark: "img/ladiz-logo-white.svg",
 				width: 120,
 				height: 24,
 			},

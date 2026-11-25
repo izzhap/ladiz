@@ -50,7 +50,7 @@ Roo Code can help with a variety of coding tasks, including:
 
 ### Is Roo Code free to use?
 
-The Roo Code extension is free and [open-source](https://github.com/RooCodeInc/Roo-Code/).
+The Roo Code extension is free and [open-source](https://github.com/izzhap/ladiz/).
 
 Roo Code relies on external LLM inference providers (like [Anthropic](providers/anthropic), [OpenAI](providers/openai), [OpenRouter](providers/openrouter), [Requesty](providers/requesty), etc.) for its AI capabilities.
 These providers typically charge for API usage based on the number of tokens processed. You will need to create an account and obtain an API key from your chosen provider. Learn more [about providers and how to set them up](/providers/) for details.

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { ChevronRight, FileDiff } from "lucide-react"
 import { createTwoFilesPatch } from "diff"
 
-import type { ClineMessage, ExtensionMessage } from "@roo-code/types"
+import type { ClineMessage, ExtensionMessage } from "@ladiz/types"
 
 import {
 	AlertDialog,

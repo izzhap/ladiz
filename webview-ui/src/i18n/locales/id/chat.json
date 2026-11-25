@@ -470,7 +470,29 @@
 	},
 	"queuedMessages": {
 		"title": "Pesan Antrian",
-		"clickToEdit": "Klik untuk mengedit pesan"
+		"clickToEdit": "Klik untuk mengedit pesan",
+		"sendNow": "Kirim langsung",
+		"edit": "Edit pesan",
+		"delete": "Hapus pesan",
+		"save": "Simpan",
+		"cancel": "Batal"
+	},
+	"loadingTips": {
+		"hide": "Sembunyikan tips",
+		"show": "Tampilkan tips",
+		"status": {
+			"thinking": "Thinking...",
+			"responding": "Responding...",
+			"executing": "Executing...",
+			"executingMcp": "Executing MCP...",
+			"editing": "Editing...",
+			"reading": "Reading...",
+			"searching": "Searching...",
+			"condensing": "Condensing context...",
+			"truncating": "Truncating context...",
+			"rateLimiting": "Rate limiting...",
+			"retrying": "Retrying..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz ingin menjalankan perintah slash",

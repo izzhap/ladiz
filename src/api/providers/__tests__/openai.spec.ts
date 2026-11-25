@@ -5,7 +5,7 @@ import { DEFAULT_HEADERS } from "../constants"
 import { ApiHandlerOptions } from "../../../shared/api"
 import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI from "openai"
-import { openAiModelInfoSaneDefaults } from "@roo-code/types"
+import { openAiModelInfoSaneDefaults } from "@ladiz/types"
 import { Package } from "../../../shared/package"
 import axios from "axios"
 
@@ -524,7 +524,7 @@ describe("OpenAiHandler", () => {
 		it("should handle rate limiting", async () => {
 			const rateLimitError = new Error("Rate limit exceeded")
 			rateLimitError.name = "Error"
-				; (rateLimitError as any).status = 429
+			;(rateLimitError as any).status = 429
 			mockCreate.mockRejectedValueOnce(rateLimitError)
 
 			const stream = handler.createMessage("system prompt", testMessages)

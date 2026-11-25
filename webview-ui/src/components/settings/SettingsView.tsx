@@ -36,7 +36,7 @@ import {
 	type ExperimentId,
 	DEFAULT_CHECKPOINT_TIMEOUT_SECONDS,
 	ImageGenerationProvider,
-} from "@roo-code/types"
+} from "@ladiz/types"
 
 import { vscode } from "@src/utils/vscode"
 import { cn } from "@src/lib/utils"

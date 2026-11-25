@@ -24,7 +24,14 @@
 	"unpin": "Sabitlemeyi iptal et",
 	"pin": "Sabitle",
 	"fileChangesInConversation": {
-		"header": "Bu sohbette {{count}} dosya değiştirildi"
+		"header": "Bu sohbette {{count}} dosya değiştirildi",
+		"revertAll": "Tümünü geri al",
+		"revertAllConfirmTitle": "Tüm Değişiklikleri Geri Al",
+		"revertAllConfirmDescription": "Bu sohbette {{count}} dosyada yapılan tüm değişiklikleri geri almak istediğinden emin misin? Bu işlem dosyaları bu sohbet başlamadan önceki durumuna döndürecektir.",
+		"revertFileConfirmTitle": "Dosya Değişikliklerini Geri Al",
+		"revertFileConfirmDescription": "Bu sohbette {{path}} dosyasında yapılan değişiklikleri geri almak istediğinden emin misin? Bu işlem dosyayı bu sohbet başlamadan önceki durumuna döndürecektir.",
+		"revertFile": "Dosyayı geri al",
+		"reverted": "Geri alındı"
 	},
 	"tokenProgress": {
 		"availableSpace": "Kullanılabilir alan: {{amount}} token",
@@ -458,7 +465,29 @@
 	},
 	"queuedMessages": {
 		"title": "Sıradaki Mesajlar",
-		"clickToEdit": "Mesajı düzenlemek için tıkla"
+		"clickToEdit": "Mesajı düzenlemek için tıkla",
+		"sendNow": "Hemen gönder",
+		"edit": "Mesajı düzenle",
+		"delete": "Mesajı sil",
+		"save": "Kaydet",
+		"cancel": "İptal"
+	},
+	"loadingTips": {
+		"hide": "İpuçlarını gizle",
+		"show": "İpuçlarını göster",
+		"status": {
+			"thinking": "Düşünüyor...",
+			"responding": "Yanıtlıyor...",
+			"executing": "Çalıştırılıyor...",
+			"executingMcp": "MCP çalıştırılıyor...",
+			"editing": "Düzenleniyor...",
+			"reading": "Okunuyor...",
+			"searching": "Aranıyor...",
+			"condensing": "Bağlam sıkıştırılıyor...",
+			"truncating": "Bağlam kırpılıyor...",
+			"rateLimiting": "Hız sınırlaması...",
+			"retrying": "Yeniden deneniyor..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz bir slash komutu çalıştırmak istiyor",

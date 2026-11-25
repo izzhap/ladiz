@@ -10,11 +10,11 @@ import { appendImages } from "@src/utils/imageUtils"
 import { getCostBreakdownIfNeeded } from "@src/utils/costFormatting"
 import { batchConsecutive } from "@src/utils/batchConsecutive"
 
-import type { ClineAsk, ClineSayTool, ClineMessage, ExtensionMessage, AudioType } from "@roo-code/types"
-import { isRetiredProvider } from "@roo-code/types"
+import type { ClineAsk, ClineSayTool, ClineMessage, ExtensionMessage, AudioType } from "@ladiz/types"
+import { isRetiredProvider } from "@ladiz/types"
 
 import { findLast } from "@roo/array"
-import { SuggestionItem } from "@roo-code/types"
+import { SuggestionItem } from "@ladiz/types"
 import { combineApiRequests } from "@roo/combineApiRequests"
 import { combineCommandSequences } from "@roo/combineCommandSequences"
 import { getApiMetrics } from "@roo/getApiMetrics"
@@ -1861,6 +1861,11 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							type: "editQueuedMessage",
 							payload: { id: messageQueue[index].id, text: newText, images: messageQueue[index].images },
 						})
+					}
+				}}
+				onSendNow={(index) => {
+					if (messageQueue[index]) {
+						vscode.postMessage({ type: "sendQueuedMessage", text: messageQueue[index].id })
 					}
 				}}
 			/>

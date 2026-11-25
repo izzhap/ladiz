@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode"
 
-import type { ProviderSettings } from "@roo-code/types"
+import type { ProviderSettings } from "@ladiz/types"
 import { Task } from "../Task"
 import { ClineProvider } from "../../webview/ClineProvider"
 

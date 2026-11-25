@@ -24,7 +24,14 @@
 	"unpin": "取消釘選",
 	"pin": "釘選",
 	"fileChangesInConversation": {
-		"header": "此對話中已變更 {{count}} 個檔案"
+		"header": "此對話中已變更 {{count}} 個檔案",
+		"revertAll": "全部還原",
+		"revertAllConfirmTitle": "還原所有變更",
+		"revertAllConfirmDescription": "確定要還原此對話中對 {{count}} 個檔案所做的所有變更嗎？這會將檔案恢復至此對話開始前的狀態。",
+		"revertFileConfirmTitle": "還原檔案變更",
+		"revertFileConfirmDescription": "確定要還原此對話中對 {{path}} 所做的變更嗎？這會將檔案恢復至此對話開始前的狀態。",
+		"revertFile": "還原檔案",
+		"reverted": "已還原"
 	},
 	"retry": {
 		"title": "重試",
@@ -451,7 +458,29 @@
 	},
 	"queuedMessages": {
 		"title": "佇列中的訊息",
-		"clickToEdit": "點選以編輯訊息"
+		"clickToEdit": "點選以編輯訊息",
+		"sendNow": "立即傳送",
+		"edit": "編輯訊息",
+		"delete": "刪除訊息",
+		"save": "儲存",
+		"cancel": "取消"
+	},
+	"loadingTips": {
+		"hide": "隱藏提示",
+		"show": "顯示提示",
+		"status": {
+			"thinking": "思考中...",
+			"responding": "回覆中...",
+			"executing": "執行中...",
+			"executingMcp": "執行 MCP 中...",
+			"editing": "編輯中...",
+			"reading": "讀取中...",
+			"searching": "搜尋中...",
+			"condensing": "壓縮上下文中...",
+			"truncating": "截斷上下文中...",
+			"rateLimiting": "速率限制中...",
+			"retrying": "重試中..."
+		}
 	},
 	"contextMenu": {
 		"noResults": "找不到結果",

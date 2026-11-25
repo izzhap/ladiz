@@ -51,7 +51,7 @@ import {
 	MIN_CHECKPOINT_TIMEOUT_SECONDS,
 	MAX_MCP_TOOLS_THRESHOLD,
 	countEnabledMcpTools,
-} from "@roo-code/types"
+} from "@ladiz/types"
 
 // api
 import { ApiHandler, ApiHandlerCreateMessageMetadata, buildApiHandler } from "../../api"
@@ -154,6 +154,7 @@ export interface TaskOptions extends CreateTaskOptions {
 	workspacePath?: string
 	/** Initial status for the task's history item (e.g., "active" for child tasks) */
 	initialStatus?: "active" | "delegated" | "completed"
+	initialQueuedMessages?: QueuedMessage[]
 }
 
 export class Task extends EventEmitter<TaskEvents> implements TaskLike {
@@ -331,6 +332,11 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 	// Message Queue Service
 	public readonly messageQueueService: MessageQueueService
 	private messageQueueStateChangedHandler: (() => void) | undefined
+	private _isWaitingForAsk = false
+
+	public get isWaitingForAsk(): boolean {
+		return this._isWaitingForAsk
+	}
 
 	// Streaming
 	isWaitingForFirstChunk = false
@@ -431,6 +437,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		initialTodos,
 		workspacePath,
 		initialStatus,
+		initialQueuedMessages,
 	}: TaskOptions) {
 		super()
 
@@ -499,6 +506,9 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		this.assistantMessageParser = undefined
 
 		this.messageQueueService = new MessageQueueService()
+		if (initialQueuedMessages?.length) {
+			this.messageQueueService.seedMessages(initialQueuedMessages)
+		}
 
 		this.messageQueueStateChangedHandler = () => {
 			this.emit(RooCodeEventName.TaskUserMessage, this.taskId)
@@ -1342,10 +1352,18 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		// block (via the `pWaitFor`).
 		const isBlocking = !(this.askResponse !== undefined || this.lastMessageTs !== askTs)
 		const isMessageQueued = !this.messageQueueService.isEmpty()
-		// Keep queued user messages intact during command_output asks. Those asks
-		// are terminal flow-control, not conversational turns.
-		const shouldDrainQueuedMessageForAsk = type !== "command_output"
-		const isStatusMutable = !partial && isBlocking && !isMessageQueued && approval.decision === "ask"
+		// Only drain queued messages when the task has finished/paused for the next
+		// user turn, never mid-turn on tool/command/MCP approvals or error/flow-control asks.
+		const shouldDrainQueuedMessageForAsk =
+			type === "completion_result" ||
+			type === "followup" ||
+			type === "resume_task" ||
+			type === "resume_completed_task"
+		const isStatusMutable =
+			!partial &&
+			isBlocking &&
+			!(isMessageQueued && shouldDrainQueuedMessageForAsk) &&
+			approval.decision === "ask"
 
 		if (isStatusMutable) {
 			const statusMutationTimeout = 2_000
@@ -1389,46 +1407,36 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			const message = this.messageQueueService.dequeueMessage()
 
 			if (message) {
-				// Check if this is a tool approval ask that needs to be handled.
-				if (type === "tool" || type === "command" || type === "use_mcp_server") {
-					// For tool approvals, we need to approve first, then send
-					// the message if there's text/images.
-					this.handleWebviewAskResponse("yesButtonClicked", message.text, message.images)
-				} else {
-					// For other ask types (like followup or command_output), fulfill the ask
-					// directly.
-					this.handleWebviewAskResponse("messageResponse", message.text, message.images)
-				}
+				this.handleWebviewAskResponse("messageResponse", message.text, message.images)
 			}
 		}
 
 		// Wait for askResponse to be set
-		await pWaitFor(
-			() => {
-				if (this.askResponse !== undefined || this.lastMessageTs !== askTs) {
-					return true
-				}
+		this._isWaitingForAsk = true
+		try {
+			await pWaitFor(
+				() => {
+					if (this.askResponse !== undefined || this.lastMessageTs !== askTs) {
+						return true
+					}
 
-				// If a queued message arrives while we're blocked on an ask (e.g. a follow-up
-				// suggestion click that was incorrectly queued due to UI state), consume it
-				// immediately so the task doesn't hang.
-				if (shouldDrainQueuedMessageForAsk && !this.messageQueueService.isEmpty()) {
-					const message = this.messageQueueService.dequeueMessage()
-					if (message) {
-						// If this is a tool approval ask, we need to approve first (yesButtonClicked)
-						// and include any queued text/images.
-						if (type === "tool" || type === "command" || type === "use_mcp_server") {
-							this.handleWebviewAskResponse("yesButtonClicked", message.text, message.images)
-						} else {
+					// If a queued message arrives while we're blocked on an ask (e.g. a follow-up
+					// suggestion click that was incorrectly queued due to UI state), consume it
+					// immediately so the task doesn't hang.
+					if (shouldDrainQueuedMessageForAsk && !this.messageQueueService.isEmpty()) {
+						const message = this.messageQueueService.dequeueMessage()
+						if (message) {
 							this.handleWebviewAskResponse("messageResponse", message.text, message.images)
 						}
 					}
-				}
 
-				return false
-			},
-			{ interval: 100 },
-		)
+					return false
+				},
+				{ interval: 100 },
+			)
+		} finally {
+			this._isWaitingForAsk = false
+		}
 
 		if (this.lastMessageTs !== askTs) {
 			// Could happen if we send multiple asks in a row i.e. with
@@ -2059,7 +2067,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 					// Removing or merging it would destroy this metadata, causing all condensed
 					// messages to become "orphaned" and restored to active status — effectively
 					// undoing the condensation and sending the full history to the API.
-					// See: https://github.com/RooCodeInc/Roo-Code/issues/11487
+					// See: https://github.com/izzhap/ladiz/issues/11487
 					modifiedApiConversationHistory = [...existingApiConversationHistory]
 					modifiedOldUserContent = []
 				} else if (lastMessage.role === "assistant") {

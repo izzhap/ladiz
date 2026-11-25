@@ -18,7 +18,7 @@ This release introduces Browser Use 2.0 for richer web automation, adds the Base
 
 ## Browser Use 2.0
  
-Browser Use now supports a more capable "2.0" experience ([#8941](https://github.com/RooCodeInc/Roo-Code/pull/8941)):
+Browser Use now supports a more capable "2.0" experience ([#8941](https://github.com/izzhap/ladiz/pull/8941)):
  
 - **Richer browser interaction**: Enables more advanced navigation and interaction patterns so Roo can better follow multi-step web workflows.
 - **More reliable automation**: Improves stability for sequences of clicks, typing, and scrolling, reducing the chance of flaky browser runs.
@@ -28,19 +28,19 @@ Browser Use now supports a more capable "2.0" experience ([#8941](https://github
  
 ## QOL Improvements
  
-- **Provider-Oriented Welcome Screen**: Added a provider-focused welcome screen so new users can more quickly choose and configure a working model setup ([#9484](https://github.com/RooCodeInc/Roo-Code/pull/9484)).
-- **Pinned Roo Provider**: Pinned the Roo provider to the top of the provider list so it is easier to discover and select ([#9485](https://github.com/RooCodeInc/Roo-Code/pull/9485)).
-- **Clearer Native Tool Descriptions**: Enhanced built-in tool descriptions with examples and clarifications so Roo can choose the right tools and use them more accurately ([#9486](https://github.com/RooCodeInc/Roo-Code/pull/9486)).
+- **Provider-Oriented Welcome Screen**: Added a provider-focused welcome screen so new users can more quickly choose and configure a working model setup ([#9484](https://github.com/izzhap/ladiz/pull/9484)).
+- **Pinned Roo Provider**: Pinned the Roo provider to the top of the provider list so it is easier to discover and select ([#9485](https://github.com/izzhap/ladiz/pull/9485)).
+- **Clearer Native Tool Descriptions**: Enhanced built-in tool descriptions with examples and clarifications so Roo can choose the right tools and use them more accurately ([#9486](https://github.com/izzhap/ladiz/pull/9486)).
  
 ## Bug Fixes
  
-- **Streaming Cancel Responsiveness**: Fixed the cancel button so it responds immediately during streaming, making it easier to stop long or unwanted runs (thanks jwadow!) ([#9448](https://github.com/RooCodeInc/Roo-Code/pull/9448)).
-- **apply_diff Performance Regression**: Resolved a recent performance regression in `apply_diff`, restoring fast patch application on larger edits ([#9474](https://github.com/RooCodeInc/Roo-Code/pull/9474)).
-- **Model Cache Refresh**: Implemented cache refreshing to avoid using stale disk-cached models, ensuring configuration updates are picked up correctly ([#9478](https://github.com/RooCodeInc/Roo-Code/pull/9478)).
-- **Tool Call Fallbacks**: Added a fallback to always yield tool calls regardless of `finish_reason`, preventing cases where valid tool calls were dropped ([#9476](https://github.com/RooCodeInc/Roo-Code/pull/9476)).
+- **Streaming Cancel Responsiveness**: Fixed the cancel button so it responds immediately during streaming, making it easier to stop long or unwanted runs (thanks jwadow!) ([#9448](https://github.com/izzhap/ladiz/pull/9448)).
+- **apply_diff Performance Regression**: Resolved a recent performance regression in `apply_diff`, restoring fast patch application on larger edits ([#9474](https://github.com/izzhap/ladiz/pull/9474)).
+- **Model Cache Refresh**: Implemented cache refreshing to avoid using stale disk-cached models, ensuring configuration updates are picked up correctly ([#9478](https://github.com/izzhap/ladiz/pull/9478)).
+- **Tool Call Fallbacks**: Added a fallback to always yield tool calls regardless of `finish_reason`, preventing cases where valid tool calls were dropped ([#9476](https://github.com/izzhap/ladiz/pull/9476)).
  
 ## Provider Updates
  
-- **Baseten Provider**: Added Baseten as a new AI provider, giving you another option for hosted models and deployments (thanks AlexKer!) ([#9461](https://github.com/RooCodeInc/Roo-Code/pull/9461)).
-- **OpenAI-Compatible Improvements**: Improved the base OpenAI-compatible provider configuration and error handling so more OpenAI-style endpoints work smoothly without special tweaks ([#9462](https://github.com/RooCodeInc/Roo-Code/pull/9462)).
-- **OpenRouter Capabilities**: Improved copying of model-level capabilities onto OpenRouter endpoint models so routing respects each model's real abilities ([#9483](https://github.com/RooCodeInc/Roo-Code/pull/9483)).
+- **Baseten Provider**: Added Baseten as a new AI provider, giving you another option for hosted models and deployments (thanks AlexKer!) ([#9461](https://github.com/izzhap/ladiz/pull/9461)).
+- **OpenAI-Compatible Improvements**: Improved the base OpenAI-compatible provider configuration and error handling so more OpenAI-style endpoints work smoothly without special tweaks ([#9462](https://github.com/izzhap/ladiz/pull/9462)).
+- **OpenRouter Capabilities**: Improved copying of model-level capabilities onto OpenRouter endpoint models so routing respects each model's real abilities ([#9483](https://github.com/izzhap/ladiz/pull/9483)).

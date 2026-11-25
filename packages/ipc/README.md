@@ -49,7 +49,7 @@ Resumes a task from history.
 ## Usage Example
 
 ```typescript
-import { IpcClient } from "@roo-code/ipc"
+import { IpcClient } from "@ladiz/ipc"
 
 const client = new IpcClient("/path/to/socket")
 
@@ -86,5 +86,5 @@ The IPC interface also emits task events that clients can listen to:
 
 The socket path is typically located in the system's temporary directory and follows the pattern:
 
-- Unix/Linux/macOS: `/tmp/roo-code-{id}.sock`
-- Windows: `\\.\pipe\roo-code-{id}`
+- Unix/Linux/macOS: `/tmp/ladiz-{id}.sock`
+- Windows: `\\.\pipe\ladiz-{id}`

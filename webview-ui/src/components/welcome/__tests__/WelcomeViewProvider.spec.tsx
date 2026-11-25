@@ -2,7 +2,7 @@
 
 import React from "react"
 import { render, screen, fireEvent } from "@/utils/test-utils"
-import { ladizDefaultModelId } from "@roo-code/types"
+import { ladizDefaultModelId } from "@ladiz/types"
 
 import * as ExtensionStateContext from "@src/context/ExtensionStateContext"
 const { ExtensionStateContextProvider } = ExtensionStateContext

@@ -28,7 +28,7 @@
 - [简体中文](../zh-CN/README.md)
 - [繁體中文](../zh-TW/README.md)
 - ...
-    </details>
+      </details>
 
 ---
 
@@ -52,12 +52,12 @@ Roo Code s'adapta a la teva manera de treballar, no a l'inrevés:
 - Mode Depuració: rastrejar problemes, afegir registres, aïllar les causes arrel
 - Modes personalitzats: crea modes especialitzats per al teu equip o flux de treball
 
-Més informació: [Ús de Modes](https://roocodeinc.github.io/Roo-Code/basic-usage/using-modes) • [Modes personalitzats](https://roocodeinc.github.io/Roo-Code/advanced-usage/custom-modes)
+Més informació: [Ús de Modes](https://ladizai.com/basic-usage/using-modes) • [Modes personalitzats](https://ladizai.com/advanced-usage/custom-modes)
 
 ## Recursos
 
-- **[Documentació](https://roocodeinc.github.io/Roo-Code/):** La guia oficial per instal·lar, configurar i dominar Roo Code.
-- **[Incidències de GitHub](https://github.com/RooCodeInc/Roo-Code/issues):** Informa d'errors i segueix el desenvolupament.
+- **[Documentació](https://ladizai.com/):** La guia oficial per instal·lar, configurar i dominar Roo Code.
+- **[Incidències de GitHub](https://github.com/izzhap/ladiz/issues):** Informa d'errors i segueix el desenvolupament.
 
 ---
 

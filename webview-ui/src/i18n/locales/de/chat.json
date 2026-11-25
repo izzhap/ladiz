@@ -24,7 +24,14 @@
 	"unpin": "Lösen von oben",
 	"pin": "Anheften",
 	"fileChangesInConversation": {
-		"header": "{{count}} Datei(en) in dieser Unterhaltung geändert"
+		"header": "{{count}} Datei(en) in dieser Unterhaltung geändert",
+		"revertAll": "Alle rückgängig",
+		"revertAllConfirmTitle": "Alle Änderungen rückgängig machen",
+		"revertAllConfirmDescription": "Möchtest du wirklich alle Änderungen an {{count}} Datei(en) aus dieser Unterhaltung rückgängig machen? Dadurch werden die Dateien auf den Stand vor Beginn dieser Unterhaltung zurückgesetzt.",
+		"revertFileConfirmTitle": "Dateiänderungen rückgängig machen",
+		"revertFileConfirmDescription": "Möchtest du wirklich alle Änderungen an {{path}} aus dieser Unterhaltung rückgängig machen? Dadurch wird die Datei auf den Stand vor Beginn dieser Unterhaltung zurückgesetzt.",
+		"revertFile": "Datei rückgängig",
+		"reverted": "Rückgängig gemacht"
 	},
 	"tokenProgress": {
 		"availableSpace": "Verfügbarer Speicher: {{amount}} Tokens",
@@ -457,7 +464,29 @@
 	},
 	"queuedMessages": {
 		"title": "Warteschlange Nachrichten",
-		"clickToEdit": "Klicken zum Bearbeiten der Nachricht"
+		"clickToEdit": "Klicken zum Bearbeiten der Nachricht",
+		"sendNow": "Sofort senden",
+		"edit": "Nachricht bearbeiten",
+		"delete": "Nachricht löschen",
+		"save": "Speichern",
+		"cancel": "Abbrechen"
+	},
+	"loadingTips": {
+		"hide": "Tipps ausblenden",
+		"show": "Tipps anzeigen",
+		"status": {
+			"thinking": "Denkt nach...",
+			"responding": "Antwortet...",
+			"executing": "Führt aus...",
+			"executingMcp": "Führt MCP aus...",
+			"editing": "Bearbeitet...",
+			"reading": "Liest...",
+			"searching": "Sucht...",
+			"condensing": "Kontext wird verdichtet...",
+			"truncating": "Kontext wird gekürzt...",
+			"rateLimiting": "Rate-Limiting...",
+			"retrying": "Wiederholt..."
+		}
 	},
 	"slashCommand": {
 		"wantsToRun": "Ladiz möchte einen Slash-Befehl ausführen",

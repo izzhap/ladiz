@@ -18,8 +18,8 @@ import {
 	ExperimentId,
 	checkoutDiffPayloadSchema,
 	checkoutRestorePayloadSchema,
-} from "@roo-code/types"
-import { customToolRegistry } from "@roo-code/core"
+} from "@ladiz/types"
+import { customToolRegistry } from "@ladiz/core"
 
 import { type ApiMessage } from "../task-persistence/apiMessages"
 import { saveTaskMessages } from "../task-persistence"
@@ -2905,6 +2905,10 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 				provider.getCurrentTask()?.messageQueueService.updateMessage(id, text, images)
 			}
 
+			break
+		}
+		case "sendQueuedMessage": {
+			await provider.sendQueuedMessage(message.text ?? "")
 			break
 		}
 
