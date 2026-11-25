@@ -1,37 +1,48 @@
 name: Publish Extension
 
 on:
-  pull_request:
-    types: [closed]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 env:
-  GIT_REF: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
+  GIT_REF: ${{ github.sha }}
 
 jobs:
   publish-extension:
     runs-on: ubuntu-latest
     permissions:
       contents: write # Required for pushing tags.
-    if: >
-        ( github.event_name == 'pull_request' &&
-        github.event.pull_request.base.ref == 'main' &&
-        contains(github.event.pull_request.title, 'Changeset version bump') ) ||
-        github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: ${{ env.GIT_REF }}
+      - name: Check if version tag already exists
+        id: version-check
+        run: |
+          current_package_version=$(node -p "require('./src/package.json').version")
+          echo "version=${current_package_version}" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/v${current_package_version}" >/dev/null 2>&1; then
+            echo "Tag v${current_package_version} already exists; skipping publish."
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tag v${current_package_version} not found; proceeding to publish."
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Setup Node.js and pnpm
+        if: steps.version-check.outputs.should_publish == 'true'
         uses: ./.github/actions/setup-node-pnpm
       - name: Configure Git
+        if: steps.version-check.outputs.should_publish == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       - name: Create .env file
+        if: steps.version-check.outputs.should_publish == 'true'
         run: echo "POSTHOG_API_KEY=${{ secrets.POSTHOG_API_KEY }}" >> .env
       - name: Package Extension
+        if: steps.version-check.outputs.should_publish == 'true'
         run: |
           current_package_version=$(node -p "require('./src/package.json').version")
           pnpm vsix
@@ -52,12 +63,14 @@ jobs:
           # Clean up temporary file.
           rm /tmp/ladiz-vsix-contents.txt
       - name: Create and Push Git Tag
+        if: steps.version-check.outputs.should_publish == 'true'
         run: |
           current_package_version=$(node -p "require('./src/package.json').version")
           git tag -a "v${current_package_version}" -m "Release v${current_package_version}"
           git push origin "v${current_package_version}" --no-verify
           echo "Successfully created and pushed git tag v${current_package_version}"
       - name: Publish Extension
+        if: steps.version-check.outputs.should_publish == 'true'
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
@@ -66,6 +79,7 @@ jobs:
           pnpm --filter ladiz publish:marketplace
           echo "Successfully published version $current_package_version to VS Code Marketplace"
       - name: Create GitHub Release
+        if: steps.version-check.outputs.should_publish == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
