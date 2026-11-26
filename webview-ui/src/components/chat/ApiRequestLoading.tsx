@@ -219,19 +219,20 @@ export function ApiRequestLoading({ lastModifiedMessage }: { lastModifiedMessage
 	const activityLabel = t(getLoadingActivityStatusKey(lastModifiedMessage))
 
 	return (
-		<div onContextMenu={handleContextMenu} className="flex items-center gap-2 min-w-0 w-full py-0.5">
+		<div onContextMenu={handleContextMenu} className="flex items-start gap-2 min-w-0 w-full mt-0.5">
 			{isTipsHidden ? (
-				<span className="text-xs text-vscode-descriptionForeground font-normal flex-1 truncate">
+				<span className="text-xs leading-[19px] text-vscode-descriptionForeground font-normal flex-1 truncate">
 					{activityLabel}
 				</span>
 			) : (
 				<>
-					<span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase rounded bg-vscode-badge-background text-vscode-badge-foreground shrink-0 select-none leading-none">
+					<span className="inline-flex items-center justify-center h-[19px] px-1.5 text-[10px] font-semibold tracking-wide uppercase rounded bg-vscode-badge-background text-vscode-badge-foreground shrink-0 select-none leading-none">
 						Tip
 					</span>
 					<p
+						key={tipIndex}
 						className={cn(
-							"text-xs text-vscode-descriptionForeground font-normal line-clamp-2 leading-normal break-words transition-all duration-300 m-0 p-0 flex-1",
+							"text-xs text-vscode-descriptionForeground font-normal line-clamp-2 leading-[19px] break-words transition-all duration-200 ease-out m-0 p-0 flex-1 min-w-0",
 							isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-0.5",
 						)}
 						title={shuffledTips[tipIndex]}>
@@ -244,7 +245,7 @@ export function ApiRequestLoading({ lastModifiedMessage }: { lastModifiedMessage
 					ref={menuRef}
 					role="menu"
 					style={{ top: menuPos.y, left: menuPos.x }}
-					className="fixed z-50 min-w-[8rem] overflow-hidden rounded-xs p-1 shadow-xs border border-vscode-focusBorder bg-vscode-dropdown-background text-vscode-dropdown-foreground">
+					className="animate-fade-in fixed z-50 min-w-[8rem] overflow-hidden rounded-xs p-1 shadow-xs border border-vscode-focusBorder bg-vscode-dropdown-background text-vscode-dropdown-foreground">
 					<button
 						type="button"
 						role="menuitem"

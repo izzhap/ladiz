@@ -48,20 +48,20 @@ export const TimelineItem: React.FC<TimelineItemProps> = memo(
 		const getDotClass = () => {
 			switch (status) {
 				case "success":
-					return "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]"
+					return "bg-emerald-500/85"
 				case "edit":
-					return "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]"
+					return "bg-amber-500/85"
 				case "command":
-					return "bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.7)]"
+					return "bg-indigo-400/85"
 				case "info":
-					return "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.7)]"
+					return "bg-sky-500/85"
 				case "running":
-					return "bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.9)] animate-pulse"
+					return "bg-vscode-focusBorder animate-pulse"
 				case "error":
-					return "bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.7)]"
+					return "bg-rose-500/85"
 				case "idle":
 				default:
-					return "bg-slate-400/80"
+					return "bg-vscode-descriptionForeground/60"
 			}
 		}
 

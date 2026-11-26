@@ -66,6 +66,40 @@ import { cn } from "@/lib/utils"
 import { OpenMarkdownPreviewButton } from "./OpenMarkdownPreviewButton"
 import { TimelineItem } from "./TimelineItem"
 
+function TaskCompletedCard({
+	label,
+	markdown,
+	partial,
+}: {
+	label: string
+	markdown: string | undefined
+	partial?: boolean
+}) {
+	return (
+		<div className="ladiz-card-enter group relative my-2 overflow-hidden rounded-lg border border-vscode-panel-border/75 bg-vscode-sideBar-background/80 transition-colors duration-150 hover:border-vscode-panel-border">
+			<div className="flex items-center justify-between gap-2 px-3.5 py-2 border-b border-vscode-panel-border/50 bg-vscode-editor-background/35">
+				<div className="flex items-center gap-2 min-w-0">
+					<span
+						aria-hidden="true"
+						className="size-1.5 rounded-full shrink-0"
+						style={{
+							backgroundColor: "var(--vscode-testing-iconPassed, var(--vscode-charts-green, #3fb950))",
+						}}
+					/>
+					<span className="text-[11px] font-semibold tracking-wide text-vscode-foreground/85 uppercase truncate">
+						{label}
+					</span>
+				</div>
+				<OpenMarkdownPreviewButton markdown={markdown} />
+			</div>
+
+			<div className="px-3.5 py-3 text-xs leading-relaxed text-vscode-foreground">
+				<Markdown markdown={markdown} partial={partial} />
+			</div>
+		</div>
+	)
+}
+
 // Helper function to get previous todos before a specific message
 function getPreviousTodos(messages: ClineMessage[], currentMessageTs: number): any[] {
 	// Find the previous updateTodoList message before the current one
@@ -299,7 +333,9 @@ export const ChatRowContent = ({
 				]
 			case "completion_result":
 				return [
-					<span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] inline-block shrink-0"></span>,
+					<span
+						className="size-1.5 rounded-full inline-block shrink-0"
+						style={{ backgroundColor: successColor }}></span>,
 					<span style={{ color: successColor, fontWeight: "bold" }}>{t("chat:taskCompleted")}</span>,
 				]
 			case "api_req_rate_limit_wait":
@@ -1131,22 +1167,7 @@ export const ChatRowContent = ({
 						<ErrorRow type="error" message={message.text || t("chat:error")} errorDetails={message.text} />
 					)
 				case "completion_result":
-					return (
-						<div className="group relative my-2 overflow-hidden rounded-xl border border-emerald-500/25 bg-gradient-to-b from-emerald-950/20 via-slate-900/40 to-slate-950/30 p-3.5 shadow-sm">
-							<div className="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-emerald-500/15">
-								<div className="flex items-center gap-2">
-									<span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] shrink-0" />
-									<span className="text-xs font-semibold tracking-wider text-emerald-300 uppercase font-mono">
-										{t("chat:taskCompleted")}
-									</span>
-								</div>
-								<OpenMarkdownPreviewButton markdown={message.text} />
-							</div>
-							<div className="text-xs leading-relaxed text-slate-200">
-								<Markdown markdown={message.text} />
-							</div>
-						</div>
-					)
+					return <TaskCompletedCard label={t("chat:taskCompleted")} markdown={message.text} />
 				case "shell_integration_warning":
 					return <CommandExecutionError />
 				case "checkpoint_saved":
@@ -1386,20 +1407,11 @@ export const ChatRowContent = ({
 				case "completion_result":
 					if (message.text) {
 						return (
-							<div className="group relative my-2 overflow-hidden rounded-xl border border-emerald-500/25 bg-gradient-to-b from-emerald-950/20 via-slate-900/40 to-slate-950/30 p-3.5 shadow-sm">
-								<div className="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-emerald-500/15">
-									<div className="flex items-center gap-2">
-										<span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] shrink-0" />
-										<span className="text-xs font-semibold tracking-wider text-emerald-300 uppercase font-mono">
-											{t("chat:taskCompleted")}
-										</span>
-									</div>
-									<OpenMarkdownPreviewButton markdown={message.text} />
-								</div>
-								<div className="text-xs leading-relaxed text-slate-200">
-									<Markdown markdown={message.text} partial={message.partial} />
-								</div>
-							</div>
+							<TaskCompletedCard
+								label={t("chat:taskCompleted")}
+								markdown={message.text}
+								partial={message.partial}
+							/>
 						)
 					} else {
 						return null
