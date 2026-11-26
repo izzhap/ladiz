@@ -4,14 +4,7 @@ import * as vscode from "vscode"
 import matter from "gray-matter"
 
 import type { ClineProvider } from "../../core/webview/ClineProvider"
-import {
-	getGlobalLadizDirectory,
-	getProjectLadizDirectoryForCwd,
-	getGlobalAgentsDirectory,
-	getProjectAgentsDirectoryForCwd,
-	directoryExists,
-	fileExists,
-} from "../ladiz-config"
+import { getGlobalLadizDirectory, getProjectLadizDirectoryForCwd, directoryExists, fileExists } from "../ladiz-config"
 import { SkillMetadata, SkillContent } from "../../shared/skills"
 import { modes, getAllModes } from "../../shared/modes"
 import {
@@ -478,7 +471,7 @@ Add your skill instructions here.
 			throw new Error(t("skills:errors.not_found", { name, source, modeInfo }))
 		}
 
-		// Derive base directory from the skill's actual path (.ladiz, .roo, or .agents)
+		// Derive base directory from the skill's actual path (.ladiz or .roo)
 		const baseDir = path.dirname(path.dirname(path.dirname(skill.path)))
 
 		// Determine source and destination directories
@@ -570,44 +563,19 @@ Add your skill instructions here.
 	> {
 		const dirs: Array<{ dir: string; source: "global" | "project"; mode?: string }> = []
 		const globalLadizDir = getGlobalLadizDirectory()
-		const globalAgentsDir = getGlobalAgentsDirectory()
 		const provider = this.providerRef.deref()
 		const projectLadizDir = provider?.cwd ? getProjectLadizDirectoryForCwd(provider.cwd) : null
-		const projectAgentsDir = provider?.cwd ? getProjectAgentsDirectoryForCwd(provider.cwd) : null
 
 		// Get list of modes to check for mode-specific skills
 		const modesList = await this.getAvailableModes()
 
-		// Priority rules for skills with the same name:
-		// 1. Source level: project > global (handled by shouldOverrideSkill in getSkillsForMode)
-		// 2. Within the same source level: later-processed directories override earlier ones
-		//    (via Map.set replacement during discovery - same source+mode+name key gets replaced)
-		//
-		// Processing order (later directories override earlier ones at the same source level):
-		// - Global: .agents -> .ladiz (so .ladiz wins)
-		// - Project: .agents -> .ladiz (so .ladiz wins)
-
-		// Global .agents directories (lowest priority - shared across agents)
-		dirs.push({ dir: path.join(globalAgentsDir, "skills"), source: "global" })
-		for (const mode of modesList) {
-			dirs.push({ dir: path.join(globalAgentsDir, `skills-${mode}`), source: "global", mode })
-		}
-
-		// Project .agents directories
-		if (projectAgentsDir) {
-			dirs.push({ dir: path.join(projectAgentsDir, "skills"), source: "project" })
-			for (const mode of modesList) {
-				dirs.push({ dir: path.join(projectAgentsDir, `skills-${mode}`), source: "project", mode })
-			}
-		}
-
-		// Global .ladiz directories (Ladiz-specific, overrides .agents)
+		// Global .ladiz directories
 		dirs.push({ dir: path.join(globalLadizDir, "skills"), source: "global" })
 		for (const mode of modesList) {
 			dirs.push({ dir: path.join(globalLadizDir, `skills-${mode}`), source: "global", mode })
 		}
 
-		// Project .ladiz directories (highest priority)
+		// Project .ladiz directories (overrides global via shouldOverrideSkill in getSkillsForMode)
 		if (projectLadizDir) {
 			dirs.push({ dir: path.join(projectLadizDir, "skills"), source: "project" })
 			for (const mode of modesList) {
@@ -653,29 +621,17 @@ Add your skill instructions here.
 
 		// Watch for changes in skills directories
 		const globalLadizDir = getGlobalLadizDirectory()
-		const globalAgentsDir = getGlobalAgentsDirectory()
 		const projectLadizDir = getProjectLadizDirectoryForCwd(provider.cwd)
-		const projectAgentsDir = getProjectAgentsDirectoryForCwd(provider.cwd)
 
 		// Watch global & project .ladiz skills directories
 		this.watchDirectory(path.join(globalLadizDir, "skills"))
 		this.watchDirectory(path.join(projectLadizDir, "skills"))
 
-		// Watch global .agents skills directory
-		this.watchDirectory(path.join(globalAgentsDir, "skills"))
-
-		// Watch project .agents skills directory
-		this.watchDirectory(path.join(projectAgentsDir, "skills"))
-
 		// Watch mode-specific directories for all available modes
 		const modesList = await this.getAvailableModes()
 		for (const mode of modesList) {
-			// .ladiz mode-specific
 			this.watchDirectory(path.join(globalLadizDir, `skills-${mode}`))
 			this.watchDirectory(path.join(projectLadizDir, `skills-${mode}`))
-			// .agents mode-specific
-			this.watchDirectory(path.join(globalAgentsDir, `skills-${mode}`))
-			this.watchDirectory(path.join(projectAgentsDir, `skills-${mode}`))
 		}
 	}
 

@@ -84,10 +84,8 @@
 
 	--color-vscode-input-foreground: var(--vscode-input-foreground);
 	--color-vscode-input-background: var(--vscode-input-background);
-	--color-vscode-input-border: var(
-		--vscode-input-border,
-		transparent
-	); /* Some themes don't have a border color, so we can fallback to transparent */
+	--color-vscode-input-border: var(--vscode-input-border, transparent);
+	/* Some themes don't have a border color, so we can fallback to transparent */
 
 	--color-vscode-focusBorder: var(--vscode-focusBorder);
 
@@ -168,7 +166,8 @@
 		--accent-foreground: var(--vscode-list-hoverForeground);
 		--destructive: var(--vscode-errorForeground);
 		--destructive-foreground: var(--vscode-editor-background);
-		--border: var(--vscode-input-border, transparent); /* --border gets theme value or transparent fallback */
+		--border: var(--vscode-input-border, transparent);
+		/* --border gets theme value or transparent fallback */
 		--input: var(--vscode-input-background);
 		--ring: var(--vscode-input-border);
 		--chart-1: var(--vscode-charts-red);
@@ -215,15 +214,19 @@
 		0% {
 			transform: translateY(0);
 		}
+
 		25% {
 			transform: translateY(-25%);
 		}
+
 		50% {
 			transform: translateY(0);
 		}
+
 		75% {
 			transform: translateY(-12.5%);
 		}
+
 		100% {
 			transform: translateY(0);
 		}
@@ -251,6 +254,7 @@ textarea:focus {
 	width: 0;
 	height: 0;
 }
+
 .scrollbar-none,
 .scrollbar-hide {
 	-ms-overflow-style: none;
@@ -355,12 +359,15 @@ body:focus-within .code-block-scrollable {
  */
 
 .scrollbar-hide {
-	-ms-overflow-style: none; /* IE and Edge */
-	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+	/* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-	display: none; /* Chrome, Safari and Opera */
+	display: none;
+	/* Chrome, Safari and Opera */
 }
 
 /**
@@ -487,6 +494,7 @@ input[cmdk-input]:focus {
 	from {
 		transform: translateX(100%);
 	}
+
 	to {
 		transform: translateX(0);
 	}
@@ -500,6 +508,7 @@ input[cmdk-input]:focus {
 	from {
 		opacity: 0;
 	}
+
 	to {
 		opacity: 1;
 	}
@@ -514,6 +523,7 @@ input[cmdk-input]:focus {
 	100% {
 		opacity: 1;
 	}
+
 	50% {
 		opacity: 0.7;
 	}
@@ -554,9 +564,11 @@ input[cmdk-input]:focus {
 .diff-content-inserted {
 	background-color: color-mix(in srgb, var(--vscode-diffEditor-insertedTextBackground) 70%, transparent);
 }
+
 .diff-content-removed {
 	background-color: color-mix(in srgb, var(--vscode-diffEditor-removedTextBackground) 70%, transparent);
 }
+
 .diff-content-context {
 	background-color: color-mix(in srgb, var(--vscode-editorGroup-border) 100%, transparent);
 }
@@ -565,6 +577,7 @@ input[cmdk-input]:focus {
 	0% {
 		transform: translateX(0);
 	}
+
 	100% {
 		transform: translateX(-30px);
 	}
@@ -578,6 +591,7 @@ input[cmdk-input]:focus {
 	0% {
 		transform: translateX(200px);
 	}
+
 	100% {
 		transform: translateX(-200px);
 	}
@@ -592,6 +606,7 @@ input[cmdk-input]:focus {
 	0% {
 		background-color: color-mix(in srgb, var(--vscode-focusBorder) 40%, transparent);
 	}
+
 	100% {
 		background-color: transparent;
 	}
@@ -602,4 +617,27 @@ input[cmdk-input]:focus {
 	border-radius: 4px;
 	padding: 8px;
 	margin: -8px;
+}
+
+/* Subtle card entrance animation */
+@keyframes ladiz-card-enter {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.ladiz-card-enter {
+	animation: ladiz-card-enter 0.2s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ladiz-card-enter {
+		animation: none !important;
+	}
 }
