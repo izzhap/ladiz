@@ -66,6 +66,7 @@ describe("getRulesSection", () => {
 		expect(result).toContain("RULES")
 		expect(result).toContain("project base directory")
 		expect(result).toContain(cwd)
+		expect(result).toContain(".ladiz/skills/<skill-name>/SKILL.md")
 	})
 
 	it("includes vendor confidentiality section when isStealthModel is true", () => {

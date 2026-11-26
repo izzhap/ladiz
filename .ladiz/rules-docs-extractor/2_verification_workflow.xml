@@ -36,7 +36,7 @@
     <step number="4">
       <title>Output Verification Report</title>
       <actions>
-        <action>Write verification to .roo/extraction/VERIFY-[feature].yaml</action>
+        <action>Write verification to .ladiz/extraction/VERIFY-[feature].yaml</action>
         <action>Use the output schema (see output_format.xml)</action>
       </actions>
     </step>
