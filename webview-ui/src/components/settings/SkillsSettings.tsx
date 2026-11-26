@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react"
 import { Trans } from "react-i18next"
-import { Plus, Globe, Folder, Edit, Trash2, Settings } from "lucide-react"
+import { Globe, Folder, Edit, Trash2, Settings } from "lucide-react"
 
 import type { SkillMetadata } from "@ladiz/types"
 
@@ -31,7 +31,6 @@ import { vscode } from "@/utils/vscode"
 import { buildDocLink } from "@/utils/docLinks"
 
 import { SectionHeader } from "./SectionHeader"
-import { CreateSkillDialog } from "./CreateSkillDialog"
 
 export const SkillsSettings: React.FC = () => {
 	const { t } = useAppTranslation()
@@ -40,7 +39,6 @@ export const SkillsSettings: React.FC = () => {
 
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 	const [skillToDelete, setSkillToDelete] = useState<SkillMetadata | null>(null)
-	const [createDialogOpen, setCreateDialogOpen] = useState(false)
 
 	// Mode selection modal state
 	const [modeDialogOpen, setModeDialogOpen] = useState(false)
@@ -154,9 +152,6 @@ export const SkillsSettings: React.FC = () => {
 		setSkillToEditModes(null)
 	}, [])
 
-	// No-op callback - the backend sends updated skills list via ExtensionStateContext
-	const handleSkillCreated = useCallback(() => {}, [])
-
 	// Group skills by source
 	const projectSkills = useMemo(() => skills.filter((skill) => skill.source === "project"), [skills])
 	const globalSkills = useMemo(() => skills.filter((skill) => skill.source === "global"), [skills])
@@ -232,12 +227,6 @@ export const SkillsSettings: React.FC = () => {
 							}}
 						/>
 					</p>
-
-					{/* Add Skill button */}
-					<Button variant="secondary" className="py-1" onClick={() => setCreateDialogOpen(true)}>
-						<Plus />
-						{t("settings:skills.addSkill")}
-					</Button>
 				</div>
 			</div>
 
@@ -295,14 +284,6 @@ export const SkillsSettings: React.FC = () => {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-
-			{/* Create Skill Dialog */}
-			<CreateSkillDialog
-				open={createDialogOpen}
-				onOpenChange={setCreateDialogOpen}
-				onSkillCreated={handleSkillCreated}
-				hasWorkspace={hasWorkspace}
-			/>
 
 			{/* Mode Selection Dialog */}
 			<Dialog open={modeDialogOpen} onOpenChange={setModeDialogOpen}>

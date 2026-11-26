@@ -35,7 +35,7 @@
     <step number="4">
       <title>Output Structured Data</title>
       <actions>
-        <action>Write extraction to .roo/extraction/EXTRACT-[feature].yaml</action>
+        <action>Write extraction to .ladiz/extraction/EXTRACT-[feature].yaml</action>
         <action>Use the output schema (see output_format.xml)</action>
       </actions>
     </step>

@@ -112,24 +112,6 @@ vi.mock("@/components/ui", () => ({
 	SelectValue: () => <span data-testid="select-value" />,
 }))
 
-// Mock CreateSkillDialog component
-vi.mock("../CreateSkillDialog", () => ({
-	CreateSkillDialog: ({ open, onOpenChange, onSkillCreated }: any) => (
-		<div data-testid="create-skill-dialog" data-open={open}>
-			{open && (
-				<>
-					<button onClick={() => onOpenChange(false)} data-testid="close-dialog">
-						Close
-					</button>
-					<button onClick={onSkillCreated} data-testid="create-skill-button">
-						Create
-					</button>
-				</>
-			)}
-		</div>
-	),
-}))
-
 // Mock SectionHeader component
 vi.mock("../SectionHeader", () => ({
 	SectionHeader: ({ children }: any) => <div data-testid="section-header">{children}</div>,
@@ -261,19 +243,6 @@ describe("SkillsSettings", () => {
 		expect(screen.getByText("A global skill")).toBeInTheDocument()
 	})
 
-	it("opens create skill dialog when add button is clicked", () => {
-		renderSkillsSettings()
-
-		// There's now a single "Add Skill" button at the top
-		const addButton = screen
-			.getAllByTestId("button")
-			.find((btn) => btn.textContent?.includes("settings:skills.addSkill"))
-		expect(addButton).toBeInTheDocument()
-		fireEvent.click(addButton!)
-
-		expect(screen.getByTestId("create-skill-dialog")).toHaveAttribute("data-open", "true")
-	})
-
 	it("opens delete confirmation dialog when delete button is clicked", () => {
 		renderSkillsSettings()
 
@@ -380,29 +349,6 @@ describe("SkillsSettings", () => {
 		expect(refreshCalls.length).toBe(0)
 	})
 
-	it("does not manually refresh after creating new skill (backend sends updated skills via context)", async () => {
-		renderSkillsSettings()
-
-		// Clear mock calls after initial mount
-		;(vscode.postMessage as any).mockClear()
-
-		// Open create dialog
-		const addButton = screen
-			.getAllByTestId("button")
-			.find((btn) => btn.textContent?.includes("settings:skills.addSkill"))
-		fireEvent.click(addButton!)
-
-		// Simulate skill creation
-		const createButton = screen.getByTestId("create-skill-button")
-		fireEvent.click(createButton)
-
-		// Verify that requestSkills was NOT called after creation
-		// (the backend sends updated skills via ExtensionStateContext automatically)
-		const calls = (vscode.postMessage as any).mock.calls
-		const refreshCalls = calls.filter((call: any[]) => call[0].type === "requestSkills")
-		expect(refreshCalls.length).toBe(0)
-	})
-
 	it("renders empty state when no skills exist", () => {
 		renderSkillsSettings([])
 
@@ -439,12 +385,11 @@ describe("SkillsSettings", () => {
 		expect(screen.getByText("skill-3")).toBeInTheDocument()
 	})
 
-	it("renders a single add skill button", () => {
+	it("does not render add skill button", () => {
 		renderSkillsSettings()
 
-		// Should have one "Add Skill" button at the top
 		const buttons = screen.getAllByTestId("button")
 		const addButtons = buttons.filter((btn) => btn.textContent?.includes("settings:skills.addSkill"))
-		expect(addButtons.length).toBe(1)
+		expect(addButtons.length).toBe(0)
 	})
 })

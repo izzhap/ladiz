@@ -46,7 +46,7 @@ logs
 .idea/
 .qodo/
 .vercel
-.roo/mcp.json
+.ladiz/mcp.json
 
 # Qdrant
 qdrant_storage/

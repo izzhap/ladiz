@@ -128,6 +128,6 @@ claims:
   <file_naming>
     <extraction>EXTRACT-[feature-slug].yaml</extraction>
     <verification>VERIFY-[feature-slug].yaml</verification>
-    <location>.roo/extraction/</location>
+    <location>.ladiz/extraction/</location>
   </file_naming>
 </output_format>
