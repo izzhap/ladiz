@@ -633,7 +633,7 @@ input[cmdk-input]:focus {
 }
 
 .ladiz-card-enter {
-	animation: ladiz-card-enter 0.2s ease-out both;
+	animation: ladiz-card-enter 0.2s ease-out backwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

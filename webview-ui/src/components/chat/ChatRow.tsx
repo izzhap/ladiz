@@ -81,7 +81,7 @@ function TaskCompletedCard({
 				<div className="flex items-center gap-2 min-w-0">
 					<span
 						aria-hidden="true"
-						className="size-1.5 rounded-full shrink-0"
+						className="size-1.5 rounded-none shrink-0"
 						style={{
 							backgroundColor: "var(--vscode-testing-iconPassed, var(--vscode-charts-green, #3fb950))",
 						}}
