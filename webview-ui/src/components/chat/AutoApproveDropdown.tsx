@@ -76,16 +76,18 @@ export const AutoApproveDropdown = ({ disabled = false, triggerClassName = "" }:
 				type="button"
 				onClick={handleToggleYolo}
 				disabled={disabled}
+				aria-pressed={isYoloOn}
 				data-testid="auto-approve-dropdown-trigger"
 				className={cn(
-					"inline-flex items-center gap-1.5 relative whitespace-nowrap px-2.5 py-1 text-xs font-semibold rounded-full select-none cursor-pointer transition-all duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-500",
+					"inline-flex items-center gap-1.5 h-7 relative whitespace-nowrap px-2 text-[11px] font-medium rounded-md border select-none cursor-pointer transition-colors duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 					isYoloOn
-						? "bg-amber-500/15 border border-amber-500/40 text-amber-300 shadow-sm shadow-amber-500/20 hover:bg-amber-500/25 active:scale-95"
-						: "bg-white/[0.04] border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/[0.08] hover:border-white/20 active:scale-95",
+						? "bg-amber-500/12 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 hover:border-amber-500/45"
+						: "bg-white/[0.04] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:bg-white/[0.08] hover:border-white/[0.16]",
 					disabled && "opacity-50 cursor-not-allowed",
 					triggerClassName,
 				)}>
 				<span
+					aria-hidden="true"
 					className={cn(
 						"size-1.5 rounded-full shrink-0 transition-colors",
 						isYoloOn ? "bg-amber-400" : "bg-slate-500",

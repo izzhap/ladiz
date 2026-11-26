@@ -1121,29 +1121,24 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					)}
 
 					{/* Integrated Bottom Toolbar inside the Card */}
-					<div className="flex items-center justify-between gap-2 px-3 pb-2.5 pt-1 border-t border-white/[0.04]">
-						{/* Left: Mode and Model selector pills */}
-						<div className="flex items-center gap-1.5 min-w-0 overflow-x-auto scrollbar-none flex-1">
+					<div className="flex items-center justify-between gap-2 px-3 pb-2.5 pt-1.5 border-t border-white/[0.04]">
+						{/* Left: Mode and Model selector chips */}
+						<div className="flex items-center gap-1.5 min-w-0 flex-1">
 							<ModeSelector
 								value={mode}
 								title={t("chat:selectMode")}
 								onChange={handleModeChange}
-								triggerClassName="text-ellipsis overflow-hidden flex-shrink-0"
+								triggerClassName="shrink-0"
 								modeShortcutText={modeShortcutText}
 								customModes={customModes}
 								customModePrompts={customModePrompts}
 							/>
-							<ModelSelector
-								disabled={selectApiConfigDisabled}
-								triggerClassName="text-ellipsis overflow-hidden flex-shrink-0"
-							/>
+							<ModelSelector disabled={selectApiConfigDisabled} triggerClassName="min-w-0 max-w-full" />
 						</div>
 
 						{/* Right: YOLO status, Attach image, Enhance prompt, Queue, Cancel, Send/Stop */}
-						<div className="flex items-center gap-1.5 shrink-0">
-							{!isEditMode && (
-								<AutoApproveDropdown triggerClassName="min-w-[28px] text-ellipsis overflow-hidden shrink-0" />
-							)}
+						<div className="flex items-center gap-1 shrink-0">
+							{!isEditMode && <AutoApproveDropdown triggerClassName="shrink-0" />}
 
 							{!shouldDisableImages && (
 								<StandardTooltip content={t("chat:addImages")}>
@@ -1153,14 +1148,13 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 										onClick={!shouldDisableImages ? onSelectImages : undefined}
 										className={cn(
 											"relative inline-flex items-center justify-center",
-											"bg-transparent border-none p-1.5",
-											"rounded-lg min-w-[28px] min-h-[28px]",
+											"bg-transparent border-none size-7 rounded-md",
 											"text-vscode-descriptionForeground hover:text-vscode-foreground",
-											"transition-all duration-150 cursor-pointer",
+											"transition-colors duration-150 cursor-pointer",
 											"hover:bg-white/[0.06] active:bg-white/[0.1]",
 											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 										)}>
-										<Image className="w-3.5 h-3.5" />
+										<Image className="size-3.5" aria-hidden="true" />
 									</button>
 								</StandardTooltip>
 							)}
@@ -1173,15 +1167,13 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 										onClick={onCancel}
 										className={cn(
 											"relative inline-flex items-center justify-center",
-											"bg-transparent border-none p-1.5",
-											"rounded-lg min-w-[28px] min-h-[28px]",
-											"opacity-60 hover:opacity-100 text-vscode-descriptionForeground hover:text-vscode-foreground",
-											"transition-all duration-150",
+											"bg-transparent border-none size-7 rounded-md",
+											"opacity-70 hover:opacity-100 text-vscode-descriptionForeground hover:text-vscode-foreground",
+											"transition-colors duration-150 cursor-pointer",
 											"hover:bg-white/[0.06] active:bg-white/[0.1]",
 											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
-											"cursor-pointer",
 										)}>
-										<X className="w-3.5 h-3.5" />
+										<X className="size-3.5" aria-hidden="true" />
 									</button>
 								</StandardTooltip>
 							) : (
@@ -1192,17 +1184,17 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 										onClick={handleEnhancePrompt}
 										className={cn(
 											"relative inline-flex items-center justify-center",
-											"bg-transparent border-none p-1.5",
-											"rounded-lg min-w-[28px] min-h-[28px]",
+											"bg-transparent border-none size-7 rounded-md",
 											"text-vscode-descriptionForeground hover:text-vscode-foreground",
-											"transition-all duration-150 cursor-pointer",
+											"transition-colors duration-150 cursor-pointer",
 											hasInputContent
 												? "opacity-100 hover:bg-white/[0.06] active:bg-white/[0.1] pointer-events-auto"
 												: "opacity-0 pointer-events-none w-0 h-0 p-0 m-0 min-w-0 min-h-0 overflow-hidden",
 											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 										)}>
 										<WandSparkles
-											className={cn("w-3.5 h-3.5", isEnhancingPrompt && "animate-spin")}
+											className={cn("size-3.5", isEnhancingPrompt && "animate-spin")}
+											aria-hidden="true"
 										/>
 									</button>
 								</StandardTooltip>
@@ -1216,14 +1208,13 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 										onClick={onEnqueueMessage}
 										className={cn(
 											"relative inline-flex items-center justify-center",
-											"bg-transparent border-none p-1.5",
-											"rounded-lg min-w-[28px] min-h-[28px]",
+											"bg-transparent border-none size-7 rounded-md",
 											"text-vscode-descriptionForeground hover:text-vscode-foreground",
-											"transition-all duration-150 cursor-pointer",
+											"transition-colors duration-150 cursor-pointer",
 											"hover:bg-white/[0.06] active:bg-white/[0.1]",
 											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 										)}>
-										<ListEnd className="w-3.5 h-3.5" />
+										<ListEnd className="size-3.5" aria-hidden="true" />
 									</button>
 								</StandardTooltip>
 							)}
@@ -1249,18 +1240,19 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 									onClick={isStreaming ? onStop : onSend}
 									className={cn(
 										"relative inline-flex items-center justify-center",
-										"size-7 rounded-lg transition-all duration-150",
+										"size-7 rounded-md transition-colors duration-150",
+										"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 										isStreaming
-											? "bg-rose-600 hover:bg-rose-500 text-white shadow-sm"
-											: "bg-blue-600 hover:bg-blue-500 text-white shadow-sm active:scale-95",
+											? "bg-rose-600 hover:bg-rose-500 text-white"
+											: "bg-blue-600 hover:bg-blue-500 text-white",
 										isEditMode || isStreaming || hasInputContent
 											? "opacity-100 pointer-events-auto cursor-pointer"
-											: "opacity-25 pointer-events-none bg-slate-800 text-slate-500 shadow-none",
+											: "opacity-25 pointer-events-none bg-white/[0.08] text-vscode-descriptionForeground",
 									)}>
 									{isStreaming ? (
-										<Square className="size-3.5 stroke-none fill-white" />
+										<Square className="size-3 stroke-none fill-current" aria-hidden="true" />
 									) : (
-										<SendHorizontal className="size-3.5 text-white" />
+										<SendHorizontal className="size-3.5" aria-hidden="true" />
 									)}
 								</button>
 							</StandardTooltip>
@@ -1271,11 +1263,12 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 										aria-label={t("chat:stopTts")}
 										onClick={() => vscode.postMessage({ type: "stopTts" })}
 										className={cn(
-											"inline-flex items-center justify-center p-1 rounded-full",
-											"text-vscode-foreground opacity-80 hover:opacity-100 hover:bg-white/10",
-											"transition-all duration-150 cursor-pointer",
+											"inline-flex items-center justify-center size-7 rounded-md",
+											"text-vscode-descriptionForeground hover:text-vscode-foreground hover:bg-white/[0.06]",
+											"transition-colors duration-150 cursor-pointer",
+											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 										)}>
-										<VolumeX className="w-3.5 h-3.5" />
+										<VolumeX className="size-3.5" aria-hidden="true" />
 									</button>
 								</StandardTooltip>
 							)}
