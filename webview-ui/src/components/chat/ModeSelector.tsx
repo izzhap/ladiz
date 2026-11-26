@@ -218,16 +218,14 @@ export const ModeSelector = ({
 					disabled={disabled}
 					data-testid="mode-selector-trigger"
 					className={cn(
-						"inline-flex items-center relative whitespace-nowrap px-2.5 py-1 text-xs font-medium rounded-full border shadow-sm",
+						"inline-flex items-center h-7 relative whitespace-nowrap px-2.5 text-xs font-medium rounded-md border",
 						value === "architect" || value === "plan"
-							? "bg-purple-950/70 border-purple-500/40 text-purple-200 shadow-purple-500/20"
+							? "bg-purple-500/10 border-purple-400/25 text-purple-200 hover:bg-purple-500/15 hover:border-purple-400/40"
 							: value === "code"
-								? "bg-blue-950/60 border-blue-500/30 text-blue-200"
-								: "bg-white/[0.06] border-white/10 text-slate-200",
-						"transition-all duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500",
-						disabled
-							? "opacity-50 cursor-not-allowed"
-							: "hover:bg-white/[0.12] hover:border-white/20 cursor-pointer",
+								? "bg-blue-500/10 border-blue-400/25 text-blue-200 hover:bg-blue-500/15 hover:border-blue-400/40"
+								: "bg-white/[0.05] border-white/[0.08] text-slate-200 hover:bg-white/[0.09] hover:border-white/[0.16]",
+						"transition-colors duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+						disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
 						triggerClassName,
 					)}>
 					<span className="truncate">

@@ -2063,13 +2063,13 @@ describe("Project MCP Settings", () => {
 		})
 
 		// Check that fs.mkdir was called with the correct path
-		expect(mockedFs.mkdir).toHaveBeenCalledWith("/test/workspace/.roo", { recursive: true })
+		expect(mockedFs.mkdir).toHaveBeenCalledWith("/test/workspace/.ladiz", { recursive: true })
 
 		// Verify file was created with default content
-		expect(safeWriteJson).toHaveBeenCalledWith("/test/workspace/.roo/mcp.json", { mcpServers: {} })
+		expect(safeWriteJson).toHaveBeenCalledWith("/test/workspace/.ladiz/mcp.json", { mcpServers: {} })
 
 		// Check that openFile was called
-		expect(openFileSpy).toHaveBeenCalledWith("/test/workspace/.roo/mcp.json")
+		expect(openFileSpy).toHaveBeenCalledWith("/test/workspace/.ladiz/mcp.json")
 	})
 
 	test("handles openProjectMcpSettings when workspace is not open", async () => {

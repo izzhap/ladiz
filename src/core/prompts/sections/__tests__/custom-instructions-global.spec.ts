@@ -7,20 +7,20 @@ const {
 	mockReadFile,
 	mockReaddir,
 	mockLstat,
-	mockGetRooDirectoriesForCwd,
-	mockGetAllRooDirectoriesForCwd,
+	mockGetLadizDirectoriesForCwd,
+	mockGetAllLadizDirectoriesForCwd,
 	mockGetAgentsDirectoriesForCwd,
-	mockGetGlobalRooDirectory,
+	mockGetGlobalLadizDirectory,
 } = vi.hoisted(() => ({
 	mockHomedir: vi.fn(),
 	mockStat: vi.fn(),
 	mockReadFile: vi.fn(),
 	mockReaddir: vi.fn(),
 	mockLstat: vi.fn(),
-	mockGetRooDirectoriesForCwd: vi.fn(),
-	mockGetAllRooDirectoriesForCwd: vi.fn(),
+	mockGetLadizDirectoriesForCwd: vi.fn(),
+	mockGetAllLadizDirectoriesForCwd: vi.fn(),
 	mockGetAgentsDirectoriesForCwd: vi.fn(),
-	mockGetGlobalRooDirectory: vi.fn(),
+	mockGetGlobalLadizDirectory: vi.fn(),
 }))
 
 // Mock os module
@@ -41,31 +41,31 @@ vi.mock("fs/promises", () => ({
 	},
 }))
 
-// Mock the roo-config service
-vi.mock("../../../../services/roo-config", () => ({
-	getRooDirectoriesForCwd: mockGetRooDirectoriesForCwd,
-	getAllRooDirectoriesForCwd: mockGetAllRooDirectoriesForCwd,
+// Mock the ladiz-config service
+vi.mock("../../../../services/ladiz-config", () => ({
+	getLadizDirectoriesForCwd: mockGetLadizDirectoriesForCwd,
+	getAllLadizDirectoriesForCwd: mockGetAllLadizDirectoriesForCwd,
 	getAgentsDirectoriesForCwd: mockGetAgentsDirectoriesForCwd,
-	getGlobalRooDirectory: mockGetGlobalRooDirectory,
+	getGlobalLadizDirectory: mockGetGlobalLadizDirectory,
 }))
 
 import { loadRuleFiles, addCustomInstructions } from "../custom-instructions"
 
-describe("custom-instructions global .roo support", () => {
+describe("custom-instructions global .ladiz support", () => {
 	const mockCwd = "/mock/project"
 	const mockHomeDir = "/mock/home"
-	const globalRooDir = path.join(mockHomeDir, ".roo")
-	const projectRooDir = path.join(mockCwd, ".roo")
+	const globalLadizDir = path.join(mockHomeDir, ".ladiz")
+	const projectLadizDir = path.join(mockCwd, ".ladiz")
 
 	beforeEach(() => {
 		vi.clearAllMocks()
 		mockHomedir.mockReturnValue(mockHomeDir)
-		mockGetRooDirectoriesForCwd.mockReturnValue([globalRooDir, projectRooDir])
-		// getAllRooDirectoriesForCwd is now async and returns the same directories by default
-		mockGetAllRooDirectoriesForCwd.mockResolvedValue([globalRooDir, projectRooDir])
-		// getAgentsDirectoriesForCwd returns parent directories (without .roo)
+		mockGetLadizDirectoriesForCwd.mockReturnValue([globalLadizDir, projectLadizDir])
+		// getAllLadizDirectoriesForCwd is now async and returns the same directories by default
+		mockGetAllLadizDirectoriesForCwd.mockResolvedValue([globalLadizDir, projectLadizDir])
+		// getAgentsDirectoriesForCwd returns parent directories (without .ladiz)
 		mockGetAgentsDirectoriesForCwd.mockResolvedValue([mockCwd])
-		mockGetGlobalRooDirectory.mockReturnValue(globalRooDir)
+		mockGetGlobalLadizDirectory.mockReturnValue(globalLadizDir)
 		// Default lstat to reject (file not found)
 		mockLstat.mockRejectedValue(new Error("ENOENT"))
 	})
@@ -173,14 +173,14 @@ describe("custom-instructions global .roo support", () => {
 			expect(globalIndex).toBeLessThan(projectIndex)
 		})
 
-		it("should fall back to legacy .roorules file when no .roo/rules directories exist", async () => {
+		it("should fall back to legacy .roorules file when no .ladiz/rules directories exist", async () => {
 			// Mock directory existence - neither exist
 			mockStat
 				.mockRejectedValueOnce(new Error("ENOENT")) // global rules dir doesn't exist
 				.mockRejectedValueOnce(new Error("ENOENT")) // project rules dir doesn't exist
 
-			// Mock legacy file reading
-			mockReadFile.mockResolvedValueOnce("legacy rule content")
+			// Mock legacy file reading: .ladizrules empty -> .roorules has content
+			mockReadFile.mockResolvedValueOnce("").mockResolvedValueOnce("legacy rule content")
 
 			const result = await loadRuleFiles(mockCwd)
 
@@ -198,6 +198,7 @@ describe("custom-instructions global .roo support", () => {
 			// The safeReadFile function catches ENOENT errors and returns empty string
 			// So we don't need to mock rejections, just empty responses
 			mockReadFile
+				.mockResolvedValueOnce("") // .ladizrules returns empty
 				.mockResolvedValueOnce("") // .roorules returns empty (simulating ENOENT caught by safeReadFile)
 				.mockResolvedValueOnce("") // .clinerules returns empty (simulating ENOENT caught by safeReadFile)
 
@@ -242,6 +243,7 @@ describe("custom-instructions global .roo support", () => {
 				.mockResolvedValueOnce("global mode rule content")
 				.mockResolvedValueOnce("project mode rule content")
 				.mockResolvedValueOnce("") // AGENTS.md file (empty)
+				.mockResolvedValueOnce("") // .ladizrules legacy file (empty)
 				.mockResolvedValueOnce("") // .roorules legacy file (empty)
 				.mockResolvedValueOnce("") // .clinerules legacy file (empty)
 
@@ -266,8 +268,10 @@ describe("custom-instructions global .roo support", () => {
 
 			// Mock legacy mode file reading
 			mockReadFile
+				.mockResolvedValueOnce("") // .ladizrules-code (empty)
 				.mockResolvedValueOnce("legacy mode rule content") // .roorules-code
 				.mockResolvedValueOnce("") // AGENTS.md file (empty)
+				.mockResolvedValueOnce("") // generic .ladizrules (empty)
 				.mockResolvedValueOnce("") // generic .roorules (empty)
 				.mockResolvedValueOnce("") // generic .clinerules (empty)
 

@@ -2,7 +2,7 @@ import { safeWriteJson } from "../../utils/safeWriteJson"
 import * as path from "path"
 import * as os from "os"
 import * as fs from "fs/promises"
-import { getRooDirectoriesForCwd } from "../../services/roo-config/index.js"
+import { getLadizDirectoriesForCwd } from "../../services/ladiz-config/index.js"
 import pWaitFor from "p-wait-for"
 import * as vscode from "vscode"
 
@@ -1375,11 +1375,11 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			}
 
 			const workspaceFolder = getCurrentCwd()
-			const rooDir = path.join(workspaceFolder, ".roo")
-			const mcpPath = path.join(rooDir, "mcp.json")
+			const ladizDir = path.join(workspaceFolder, ".ladiz")
+			const mcpPath = path.join(ladizDir, "mcp.json")
 
 			try {
-				await fs.mkdir(rooDir, { recursive: true })
+				await fs.mkdir(ladizDir, { recursive: true })
 				const exists = await fileExistsAtPath(mcpPath)
 
 				if (!exists) {
@@ -1794,7 +1794,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		}
 		case "refreshCustomTools": {
 			try {
-				const toolDirs = getRooDirectoriesForCwd(getCurrentCwd()).map((dir) => path.join(dir, "tools"))
+				const toolDirs = getLadizDirectoriesForCwd(getCurrentCwd()).map((dir) => path.join(dir, "tools"))
 				await customToolRegistry.loadFromDirectories(toolDirs)
 
 				await provider.postMessageToWebview({
@@ -2011,14 +2011,14 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 				if (scope === "project") {
 					const workspacePath = getWorkspacePath()
 					if (workspacePath) {
-						rulesFolderPath = path.join(workspacePath, ".roo", `rules-${message.slug}`)
+						rulesFolderPath = path.join(workspacePath, ".ladiz", `rules-${message.slug}`)
 					} else {
-						rulesFolderPath = path.join(".roo", `rules-${message.slug}`)
+						rulesFolderPath = path.join(".ladiz", `rules-${message.slug}`)
 					}
 				} else {
 					// Global scope - use OS home directory
 					const homeDir = os.homedir()
-					rulesFolderPath = path.join(homeDir, ".roo", `rules-${message.slug}`)
+					rulesFolderPath = path.join(homeDir, ".ladiz", `rules-${message.slug}`)
 				}
 
 				// Check if the rules folder exists
@@ -2768,7 +2768,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 				// Determine the commands directory based on source
 				let commandsDir: string
 				if (source === "global") {
-					const globalConfigDir = path.join(os.homedir(), ".roo")
+					const globalConfigDir = path.join(os.homedir(), ".ladiz")
 					commandsDir = path.join(globalConfigDir, "commands")
 				} else {
 					if (!vscode.workspace.workspaceFolders?.length) {
@@ -2781,7 +2781,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 						vscode.window.showErrorMessage(t("common:errors.no_workspace_for_project_command"))
 						break
 					}
-					commandsDir = path.join(workspaceRoot, ".roo", "commands")
+					commandsDir = path.join(workspaceRoot, ".ladiz", "commands")
 				}
 
 				// Ensure the commands directory exists

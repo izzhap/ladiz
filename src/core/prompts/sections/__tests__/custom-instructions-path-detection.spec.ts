@@ -3,28 +3,28 @@ import * as path from "path"
 describe("custom-instructions path detection", () => {
 	it("should use exact path comparison instead of string includes", () => {
 		// Test the logic that our fix implements
-		const fakeHomeDir = "/Users/john.roo.smith"
-		const globalRooDir = path.join(fakeHomeDir, ".roo") // "/Users/john.roo.smith/.roo"
-		const projectRooDir = "/projects/my-project/.roo"
+		const fakeHomeDir = "/Users/john.ladiz.smith"
+		const globalLadizDir = path.join(fakeHomeDir, ".ladiz") // "/Users/john.ladiz.smith/.ladiz"
+		const projectLadizDir = "/projects/my-project/.ladiz"
 
 		// Old implementation (fragile):
-		// const isGlobal = rooDir.includes(path.join(os.homedir(), ".roo"))
-		// This could fail if the home directory path contains ".roo" elsewhere
+		// const isGlobal = ladizDir.includes(path.join(os.homedir(), ".ladiz"))
+		// This could fail if the home directory path contains ".ladiz" elsewhere
 
 		// New implementation (robust):
-		// const isGlobal = path.resolve(rooDir) === path.resolve(getGlobalRooDirectory())
+		// const isGlobal = path.resolve(ladizDir) === path.resolve(getGlobalLadizDirectory())
 
 		// Test the new logic
-		const isGlobalForGlobalDir = path.resolve(globalRooDir) === path.resolve(globalRooDir)
-		const isGlobalForProjectDir = path.resolve(projectRooDir) === path.resolve(globalRooDir)
+		const isGlobalForGlobalDir = path.resolve(globalLadizDir) === path.resolve(globalLadizDir)
+		const isGlobalForProjectDir = path.resolve(projectLadizDir) === path.resolve(globalLadizDir)
 
 		expect(isGlobalForGlobalDir).toBe(true)
 		expect(isGlobalForProjectDir).toBe(false)
 
 		// Verify that the old implementation would have been problematic
 		// if the home directory contained ".roo" in the path
-		const oldLogicGlobal = globalRooDir.includes(path.join(fakeHomeDir, ".roo"))
-		const oldLogicProject = projectRooDir.includes(path.join(fakeHomeDir, ".roo"))
+		const oldLogicGlobal = globalLadizDir.includes(path.join(fakeHomeDir, ".ladiz"))
+		const oldLogicProject = projectLadizDir.includes(path.join(fakeHomeDir, ".ladiz"))
 
 		expect(oldLogicGlobal).toBe(true) // This works
 		expect(oldLogicProject).toBe(false) // This also works, but is fragile
@@ -37,18 +37,18 @@ describe("custom-instructions path detection", () => {
 		// Test various edge cases that exact path comparison handles better
 		const testCases = [
 			{
-				global: "/Users/test/.roo",
-				project: "/Users/test/project/.roo",
+				global: "/Users/test/.ladiz",
+				project: "/Users/test/project/.ladiz",
 				expected: { global: true, project: false },
 			},
 			{
-				global: "/home/user/.roo",
-				project: "/home/user/.roo", // Same directory
+				global: "/home/user/.ladiz",
+				project: "/home/user/.ladiz", // Same directory
 				expected: { global: true, project: true },
 			},
 			{
-				global: "/Users/john.roo.smith/.roo",
-				project: "/projects/app/.roo",
+				global: "/Users/john.ladiz.smith/.ladiz",
+				project: "/projects/app/.ladiz",
 				expected: { global: true, project: false },
 			},
 		]

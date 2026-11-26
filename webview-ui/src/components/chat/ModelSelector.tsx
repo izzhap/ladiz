@@ -309,16 +309,16 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 					data-testid="dropdown-trigger"
 					disabled={disabled}
 					className={cn(
-						"inline-flex items-center gap-1.5 relative whitespace-nowrap px-2.5 py-1 text-xs font-mono font-medium rounded-full",
-						"bg-blue-950/60 border border-blue-500/30 text-blue-300",
-						"transition-all duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500",
+						"inline-flex items-center gap-1 h-7 min-w-0 max-w-full relative whitespace-nowrap px-2 text-xs font-mono font-medium rounded-md border",
+						"bg-white/[0.04] border-white/[0.08] text-slate-300",
+						"transition-colors duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 						disabled
 							? "opacity-50 cursor-not-allowed"
-							: "hover:bg-blue-900/50 hover:border-blue-400/50 cursor-pointer",
+							: "hover:bg-white/[0.08] hover:border-white/[0.16] hover:text-slate-100 cursor-pointer",
 						triggerClassName,
 					)}>
-					<span className="truncate max-w-[130px]">{currentModelId || ladizDefaultModelId}</span>
-					<ChevronDown className="size-3 opacity-60 shrink-0" />
+					<span className="truncate min-w-0">{currentModelId || ladizDefaultModelId}</span>
+					<ChevronDown className="size-3 opacity-50 shrink-0" aria-hidden="true" />
 				</PopoverTrigger>
 			</StandardTooltip>
 			<PopoverContent

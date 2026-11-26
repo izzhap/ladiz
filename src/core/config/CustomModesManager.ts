@@ -10,7 +10,7 @@ import { type ModeConfig, type PromptComponent, customModesSettingsSchema, modeC
 
 import { fileExistsAtPath } from "../../utils/fs"
 import { getWorkspacePath } from "../../utils/path"
-import { getGlobalRooDirectory } from "../../services/roo-config"
+import { getGlobalLadizDirectory } from "../../services/ladiz-config"
 import { logger } from "../../utils/logging"
 import { GlobalFileNames } from "../../shared/globalFileNames"
 import { ensureSettingsDirectoryExists } from "../../utils/globalContext"
@@ -657,16 +657,16 @@ export class CustomModesManager {
 			const isGlobalMode = mode?.source === "global"
 
 			if (isGlobalMode) {
-				// For global modes, check in global .roo directory
-				const globalRooDir = getGlobalRooDirectory()
-				modeRulesDir = path.join(globalRooDir, `rules-${slug}`)
+				// For global modes, check in global .ladiz directory
+				const globalLadizDir = getGlobalLadizDirectory()
+				modeRulesDir = path.join(globalLadizDir, `rules-${slug}`)
 			} else {
-				// For project modes, check in workspace .roo directory
+				// For project modes, check in workspace .ladiz directory
 				const workspacePath = getWorkspacePath()
 				if (!workspacePath) {
 					return false
 				}
-				modeRulesDir = path.join(workspacePath, ".roo", `rules-${slug}`)
+				modeRulesDir = path.join(workspacePath, ".ladiz", `rules-${slug}`)
 			}
 
 			try {
@@ -758,8 +758,8 @@ export class CustomModesManager {
 			const isGlobalMode = mode.source === "global"
 			let baseDir: string
 			if (isGlobalMode) {
-				// For global modes, use the global .roo directory
-				baseDir = getGlobalRooDirectory()
+				// For global modes, use the global .ladiz directory
+				baseDir = getGlobalLadizDirectory()
 			} else {
 				// For project modes, use the workspace directory
 				const workspacePath = getWorkspacePath()
@@ -769,10 +769,10 @@ export class CustomModesManager {
 				baseDir = workspacePath
 			}
 
-			// Check for .roo/rules-{slug}/ directory (or rules-{slug}/ for global)
+			// Check for .ladiz/rules-{slug}/ directory (or rules-{slug}/ for global)
 			const modeRulesDir = isGlobalMode
 				? path.join(baseDir, `rules-${slug}`)
-				: path.join(baseDir, ".roo", `rules-${slug}`)
+				: path.join(baseDir, ".ladiz", `rules-${slug}`)
 
 			let rulesFiles: RuleFile[] = []
 			try {
@@ -852,11 +852,11 @@ export class CustomModesManager {
 		let rulesFolderPath: string
 
 		if (source === "global") {
-			baseDir = getGlobalRooDirectory()
+			baseDir = getGlobalLadizDirectory()
 			rulesFolderPath = path.join(baseDir, `rules-${importMode.slug}`)
 		} else {
 			const workspacePath = getWorkspacePath()
-			baseDir = path.join(workspacePath, ".roo")
+			baseDir = path.join(workspacePath, ".ladiz")
 			rulesFolderPath = path.join(baseDir, `rules-${importMode.slug}`)
 		}
 

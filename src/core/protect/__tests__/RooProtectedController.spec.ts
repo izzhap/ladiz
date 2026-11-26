@@ -134,7 +134,7 @@ describe("RooProtectedController", () => {
 	describe("getProtectionMessage", () => {
 		it("should return appropriate protection message", () => {
 			const message = controller.getProtectionMessage()
-			expect(message).toBe("This is a Roo configuration file and requires approval for modifications")
+			expect(message).toBe("This is a Ladiz configuration file and requires approval for modifications")
 		})
 	})
 
@@ -144,9 +144,14 @@ describe("RooProtectedController", () => {
 
 			expect(instructions).toContain("# Protected Files")
 			expect(instructions).toContain("write-protected")
-			expect(instructions).toContain(".rooignore")
-			expect(instructions).toContain(".roo/**")
+			expect(instructions).toContain(".ladizignore")
+			expect(instructions).toContain(".ladiz/**")
 			expect(instructions).toContain("\u{1F6E1}") // Shield symbol
+		})
+
+		it("should protect files in .ladiz directory", () => {
+			expect(controller.isWriteProtected(".ladiz/config.json")).toBe(true)
+			expect(controller.isWriteProtected(".ladiz/skills/my-skill/SKILL.md")).toBe(true)
 		})
 	})
 
@@ -160,9 +165,14 @@ describe("RooProtectedController", () => {
 				".roorules*",
 				".clinerules*",
 				".roo/**",
+				".ladizignore",
+				".ladizmodes",
+				".ladizrules*",
+				".ladiz/**",
 				".vscode/**",
 				"*.code-workspace",
 				".rooprotected",
+				".ladizprotected",
 				"AGENTS.md",
 				"AGENT.md",
 			])
