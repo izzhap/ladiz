@@ -1,6 +1,6 @@
 import React from "react"
 import { Fzf } from "fzf"
-import { Check, X } from "lucide-react"
+import { Check, ChevronDown, X } from "lucide-react"
 
 import { type ModeConfig, type CustomModePrompts } from "@ladiz/types"
 
@@ -218,16 +218,26 @@ export const ModeSelector = ({
 					disabled={disabled}
 					data-testid="mode-selector-trigger"
 					className={cn(
-						"inline-flex items-center h-7 relative whitespace-nowrap px-2.5 text-xs font-medium rounded-md border",
-						value === "architect" || value === "plan"
-							? "bg-purple-500/10 border-purple-400/25 text-purple-200 hover:bg-purple-500/15 hover:border-purple-400/40"
-							: value === "code"
-								? "bg-blue-500/10 border-blue-400/25 text-blue-200 hover:bg-blue-500/15 hover:border-blue-400/40"
-								: "bg-white/[0.05] border-white/[0.08] text-slate-200 hover:bg-white/[0.09] hover:border-white/[0.16]",
+						"inline-flex items-center gap-1.5 h-6.5 relative whitespace-nowrap px-2 text-xs font-medium rounded border",
+						"bg-vscode-editor-background/80 border-vscode-panel-border/80 text-vscode-foreground",
+						"hover:bg-vscode-list-hoverBackground hover:border-vscode-panel-border",
 						"transition-colors duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 						disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
 						triggerClassName,
 					)}>
+					<span
+						aria-hidden="true"
+						className={cn(
+							"size-1.5 rounded-[1px] shrink-0",
+							value === "architect" || value === "plan"
+								? "bg-vscode-charts-yellow"
+								: value === "debug"
+									? "bg-vscode-charts-red"
+									: value === "ask"
+										? "bg-vscode-charts-green"
+										: "bg-vscode-focusBorder",
+						)}
+					/>
 					<span className="truncate">
 						{selectedMode?.name
 							? value === "architect"
@@ -235,6 +245,10 @@ export const ModeSelector = ({
 								: selectedMode.name.replace(/^[\p{Emoji}\s]+/u, "")
 							: ""}
 					</span>
+					<ChevronDown
+						className="size-3 text-vscode-descriptionForeground opacity-70 shrink-0"
+						aria-hidden="true"
+					/>
 				</PopoverTrigger>
 			</StandardTooltip>
 			<PopoverContent

@@ -3,6 +3,7 @@ import { useCallback } from "react"
 import { vscode } from "@/utils/vscode"
 import { cn } from "@/lib/utils"
 import { useExtensionState } from "@/context/ExtensionStateContext"
+import { useAppTranslation } from "@/i18n/TranslationContext"
 import { StandardTooltip } from "@/components/ui"
 import { useAutoApprovalToggles } from "@/hooks/useAutoApprovalToggles"
 import { useAutoApprovalState } from "@/hooks/useAutoApprovalState"
@@ -14,6 +15,7 @@ interface AutoApproveDropdownProps {
 }
 
 export const AutoApproveDropdown = ({ disabled = false, triggerClassName = "" }: AutoApproveDropdownProps) => {
+	const { t } = useAppTranslation()
 	const {
 		autoApprovalEnabled,
 		setAutoApprovalEnabled,
@@ -66,12 +68,7 @@ export const AutoApproveDropdown = ({ disabled = false, triggerClassName = "" }:
 	])
 
 	return (
-		<StandardTooltip
-			content={
-				isYoloOn
-					? "YOLO Mode: ON (Semua tindakan diizinkan otomatis)"
-					: "YOLO Mode: OFF (Memerlukan konfirmasi manual)"
-			}>
+		<StandardTooltip content={isYoloOn ? t("chat:autoApprove.tooltipOn") : t("chat:autoApprove.tooltipOff")}>
 			<button
 				type="button"
 				onClick={handleToggleYolo}
@@ -79,21 +76,21 @@ export const AutoApproveDropdown = ({ disabled = false, triggerClassName = "" }:
 				aria-pressed={isYoloOn}
 				data-testid="auto-approve-dropdown-trigger"
 				className={cn(
-					"inline-flex items-center gap-1.5 h-7 relative whitespace-nowrap px-2 text-[11px] font-medium rounded-md border select-none cursor-pointer transition-colors duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+					"inline-flex items-center gap-1.5 h-6.5 relative whitespace-nowrap px-2 text-[11px] font-medium rounded border select-none cursor-pointer transition-colors duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 					isYoloOn
-						? "bg-amber-500/12 border-amber-500/30 text-amber-300 hover:bg-amber-500/20 hover:border-amber-500/45"
-						: "bg-white/[0.04] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:bg-white/[0.08] hover:border-white/[0.16]",
+						? "bg-vscode-editorWarning-background/35 border-vscode-charts-yellow/55 text-vscode-foreground hover:bg-vscode-editorWarning-background/55"
+						: "bg-transparent border-transparent text-vscode-descriptionForeground hover:text-vscode-foreground hover:bg-vscode-list-hoverBackground hover:border-vscode-panel-border/80",
 					disabled && "opacity-50 cursor-not-allowed",
 					triggerClassName,
 				)}>
 				<span
 					aria-hidden="true"
 					className={cn(
-						"size-1.5 rounded-full shrink-0 transition-colors",
-						isYoloOn ? "bg-amber-400" : "bg-slate-500",
+						"size-1.5 rounded-[1px] shrink-0 transition-colors",
+						isYoloOn ? "bg-vscode-charts-yellow" : "border border-current opacity-65",
 					)}
 				/>
-				<span className="font-mono tracking-tight">{isYoloOn ? "YOLO: On" : "YOLO: Off"}</span>
+				<span>{isYoloOn ? t("chat:autoApprove.statusOn") : t("chat:autoApprove.statusOff")}</span>
 			</button>
 		</StandardTooltip>
 	)

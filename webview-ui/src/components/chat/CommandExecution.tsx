@@ -210,6 +210,7 @@ export const CommandExecution = ({
 									vscode.postMessage({
 										type: "terminalOperation",
 										terminalOperation: "abort",
+										executionId,
 									})
 								}}>
 								<OctagonX className="size-3.5" />

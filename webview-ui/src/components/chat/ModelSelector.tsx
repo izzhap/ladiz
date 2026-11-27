@@ -309,57 +309,61 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 					data-testid="dropdown-trigger"
 					disabled={disabled}
 					className={cn(
-						"inline-flex items-center gap-1 h-7 min-w-0 max-w-full relative whitespace-nowrap px-2 text-xs font-mono font-medium rounded-md border",
-						"bg-white/[0.04] border-white/[0.08] text-slate-300",
+						"inline-flex items-center gap-1 h-6.5 min-w-0 max-w-full relative whitespace-nowrap px-2 text-[11px] font-mono font-medium rounded border",
+						"bg-transparent border-transparent text-vscode-descriptionForeground",
 						"transition-colors duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 						disabled
 							? "opacity-50 cursor-not-allowed"
-							: "hover:bg-white/[0.08] hover:border-white/[0.16] hover:text-slate-100 cursor-pointer",
+							: "hover:bg-vscode-list-hoverBackground hover:border-vscode-panel-border/80 hover:text-vscode-foreground cursor-pointer",
 						triggerClassName,
 					)}>
 					<span className="truncate min-w-0">{currentModelId || ladizDefaultModelId}</span>
-					<ChevronDown className="size-3 opacity-50 shrink-0" aria-hidden="true" />
+					<ChevronDown className="size-3 opacity-60 shrink-0" aria-hidden="true" />
 				</PopoverTrigger>
 			</StandardTooltip>
 			<PopoverContent
 				align="start"
 				sideOffset={6}
 				container={portalContainer}
-				className="p-0 overflow-hidden w-[340px] bg-[#0c101d] border border-blue-500/30 shadow-2xl rounded-xl flex flex-col font-sans">
+				className="p-0 overflow-hidden w-[320px] max-w-[calc(100vw-24px)] bg-popover border border-vscode-panel-border shadow-md rounded-lg flex flex-col font-sans text-popover-foreground">
 				{/* Header with Provider Name & Count & Refresh */}
-				<div className="flex items-center justify-between px-3 py-2 border-b border-white/5 bg-slate-900/60">
-					<span className="text-[11px] font-semibold text-slate-200 truncate uppercase tracking-wider font-mono">
+				<div className="flex items-center justify-between px-3 py-2 border-b border-vscode-panel-border/70 bg-vscode-sideBar-background/60">
+					<span className="text-[11px] font-semibold text-vscode-foreground truncate uppercase tracking-wider font-mono">
 						{providerLabel}
 					</span>
 					<div className="flex items-center gap-1.5 shrink-0">
 						<button
+							type="button"
 							onClick={handleRefresh}
-							title="Refresh daftar model dari API"
-							className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer">
-							<RotateCw className={`size-3 ${isFetching ? "animate-spin text-cyan-400" : ""}`} />
+							title="Refresh models"
+							className="p-1 rounded hover:bg-vscode-list-hoverBackground text-vscode-descriptionForeground hover:text-vscode-foreground transition-colors cursor-pointer">
+							<RotateCw
+								className={`size-3 ${isFetching ? "animate-spin text-vscode-focusBorder" : ""}`}
+							/>
 						</button>
-						<span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-400/20">
+						<span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-vscode-badge-background text-vscode-badge-foreground">
 							{filteredModels.length} {filteredModels.length === 1 ? "model" : "models"}
 						</span>
 					</div>
 				</div>
 
 				{/* Search Box */}
-				<div className="p-2 border-b border-white/5 bg-black/20">
+				<div className="p-2 border-b border-vscode-panel-border/70">
 					<div className="relative flex items-center">
-						<Search className="absolute left-2.5 size-3.5 text-slate-400 pointer-events-none" />
+						<Search className="absolute left-2.5 size-3.5 text-vscode-descriptionForeground pointer-events-none" />
 						<input
 							ref={searchInputRef}
 							type="text"
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
-							placeholder={`Cari model di ${providerLabel}...`}
-							className="w-full pl-8 pr-7 py-1.5 text-xs bg-slate-900/80 border border-white/10 rounded-lg text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all font-sans"
+							placeholder={`Search ${providerLabel} models...`}
+							className="w-full pl-8 pr-7 py-1.5 text-xs bg-vscode-input-background border border-vscode-panel-border rounded-md text-vscode-input-foreground placeholder:text-vscode-descriptionForeground focus:outline-none focus:border-vscode-focusBorder transition-colors font-sans"
 						/>
 						{search && (
 							<button
+								type="button"
 								onClick={() => setSearch("")}
-								className="absolute right-2 p-0.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-slate-200 transition-colors">
+								className="absolute right-2 p-0.5 rounded hover:bg-vscode-list-hoverBackground text-vscode-descriptionForeground hover:text-vscode-foreground transition-colors cursor-pointer">
 								<X className="size-3" />
 							</button>
 						)}
@@ -368,15 +372,15 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 
 				{/* Loading State */}
 				{isFetching && (
-					<div className="p-4 flex flex-col items-center justify-center gap-2 text-slate-400">
-						<Loader2 className="size-4 animate-spin text-cyan-400" />
-						<span className="text-xs">Mengambil model dari API {providerLabel}...</span>
+					<div className="p-4 flex flex-col items-center justify-center gap-2 text-vscode-descriptionForeground">
+						<Loader2 className="size-4 animate-spin text-vscode-focusBorder" />
+						<span className="text-xs">Loading models from {providerLabel}...</span>
 					</div>
 				)}
 
 				{/* Model List */}
 				{!isFetching && (
-					<div className="max-h-[300px] overflow-y-auto p-1.5 flex flex-col gap-1 custom-scrollbar">
+					<div className="max-h-[300px] overflow-y-auto p-1 flex flex-col gap-0.5 custom-scrollbar">
 						{filteredModels.map(({ id, info }) => {
 							const isSelected = id === currentModelId
 							const ctx = formatContextWindow(info?.contextWindow)
@@ -384,52 +388,65 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 
 							return (
 								<button
+									type="button"
 									key={id}
 									onClick={() => handleSelectModel(id)}
 									className={cn(
-										"flex flex-col items-start p-2.5 rounded-lg text-left transition-all cursor-pointer border",
+										"flex flex-col items-start px-2.5 py-2 rounded-md text-left transition-colors cursor-pointer border",
 										isSelected
-											? "bg-blue-500/15 border-blue-500/40 text-blue-200 shadow-sm shadow-blue-500/10"
-											: "border-transparent hover:bg-white/[0.04] text-slate-300",
+											? "bg-vscode-list-activeSelectionBackground border-vscode-focusBorder/60 text-vscode-list-activeSelectionForeground"
+											: "border-transparent hover:bg-vscode-list-hoverBackground text-vscode-foreground",
 									)}>
 									{/* Top Row: Model ID & Selected Check */}
 									<div className="flex items-center justify-between w-full gap-2">
-										<span className="font-semibold font-mono text-xs text-slate-100 truncate flex-1">
-											{id}
-										</span>
-										{isSelected && <Check className="size-3.5 text-cyan-400 shrink-0" />}
+										<span className="font-semibold font-mono text-xs truncate flex-1">{id}</span>
+										{isSelected && <Check className="size-3.5 shrink-0" />}
 									</div>
 
 									{/* Badges Row - Clean text-based tags */}
-									<div className="flex flex-wrap items-center gap-1.5 mt-1 text-[10px]">
-										{ctx && (
-											<span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-slate-300 font-mono">
-												{ctx} ctx
-											</span>
-										)}
-										{info?.supportsImages && (
-											<span className="px-1.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-medium">
-												Vision
-											</span>
-										)}
-										{(info?.supportsReasoningBudget ||
-											info?.supportsReasoningBinary ||
-											info?.supportsReasoningEffort ||
-											!!info?.maxThinkingTokens) && (
-											<span className="px-1.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-medium">
-												Thinking
-											</span>
-										)}
-										{price && (
-											<span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-mono">
-												{price}
-											</span>
-										)}
-									</div>
+									{(ctx ||
+										info?.supportsImages ||
+										info?.supportsReasoningBudget ||
+										info?.supportsReasoningBinary ||
+										info?.supportsReasoningEffort ||
+										!!info?.maxThinkingTokens ||
+										price) && (
+										<div className="flex flex-wrap items-center gap-1 mt-1 text-[10px]">
+											{ctx && (
+												<span className="px-1.5 py-0.5 rounded border border-vscode-panel-border/80 bg-vscode-sideBar-background/70 text-vscode-descriptionForeground font-mono">
+													{ctx} ctx
+												</span>
+											)}
+											{info?.supportsImages && (
+												<span className="px-1.5 py-0.5 rounded border border-vscode-panel-border/80 bg-vscode-sideBar-background/70 text-vscode-descriptionForeground font-medium">
+													Vision
+												</span>
+											)}
+											{(info?.supportsReasoningBudget ||
+												info?.supportsReasoningBinary ||
+												info?.supportsReasoningEffort ||
+												!!info?.maxThinkingTokens) && (
+												<span className="px-1.5 py-0.5 rounded border border-vscode-panel-border/80 bg-vscode-sideBar-background/70 text-vscode-descriptionForeground font-medium">
+													Thinking
+												</span>
+											)}
+											{price && (
+												<span className="px-1.5 py-0.5 rounded border border-vscode-panel-border/80 bg-vscode-sideBar-background/70 text-vscode-descriptionForeground font-mono">
+													{price}
+												</span>
+											)}
+										</div>
+									)}
 
 									{/* Description */}
 									{info?.description && (
-										<span className="text-[11px] text-slate-400/90 mt-1 line-clamp-2 leading-relaxed">
+										<span
+											className={cn(
+												"text-[11px] mt-1 line-clamp-2 leading-relaxed",
+												isSelected
+													? "text-vscode-list-activeSelectionForeground/80"
+													: "text-vscode-descriptionForeground",
+											)}>
 											{info.description}
 										</span>
 									)}
@@ -440,13 +457,14 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 						{/* Empty Search State & Custom Model Option */}
 						{filteredModels.length === 0 && (
 							<div className="p-4 text-center flex flex-col items-center gap-2">
-								<span className="text-xs text-slate-400">Tidak ada model yang cocok</span>
+								<span className="text-xs text-vscode-descriptionForeground">No matching models</span>
 								{search.trim() && (
 									<button
+										type="button"
 										onClick={() => handleSelectModel(search.trim())}
-										className="mt-1 px-3 py-1.5 rounded-lg text-xs font-mono bg-blue-600/30 hover:bg-blue-600/50 border border-blue-400/40 text-blue-200 transition-colors cursor-pointer w-full flex items-center justify-center gap-1.5">
+										className="mt-1 px-3 py-1.5 rounded-md text-xs font-mono bg-vscode-button-background hover:bg-vscode-button-hoverBackground text-vscode-button-foreground transition-colors cursor-pointer w-full flex items-center justify-center gap-1.5">
 										<span>
-											Gunakan &quot;<strong>{search.trim()}</strong>&quot;
+											Use &quot;<strong>{search.trim()}</strong>&quot;
 										</span>
 									</button>
 								)}

@@ -45,12 +45,12 @@ describe("AutoApproveDropdown", () => {
 		vi.mocked(useExtensionState).mockReturnValue(mockState as unknown as ReturnType<typeof useExtensionState>)
 	})
 
-	it("renders YOLO: Off with aria-pressed=false and toggles all permissions on click", () => {
+	it("renders Auto-approve off state with aria-pressed=false and toggles all permissions on click", () => {
 		render(<AutoApproveDropdown />)
 
 		const trigger = screen.getByTestId("auto-approve-dropdown-trigger")
 		expect(trigger).toHaveAttribute("aria-pressed", "false")
-		expect(trigger).toHaveTextContent("YOLO: Off")
+		expect(trigger).toHaveTextContent("chat:autoApprove.statusOff")
 
 		fireEvent.click(trigger)
 
@@ -58,7 +58,7 @@ describe("AutoApproveDropdown", () => {
 		expect(vscode.postMessage).toHaveBeenCalledWith({ type: "autoApprovalEnabled", bool: true })
 	})
 
-	it("renders YOLO: On with aria-pressed=true when enabled", () => {
+	it("renders Auto-approve on state with aria-pressed=true when enabled", () => {
 		vi.mocked(useExtensionState).mockReturnValue({
 			...mockState,
 			autoApprovalEnabled: true,
@@ -68,6 +68,6 @@ describe("AutoApproveDropdown", () => {
 
 		const trigger = screen.getByTestId("auto-approve-dropdown-trigger")
 		expect(trigger).toHaveAttribute("aria-pressed", "true")
-		expect(trigger).toHaveTextContent("YOLO: On")
+		expect(trigger).toHaveTextContent("chat:autoApprove.statusOn")
 	})
 })

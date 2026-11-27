@@ -37,8 +37,8 @@ vi.mock("@src/context/ExtensionStateContext")
 const getEnhancePromptButton = () => {
 	return screen.getByRole("button", {
 		name: (_, element) => {
-			// Find the button with the wand sparkles icon (Lucide React)
-			return element.querySelector(".lucide-wand-sparkles") !== null
+			// Find the button with the refine/pen icon (Lucide React)
+			return element.querySelector(".lucide-pen-line") !== null
 		},
 	})
 }
@@ -1203,6 +1203,24 @@ describe("ChatTextArea", () => {
 			// Check that the button is visible
 			expect(sendButton).toHaveClass("opacity-100")
 			expect(sendButton).toHaveClass("pointer-events-auto")
+		})
+	})
+
+	describe("shortcut legend", () => {
+		it("renders concise keycap hints below the composer when not in edit mode", () => {
+			render(<ChatTextArea {...defaultProps} />)
+
+			expect(screen.getByText("chat:hintContext")).toBeInTheDocument()
+			expect(screen.getByText("chat:hintCommands")).toBeInTheDocument()
+			expect(screen.getByText("chat:hintAttachFilesImages")).toBeInTheDocument()
+			expect(screen.getByText("chat:hintSend")).toBeInTheDocument()
+		})
+
+		it("hides the shortcut legend in edit mode", () => {
+			render(<ChatTextArea {...defaultProps} isEditMode={true} />)
+
+			expect(screen.queryByText("chat:hintContext")).not.toBeInTheDocument()
+			expect(screen.queryByText("chat:hintSend")).not.toBeInTheDocument()
 		})
 	})
 })

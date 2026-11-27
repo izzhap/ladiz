@@ -17,6 +17,7 @@ interface ClineMessage {
 	ts: number
 	text?: string
 	partial?: boolean
+	isAnswered?: boolean
 }
 
 interface ExtensionState {
@@ -1113,6 +1114,62 @@ describe("ChatView - Message Queueing Tests", () => {
 		expect(vscode.postMessage).not.toHaveBeenCalledWith(
 			expect.objectContaining({
 				type: "terminalOperation",
+			}),
+		)
+	})
+
+	it("queues first message instead of sending askResponse when last tool ask is already answered", async () => {
+		const { getByTestId } = renderChatView()
+
+		mockPostMessage({
+			clineMessages: [
+				{
+					type: "say",
+					say: "task",
+					ts: Date.now() - 2000,
+					text: "Initial task",
+				},
+				{
+					type: "ask",
+					ask: "tool",
+					ts: Date.now(),
+					text: JSON.stringify({ tool: "readFile", path: "a.ts" }),
+					partial: false,
+					isAnswered: true,
+				},
+			],
+		})
+
+		await waitFor(() => {
+			expect(getByTestId("chat-textarea")).toBeInTheDocument()
+		})
+
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 50))
+		})
+
+		vi.mocked(vscode.postMessage).mockClear()
+
+		const chatTextArea = getByTestId("chat-textarea")
+		const input = chatTextArea.querySelector("input")! as HTMLInputElement
+
+		await act(async () => {
+			fireEvent.change(input, { target: { value: "first queued message" } })
+			fireEvent.keyDown(input, { key: "Enter", code: "Enter" })
+		})
+
+		await waitFor(() => {
+			expect(vscode.postMessage).toHaveBeenCalledWith({
+				type: "queueMessage",
+				text: "first queued message",
+				images: [],
+			})
+		})
+
+		expect(vscode.postMessage).not.toHaveBeenCalledWith(
+			expect.objectContaining({
+				type: "askResponse",
+				askResponse: "messageResponse",
 			}),
 		)
 	})

@@ -282,21 +282,24 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							setPrimaryButtonText(t("chat:proceedAnyways.title"))
 							setSecondaryButtonText(undefined)
 							break
-						case "followup":
-							setSendingDisabled(isPartial)
-							setClineAsk("followup")
+						case "followup": {
+							const isAnswered = !!lastMessage.isAnswered
+							setSendingDisabled(isPartial || isAnswered)
+							setClineAsk(isAnswered ? undefined : "followup")
 							// setting enable buttons to `false` would trigger a focus grab when
 							// the text area is enabled which is undesirable.
 							// We have no buttons for this tool, so no problem having them "enabled"
 							// to workaround this issue.  See #1358.
-							setEnableButtons(true)
+							setEnableButtons(!isAnswered)
 							setPrimaryButtonText(undefined)
 							setSecondaryButtonText(undefined)
 							break
-						case "tool":
-							setSendingDisabled(isPartial)
-							setClineAsk("tool")
-							setEnableButtons(!isPartial)
+						}
+						case "tool": {
+							const isAnswered = !!lastMessage.isAnswered
+							setSendingDisabled(isPartial || isAnswered)
+							setClineAsk(isAnswered ? undefined : "tool")
+							setEnableButtons(!isPartial && !isAnswered)
 							const tool = JSON.parse(lastMessage.text || "{}") as ClineSayTool
 							switch (tool.tool) {
 								case "editedExistingFile":
@@ -343,13 +346,16 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 									break
 							}
 							break
-						case "command":
-							setSendingDisabled(isPartial)
-							setClineAsk("command")
-							setEnableButtons(!isPartial)
+						}
+						case "command": {
+							const isAnswered = !!lastMessage.isAnswered
+							setSendingDisabled(isPartial || isAnswered)
+							setClineAsk(isAnswered ? undefined : "command")
+							setEnableButtons(!isPartial && !isAnswered)
 							setPrimaryButtonText(t("chat:runCommand.title"))
 							setSecondaryButtonText(t("chat:reject.title"))
 							break
+						}
 						case "command_output":
 							setSendingDisabled(false)
 							setClineAsk("command_output")
@@ -357,13 +363,15 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							setPrimaryButtonText(t("chat:proceedWhileRunning.title"))
 							setSecondaryButtonText(t("chat:killCommand.title"))
 							break
-						case "use_mcp_server":
-							setSendingDisabled(isPartial)
-							setClineAsk("use_mcp_server")
-							setEnableButtons(!isPartial)
+						case "use_mcp_server": {
+							const isAnswered = !!lastMessage.isAnswered
+							setSendingDisabled(isPartial || isAnswered)
+							setClineAsk(isAnswered ? undefined : "use_mcp_server")
+							setEnableButtons(!isPartial && !isAnswered)
 							setPrimaryButtonText(t("chat:approve.title"))
 							setSecondaryButtonText(t("chat:reject.title"))
 							break
+						}
 						case "completion_result":
 							// Extension waiting for feedback, but we can just present a new task button.
 							// Only play celebration sound if there are no queued messages.

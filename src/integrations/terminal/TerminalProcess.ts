@@ -7,6 +7,7 @@ import { Terminal } from "./Terminal"
 
 export class TerminalProcess extends BaseTerminalProcess {
 	private terminalRef: WeakRef<Terminal>
+	private isCompleted = false
 
 	constructor(terminal: Terminal) {
 		super()
@@ -14,6 +15,7 @@ export class TerminalProcess extends BaseTerminalProcess {
 		this.terminalRef = new WeakRef(terminal)
 
 		this.once("completed", () => {
+			this.isCompleted = true
 			this.terminal.busy = false
 		})
 
@@ -256,7 +258,7 @@ export class TerminalProcess extends BaseTerminalProcess {
 	}
 
 	public override abort() {
-		if (this.isListening) {
+		if (!this.isCompleted) {
 			// Send SIGINT using CTRL+C
 			this.terminal.terminal.sendText("\x03")
 		}

@@ -629,9 +629,27 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		case "askResponse":
 			{
 				const resolved = await resolveIncomingImages({ text: message.text, images: message.images })
-				provider
-					.getCurrentTask()
-					?.handleWebviewAskResponse(message.askResponse!, resolved.text, resolved.images)
+				const task = provider.getCurrentTask()
+
+				if (task) {
+					const lastMessage = task.clineMessages?.at(-1)
+					const canRespondDirectly =
+						task.isWaitingForAsk &&
+						!task.isStreaming &&
+						lastMessage?.type === "ask" &&
+						lastMessage.ask !== "command_output"
+
+					if (
+						message.askResponse === "messageResponse" &&
+						task.messageQueueService &&
+						!canRespondDirectly &&
+						(resolved.text || resolved.images?.length)
+					) {
+						task.messageQueueService.addMessage(resolved.text, resolved.images)
+					} else {
+						task.handleWebviewAskResponse(message.askResponse!, resolved.text, resolved.images)
+					}
+				}
 			}
 			break
 
@@ -735,7 +753,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 
 		case "terminalOperation":
 			if (message.terminalOperation) {
-				provider.getCurrentTask()?.handleTerminalOperation(message.terminalOperation)
+				provider.getCurrentTask()?.handleTerminalOperation(message.terminalOperation, message.executionId)
 			}
 			break
 		case "clearTask":

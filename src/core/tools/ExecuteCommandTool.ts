@@ -370,6 +370,7 @@ export async function executeCommandInTerminal(
 	}
 
 	const process = terminal.runCommand(command, callbacks)
+	process.executionId = executionId
 	task.terminalProcess = process
 
 	// Dual-timeout logic:
@@ -431,6 +432,10 @@ export async function executeCommandInTerminal(
 		clearTimeout(userTimeoutId)
 		clearTimeout(pendingCommandOutputEmitTimer)
 		task.terminalProcess = undefined
+	}
+
+	if (hasAskedForCommandOutput && !runInBackground) {
+		task.supersedePendingAsk?.()
 	}
 
 	if (shellIntegrationError) {

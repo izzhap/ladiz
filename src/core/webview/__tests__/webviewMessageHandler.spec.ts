@@ -1043,3 +1043,59 @@ describe("webviewMessageHandler - downloadErrorDiagnostics", () => {
 		expect(generateErrorDiagnostics).not.toHaveBeenCalled()
 	})
 })
+
+describe("webviewMessageHandler - askResponse queueing when task is busy", () => {
+	beforeEach(() => {
+		vi.clearAllMocks()
+		mockClineProvider.getState = vi.fn().mockResolvedValue({
+			maxImageFileSize: 5,
+			maxTotalImageSize: 20,
+		})
+	})
+
+	it("queues messageResponse instead of dropping it when task is not waiting for ask", async () => {
+		const mockAddMessage = vi.fn()
+		const mockHandleWebviewAskResponse = vi.fn()
+		vi.mocked(mockClineProvider.getCurrentTask).mockReturnValue({
+			cwd: "/mock/workspace",
+			isWaitingForAsk: false,
+			isStreaming: false,
+			clineMessages: [{ type: "ask", ask: "tool", ts: 1, isAnswered: true }],
+			messageQueueService: { addMessage: mockAddMessage },
+			handleWebviewAskResponse: mockHandleWebviewAskResponse,
+		} as any)
+
+		await webviewMessageHandler(mockClineProvider, {
+			type: "askResponse",
+			askResponse: "messageResponse",
+			text: "first queued chat",
+			images: [],
+		})
+
+		expect(mockAddMessage).toHaveBeenCalledWith("first queued chat", expect.any(Array))
+		expect(mockHandleWebviewAskResponse).not.toHaveBeenCalled()
+	})
+
+	it("passes messageResponse directly when task is waiting on a non-command_output ask", async () => {
+		const mockAddMessage = vi.fn()
+		const mockHandleWebviewAskResponse = vi.fn()
+		vi.mocked(mockClineProvider.getCurrentTask).mockReturnValue({
+			cwd: "/mock/workspace",
+			isWaitingForAsk: true,
+			isStreaming: false,
+			clineMessages: [{ type: "ask", ask: "followup", ts: 1 }],
+			messageQueueService: { addMessage: mockAddMessage },
+			handleWebviewAskResponse: mockHandleWebviewAskResponse,
+		} as any)
+
+		await webviewMessageHandler(mockClineProvider, {
+			type: "askResponse",
+			askResponse: "messageResponse",
+			text: "direct reply",
+			images: [],
+		})
+
+		expect(mockHandleWebviewAskResponse).toHaveBeenCalledWith("messageResponse", "direct reply", expect.any(Array))
+		expect(mockAddMessage).not.toHaveBeenCalled()
+	})
+})

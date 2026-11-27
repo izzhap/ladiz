@@ -612,4 +612,50 @@ Output:
 			expect(terminalOutput).toHaveTextContent("0 total")
 		})
 	})
+
+	describe("abort button", () => {
+		it("posts terminalOperation abort with executionId when abort button is clicked", async () => {
+			const { TooltipProvider } = await import("@src/components/ui")
+			const { useEvent } = await import("react-use")
+			let messageHandler: ((event: MessageEvent) => void) | undefined
+			vi.mocked(useEvent).mockImplementation((_eventName, handler) => {
+				messageHandler = handler as (event: MessageEvent) => void
+			})
+
+			render(
+				<TooltipProvider>
+					<ExtensionStateWrapper>
+						<CommandExecution executionId="exec-42" text="flutter test" />
+					</ExtensionStateWrapper>
+				</TooltipProvider>,
+			)
+
+			const { act } = await import("@testing-library/react")
+			act(() => {
+				messageHandler?.(
+					new MessageEvent("message", {
+						data: {
+							type: "commandExecutionStatus",
+							text: JSON.stringify({
+								executionId: "exec-42",
+								status: "started",
+								pid: 13876,
+								command: "flutter test",
+							}),
+						},
+					}),
+				)
+			})
+
+			const buttons = screen.getAllByRole("button")
+			// First button is the abort button (OctagonX) rendered before the expand button
+			fireEvent.click(buttons[0])
+
+			expect(vscode.postMessage).toHaveBeenCalledWith({
+				type: "terminalOperation",
+				terminalOperation: "abort",
+				executionId: "exec-42",
+			})
+		})
+	})
 })

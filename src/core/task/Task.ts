@@ -1498,11 +1498,14 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			}
 		}
 
-		// Mark the last tool-approval ask as answered when user approves (or auto-approval)
+		// Mark the last tool/command/MCP approval ask as answered when user approves (or auto-approval)
 		if (askResponse === "yesButtonClicked") {
 			const lastToolAskIndex = findLastIndex(
 				this.clineMessages,
-				(msg) => msg.type === "ask" && msg.ask === "tool" && !msg.isAnswered,
+				(msg) =>
+					msg.type === "ask" &&
+					(msg.ask === "tool" || msg.ask === "command" || msg.ask === "use_mcp_server") &&
+					!msg.isAnswered,
 			)
 			if (lastToolAskIndex !== -1) {
 				this.clineMessages[lastToolAskIndex].isAnswered = true
@@ -1595,11 +1598,33 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		}
 	}
 
-	async handleTerminalOperation(terminalOperation: "continue" | "abort") {
+	async handleTerminalOperation(terminalOperation: "continue" | "abort", executionId?: string) {
 		if (terminalOperation === "continue") {
 			this.terminalProcess?.continue()
 		} else if (terminalOperation === "abort") {
+			if (executionId) {
+				let matched = false
+				if (this.terminalProcess?.executionId === executionId) {
+					this.terminalProcess.abort()
+					matched = true
+				}
+				for (const terminal of TerminalRegistry.getTerminals(true, this.taskId)) {
+					if (terminal.process?.executionId === executionId && terminal.process !== this.terminalProcess) {
+						terminal.process.abort()
+						matched = true
+					}
+				}
+				if (matched) {
+					return
+				}
+			}
+
 			this.terminalProcess?.abort()
+			for (const terminal of TerminalRegistry.getTerminals(true, this.taskId)) {
+				if (terminal.process && terminal.process !== this.terminalProcess) {
+					terminal.process.abort()
+				}
+			}
 		}
 	}
 

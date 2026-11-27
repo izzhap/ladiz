@@ -1772,7 +1772,55 @@ describe("Cline", () => {
 				// Restore console.log
 				consoleLogSpy.mockRestore()
 			})
+		})
 
+		describe("handleTerminalOperation", () => {
+			it("aborts busy background terminals for the task when terminalProcess is undefined", async () => {
+				const task = new Task({
+					provider: mockProvider,
+					apiConfiguration: mockApiConfig,
+					task: "test task",
+					startTask: false,
+				})
+
+				const bgProcess = { abort: vi.fn(), continue: vi.fn(), executionId: "exec-1" } as any
+				const { TerminalRegistry } = await import("../../../integrations/terminal/TerminalRegistry")
+				const getTerminalsSpy = vi
+					.spyOn(TerminalRegistry, "getTerminals")
+					.mockReturnValue([{ process: bgProcess } as any])
+
+				task.terminalProcess = undefined
+				await task.handleTerminalOperation("abort", "exec-1")
+
+				expect(getTerminalsSpy).toHaveBeenCalledWith(true, task.taskId)
+				expect(bgProcess.abort).toHaveBeenCalled()
+				getTerminalsSpy.mockRestore()
+			})
+		})
+
+		describe("handleWebviewAskResponse", () => {
+			it("marks command and use_mcp_server asks as isAnswered on yesButtonClicked", () => {
+				const task = new Task({
+					provider: mockProvider,
+					apiConfiguration: mockApiConfig,
+					task: "test task",
+					startTask: false,
+				})
+
+				task.clineMessages = [
+					{ ts: 1, type: "ask", ask: "command", text: "ls" },
+					{ ts: 2, type: "ask", ask: "use_mcp_server", text: "{}" },
+				]
+
+				task.handleWebviewAskResponse("yesButtonClicked")
+				expect(task.clineMessages[1].isAnswered).toBe(true)
+
+				task.handleWebviewAskResponse("yesButtonClicked")
+				expect(task.clineMessages[0].isAnswered).toBe(true)
+			})
+		})
+
+		describe("cancelCurrentRequest - edge cases", () => {
 			it("should handle missing AbortController gracefully", () => {
 				const task = new Task({
 					provider: mockProvider,
