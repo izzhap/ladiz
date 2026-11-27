@@ -46,7 +46,8 @@ import { experimentDefault } from "../../shared/experiments"
 import { Terminal } from "../../integrations/terminal/Terminal"
 import { openFile } from "../../integrations/misc/open-file"
 import { openImage, saveImage } from "../../integrations/misc/image-handler"
-import { selectImages } from "../../integrations/misc/process-images"
+import { selectAttachments } from "../../integrations/misc/process-images"
+import { extractTextFromBuffer } from "../../integrations/misc/extract-text"
 import { getTheme } from "../../integrations/theme/getTheme"
 import { searchWorkspaceFiles } from "../../services/search/file-search"
 import { fileExistsAtPath } from "../../utils/fs"
@@ -767,15 +768,35 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			await updateGlobalState("lastShownAnnouncementId", provider.latestAnnouncementId)
 			await provider.postStateToWebview()
 			break
-		case "selectImages":
-			const images = await selectImages()
+		case "selectImages": {
+			const { images, files } = await selectAttachments()
 			await provider.postMessageToWebview({
 				type: "selectedImages",
 				images,
+				files,
 				context: message.context,
 				messageTs: message.messageTs,
 			})
 			break
+		}
+		case "processAttachedFiles": {
+			const rawFiles = message.attachedFiles ?? []
+			const files = await Promise.all(
+				rawFiles.map(async (file) => {
+					const buffer = Buffer.from(file.dataBase64, "base64")
+					const content = await extractTextFromBuffer(file.name, buffer)
+					return { name: file.name, content }
+				}),
+			)
+			await provider.postMessageToWebview({
+				type: "selectedImages",
+				images: [],
+				files,
+				context: message.context,
+				messageTs: message.messageTs,
+			})
+			break
+		}
 		case "exportCurrentTask":
 			const currentTaskId = provider.getCurrentTask()?.taskId
 			if (currentTaskId) {

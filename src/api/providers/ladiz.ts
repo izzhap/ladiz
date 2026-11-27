@@ -61,7 +61,7 @@ export class LadizHandler extends OpenAiHandler {
 		messages: Anthropic.Messages.MessageParam[],
 		metadata?: ApiHandlerCreateMessageMetadata,
 	): ApiStream {
-		const { info: modelInfo } = this.getModel()
+		const { info: modelInfo, reasoning } = this.getModel()
 		const modelId = this.options.openAiModelId || this.options.apiModelId || ladizDefaultModelId
 
 		const systemMessage: OpenAI.Chat.ChatCompletionSystemMessageParam = {
@@ -76,6 +76,7 @@ export class LadizHandler extends OpenAiHandler {
 			temperature: this.options.modelTemperature ?? 0,
 			messages: convertedMessages,
 			stream: true as const,
+			...(reasoning && reasoning),
 			tools: this.convertToolsForOpenAI(metadata?.tools),
 			tool_choice: metadata?.tool_choice,
 			parallel_tool_calls: metadata?.parallelToolCalls ?? true,

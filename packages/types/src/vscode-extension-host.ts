@@ -16,6 +16,12 @@ import type { OpenAiCodexRateLimitInfo } from "./providers/openai-codex-rate-lim
 import type { SkillMetadata } from "./skills.js"
 import type { WorktreeIncludeStatus } from "./worktree.js"
 
+export interface AttachedFile {
+	name: string
+	path?: string
+	content: string
+}
+
 /**
  * ExtensionMessage
  * Extension -> Webview | CLI
@@ -118,6 +124,7 @@ export interface ExtensionMessage {
 	 */
 	state?: Partial<ExtensionState>
 	images?: string[]
+	files?: AttachedFile[]
 	filePaths?: string[]
 	openedTabs?: Array<{
 		label: string
@@ -527,6 +534,7 @@ export interface WebviewMessage {
 		| "openSkillFile"
 		| "revertFile"
 		| "revertAllFiles"
+		| "processAttachedFiles"
 	text?: string
 	taskId?: string
 	editedMessageContent?: string
@@ -537,6 +545,7 @@ export interface WebviewMessage {
 	askResponse?: ClineAskResponse
 	apiConfiguration?: ProviderSettings
 	images?: string[]
+	attachedFiles?: Array<{ name: string; dataBase64: string }>
 	bool?: boolean
 	value?: number
 	stepIndex?: number

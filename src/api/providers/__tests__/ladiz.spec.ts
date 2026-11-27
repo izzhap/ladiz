@@ -56,4 +56,27 @@ describe("LadizHandler", () => {
 			expect(info.contextWindow).toBe(1_000_000)
 		}
 	})
+
+	it("passes reasoning_effort in createMessage when reasoningEffort is configured", async () => {
+		const handler = new LadizHandler({
+			ladizApiKey: "test-key",
+			apiModelId: "ladiz-core",
+			enableReasoningEffort: true,
+			reasoningEffort: "high",
+		})
+
+		const mockCreate = (handler as any).client.chat.completions.create as ReturnType<typeof vi.fn>
+		mockCreate.mockResolvedValueOnce((async function* () {})())
+
+		for await (const _chunk of handler.createMessage("system", [{ role: "user", content: "hi" }])) {
+			// consume stream
+		}
+
+		expect(mockCreate).toHaveBeenCalledWith(
+			expect.objectContaining({
+				model: "ladiz-core",
+				reasoning_effort: "high",
+			}),
+		)
+	})
 })

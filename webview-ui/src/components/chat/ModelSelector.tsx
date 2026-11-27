@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react"
-import { Check, Search, X, Loader2, ChevronDown, RotateCw } from "lucide-react"
+import { Check, Search, X, Loader2, ChevronDown, RotateCw, RotateCcw } from "lucide-react"
 
 import {
 	ladizModels,
@@ -8,6 +8,7 @@ import {
 	type ProviderName,
 	type ProviderSettings,
 	type ModelInfo,
+	type ReasoningEffort,
 	isDynamicProvider,
 } from "@ladiz/types"
 import { cn } from "@src/lib/utils"
@@ -112,6 +113,28 @@ function formatPricing(info?: ModelInfo): string | null {
 	return `${inPrice} / ${outPrice}`
 }
 
+type ThinkingLevelOption = "disable" | ReasoningEffort
+
+const THINKING_LEVELS: Array<{ value: ThinkingLevelOption; label: string }> = [
+	{ value: "disable", label: "Off" },
+	{ value: "low", label: "Low" },
+	{ value: "medium", label: "Med" },
+	{ value: "high", label: "High" },
+]
+
+function parseContextLengthInput(raw: string): number | undefined {
+	const trimmed = raw.trim().toLowerCase().replace(/,/g, "")
+	if (!trimmed) return undefined
+	const match = trimmed.match(/^(\d+(?:\.\d+)?)\s*(k|m)?$/)
+	if (!match) return undefined
+	const num = Number(match[1])
+	if (!Number.isFinite(num) || num <= 0) return undefined
+	const unit = match[2]
+	const multiplier = unit === "m" ? 1_000_000 : unit === "k" ? 1_000 : 1
+	const result = Math.round(num * multiplier)
+	return result >= 1024 ? result : undefined
+}
+
 export const ModelSelector = ({ disabled = false, triggerClassName = "" }: ModelSelectorProps) => {
 	const [open, setOpen] = useState(false)
 	const [search, setSearch] = useState("")
@@ -149,7 +172,7 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 
 	const vsCodeLmModels = useVsCodeLmModels(provider === "vscode-lm")
 
-	const { id: currentModelId } = useSelectedModel(apiConfiguration)
+	const { id: currentModelId, info: currentModelInfo } = useSelectedModel(apiConfiguration)
 
 	const providerLabel = useMemo(() => {
 		const found = PROVIDERS.find((p) => p.value === provider)
@@ -260,6 +283,140 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 		})
 	}, [modelList, search])
 
+	const persistApiConfiguration = useCallback(
+		(updated: ProviderSettings) => {
+			setApiConfiguration(updated)
+			vscode.postMessage({
+				type: "upsertApiConfiguration",
+				text: currentApiConfigName || "default",
+				apiConfiguration: updated,
+			})
+		},
+		[currentApiConfigName, setApiConfiguration],
+	)
+
+	const currentThinkingLevel: ThinkingLevelOption = useMemo(() => {
+		if (apiConfiguration?.enableReasoningEffort === false || apiConfiguration?.reasoningEffort === "disable") {
+			return "disable"
+		}
+		const configured =
+			provider === "openai"
+				? (apiConfiguration?.openAiCustomModelInfo?.reasoningEffort ?? apiConfiguration?.reasoningEffort)
+				: apiConfiguration?.reasoningEffort
+		if (configured === "low" || configured === "medium" || configured === "high") {
+			return configured
+		}
+		if (configured === "none") {
+			return "disable"
+		}
+		const modelDefault = currentModelInfo?.reasoningEffort
+		if (modelDefault === "low" || modelDefault === "medium" || modelDefault === "high") {
+			return modelDefault
+		}
+		return "disable"
+	}, [apiConfiguration, currentModelInfo, provider])
+
+	const handleThinkingLevelChange = useCallback(
+		(level: ThinkingLevelOption) => {
+			const updated: ProviderSettings = {
+				...apiConfiguration,
+			}
+
+			if (level === "disable") {
+				updated.enableReasoningEffort = false
+				updated.reasoningEffort = "disable"
+				if (provider === "openai") {
+					const { reasoningEffort: _, ...restInfo } =
+						apiConfiguration?.openAiCustomModelInfo || openAiModelInfoSaneDefaults
+					updated.openAiCustomModelInfo = restInfo
+				}
+			} else {
+				updated.enableReasoningEffort = true
+				updated.reasoningEffort = level
+				if (provider === "openai") {
+					updated.openAiCustomModelInfo = {
+						...(apiConfiguration?.openAiCustomModelInfo || openAiModelInfoSaneDefaults),
+						supportsReasoningEffort: true,
+						reasoningEffort: level,
+					}
+				}
+				if (currentModelInfo?.supportsReasoningBudget) {
+					const budgetByLevel: Record<ReasoningEffort, number> = {
+						low: 4096,
+						medium: 8192,
+						high: 16384,
+					}
+					updated.modelMaxThinkingTokens = budgetByLevel[level]
+				}
+			}
+
+			persistApiConfiguration(updated)
+		},
+		[apiConfiguration, currentModelInfo?.supportsReasoningBudget, persistApiConfiguration, provider],
+	)
+
+	const activeContextWindow =
+		apiConfiguration?.modelContextWindow ??
+		(provider === "openai" ? apiConfiguration?.openAiCustomModelInfo?.contextWindow : undefined) ??
+		currentModelInfo?.contextWindow ??
+		128_000
+
+	const [contextDraft, setContextDraft] = useState(String(activeContextWindow))
+	const hasCustomContextWindow =
+		Boolean(apiConfiguration?.modelContextWindow && apiConfiguration.modelContextWindow > 0) ||
+		(provider === "openai" &&
+			Boolean(apiConfiguration?.openAiCustomModelInfo?.contextWindow) &&
+			apiConfiguration?.openAiCustomModelInfo?.contextWindow !== openAiModelInfoSaneDefaults.contextWindow)
+
+	useEffect(() => {
+		setContextDraft(String(activeContextWindow))
+	}, [activeContextWindow, open])
+
+	const commitContextWindow = useCallback(() => {
+		const parsed = parseContextLengthInput(contextDraft)
+		if (!parsed) {
+			setContextDraft(String(activeContextWindow))
+			return
+		}
+		if (parsed === activeContextWindow) {
+			setContextDraft(String(parsed))
+			return
+		}
+
+		const updated: ProviderSettings = {
+			...apiConfiguration,
+			modelContextWindow: parsed,
+		}
+
+		if (provider === "openai") {
+			updated.openAiCustomModelInfo = {
+				...(apiConfiguration?.openAiCustomModelInfo || openAiModelInfoSaneDefaults),
+				contextWindow: parsed,
+			}
+		} else if (provider === "ollama") {
+			updated.ollamaNumCtx = parsed
+		}
+
+		setContextDraft(String(parsed))
+		persistApiConfiguration(updated)
+	}, [activeContextWindow, apiConfiguration, contextDraft, persistApiConfiguration, provider])
+
+	const handleResetContextWindow = useCallback(() => {
+		const updated: ProviderSettings = {
+			...apiConfiguration,
+			modelContextWindow: undefined,
+		}
+		if (provider === "openai" && updated.openAiCustomModelInfo) {
+			updated.openAiCustomModelInfo = {
+				...updated.openAiCustomModelInfo,
+				contextWindow: openAiModelInfoSaneDefaults.contextWindow,
+			}
+		} else if (provider === "ollama") {
+			updated.ollamaNumCtx = undefined
+		}
+		persistApiConfiguration(updated)
+	}, [apiConfiguration, persistApiConfiguration, provider])
+
 	const handleSelectModel = useCallback(
 		(modelId: string) => {
 			if (!modelId.trim()) return
@@ -268,6 +425,7 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 			const updated: ProviderSettings = {
 				...apiConfiguration,
 				[key]: modelId,
+				modelContextWindow: undefined,
 			}
 
 			// Keep apiModelId in sync for standard providers
@@ -278,16 +436,11 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 				updated.apiModelId = modelId
 			}
 
-			setApiConfiguration(updated)
-			vscode.postMessage({
-				type: "upsertApiConfiguration",
-				text: currentApiConfigName || "default",
-				apiConfiguration: updated,
-			})
+			persistApiConfiguration(updated)
 			setOpen(false)
 			setSearch("")
 		},
-		[apiConfiguration, currentApiConfigName, provider, setApiConfiguration, isDynamic],
+		[apiConfiguration, provider, persistApiConfiguration, isDynamic],
 	)
 
 	// Focus search input when popover opens
@@ -302,9 +455,18 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 		}
 	}, [open])
 
+	const formattedActiveCtx = formatContextWindow(activeContextWindow)
+	const tooltipSummary = [
+		`Model: ${currentModelId || ladizDefaultModelId} (${providerLabel})`,
+		currentThinkingLevel !== "disable" ? `Thinking: ${currentThinkingLevel}` : null,
+		formattedActiveCtx ? `Context: ${formattedActiveCtx}` : null,
+	]
+		.filter(Boolean)
+		.join(" · ")
+
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<StandardTooltip content={`Model: ${currentModelId || ladizDefaultModelId} (${providerLabel})`}>
+			<StandardTooltip content={tooltipSummary}>
 				<PopoverTrigger
 					data-testid="dropdown-trigger"
 					disabled={disabled}
@@ -344,6 +506,92 @@ export const ModelSelector = ({ disabled = false, triggerClassName = "" }: Model
 						<span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-vscode-badge-background text-vscode-badge-foreground">
 							{filteredModels.length} {filteredModels.length === 1 ? "model" : "models"}
 						</span>
+					</div>
+				</div>
+
+				{/* Active Model Controls: Thinking Level & Context Length */}
+				<div
+					className="px-3 py-2 border-b border-vscode-panel-border/70 bg-vscode-sideBar-background/35 flex flex-col gap-2"
+					data-testid="model-quick-settings">
+					<div className="flex items-center justify-between gap-2">
+						<span className="text-[11px] font-medium text-vscode-descriptionForeground shrink-0">
+							Thinking
+						</span>
+						<div
+							role="group"
+							aria-label="Thinking level"
+							className="inline-flex items-center p-0.5 rounded-md border border-vscode-panel-border bg-vscode-input-background">
+							{THINKING_LEVELS.map((option) => {
+								const active = currentThinkingLevel === option.value
+								return (
+									<button
+										key={option.value}
+										type="button"
+										data-testid={`thinking-level-${option.value}`}
+										aria-pressed={active}
+										onClick={() => handleThinkingLevelChange(option.value)}
+										className={cn(
+											"px-2 py-0.5 text-[10px] font-medium rounded-[4px] transition-colors cursor-pointer border-none",
+											active
+												? "bg-vscode-button-background text-vscode-button-foreground"
+												: "bg-transparent text-vscode-descriptionForeground hover:text-vscode-foreground hover:bg-vscode-list-hoverBackground",
+										)}>
+										{option.label}
+									</button>
+								)
+							})}
+						</div>
+					</div>
+
+					<div className="flex items-center justify-between gap-2">
+						<label
+							htmlFor="model-context-length-input"
+							className="text-[11px] font-medium text-vscode-descriptionForeground shrink-0">
+							Context
+						</label>
+						<div className="flex items-center gap-1 min-w-0">
+							<div className="relative flex items-center">
+								<input
+									id="model-context-length-input"
+									data-testid="context-length-input"
+									type="text"
+									inputMode="numeric"
+									value={contextDraft}
+									onChange={(e) => setContextDraft(e.target.value)}
+									onBlur={commitContextWindow}
+									onKeyDown={(e) => {
+										if (e.key === "Enter") {
+											e.preventDefault()
+											commitContextWindow()
+											e.currentTarget.blur()
+										} else if (e.key === "Escape") {
+											e.preventDefault()
+											setContextDraft(String(activeContextWindow))
+											e.currentTarget.blur()
+										}
+									}}
+									aria-label="Context length (tokens)"
+									className="w-[104px] px-2 py-0.5 pr-9 text-[11px] font-mono tabular-nums text-right bg-vscode-input-background border border-vscode-panel-border rounded text-vscode-input-foreground focus:outline-none focus:border-vscode-focusBorder"
+								/>
+								{formattedActiveCtx && (
+									<span className="absolute right-1.5 text-[10px] font-mono text-vscode-descriptionForeground pointer-events-none select-none">
+										{formattedActiveCtx}
+									</span>
+								)}
+							</div>
+							{hasCustomContextWindow && (
+								<StandardTooltip content="Reset context length to model default">
+									<button
+										type="button"
+										data-testid="reset-context-length"
+										aria-label="Reset context length"
+										onClick={handleResetContextWindow}
+										className="p-1 rounded hover:bg-vscode-list-hoverBackground text-vscode-descriptionForeground hover:text-vscode-foreground transition-colors cursor-pointer">
+										<RotateCcw className="size-3" />
+									</button>
+								</StandardTooltip>
+							)}
+						</div>
 					</div>
 				</div>
 

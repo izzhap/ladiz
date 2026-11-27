@@ -113,8 +113,17 @@ export async function parseMentions(
 	const contentBlocks: MentionContentBlock[] = []
 	let commandMode: string | undefined // Track mode from the first slash command that has one
 
+	// Preserve <attached_file ...>...</attached_file> blocks verbatim so @ or / inside attached files
+	// are not misinterpreted as workspace mentions or slash commands.
+	const attachedFilePlaceholders = new Map<string, string>()
+	const sanitizedText = text.replace(/<attached_file\b[^>]*>[\s\S]*?<\/attached_file>/g, (match) => {
+		const token = `__LADIZ_ATTACHED_FILE_${attachedFilePlaceholders.size}__`
+		attachedFilePlaceholders.set(token, match)
+		return token
+	})
+
 	// First pass: check which command mentions exist and cache the results
-	const commandMatches = Array.from(text.matchAll(commandRegexGlobal))
+	const commandMatches = Array.from(sanitizedText.matchAll(commandRegexGlobal))
 	const uniqueCommandNames = new Set(commandMatches.map(([, commandName]) => commandName))
 
 	const commandExistenceChecks = await Promise.all(
@@ -151,7 +160,7 @@ export async function parseMentions(
 	}
 
 	// Only replace text for commands that actually exist (keep "see below" for commands)
-	let parsedText = text
+	let parsedText = sanitizedText
 	for (const [match, commandName] of commandMatches) {
 		if (validCommands.has(commandName) || validSkills.has(commandName)) {
 			parsedText = parsedText.replace(match, `Command '${commandName}' (see below for command content)`)
@@ -248,6 +257,10 @@ export async function parseMentions(
 
 	for (const [skillName, skillContent] of validSkills) {
 		slashCommandHelp += `\n\n${buildSkillResult(skillName, undefined, skillContent)}`
+	}
+
+	for (const [token, original] of attachedFilePlaceholders) {
+		parsedText = parsedText.replace(token, () => original)
 	}
 
 	return {

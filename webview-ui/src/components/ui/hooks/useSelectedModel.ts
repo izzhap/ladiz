@@ -102,10 +102,15 @@ export const useSelectedModel = (apiConfiguration?: ProviderSettings) => {
 				})
 			: { id: getProviderDefaultModelId(activeProvider ?? "openrouter"), info: undefined }
 
+	const effectiveInfo =
+		info && apiConfiguration?.modelContextWindow && apiConfiguration.modelContextWindow > 0
+			? { ...info, contextWindow: apiConfiguration.modelContextWindow }
+			: info
+
 	return {
 		provider,
 		id,
-		info,
+		info: effectiveInfo,
 		isLoading:
 			(needRouterModels && routerModels.isLoading) ||
 			(needOpenRouterProviders && openRouterModelProviders.isLoading) ||

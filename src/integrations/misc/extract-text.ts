@@ -4,6 +4,7 @@ import pdf from "pdf-parse/lib/pdf-parse"
 import mammoth from "mammoth"
 import fs from "fs/promises"
 import { isBinaryFile } from "isbinaryfile"
+import ExcelJS from "exceljs"
 import { extractTextFromXLSX } from "./extract-text-from-xlsx"
 import { readWithSlice } from "./indentation-reader"
 import { DEFAULT_LINE_LIMIT } from "../../core/prompts/tools/native-tools/read_file"
@@ -131,6 +132,53 @@ export async function extractTextFromFileWithMetadata(
 export async function extractTextFromFile(filePath: string): Promise<string> {
 	const result = await extractTextFromFileWithMetadata(filePath)
 	return result.content
+}
+
+function formatByteSize(bytes: number): string {
+	if (bytes < 1024) return `${bytes} B`
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+export async function extractTextFromBuffer(fileName: string, buffer: Buffer): Promise<string> {
+	const ext = path.extname(fileName).toLowerCase()
+
+	try {
+		if (ext === ".pdf") {
+			const data = await pdf(buffer)
+			return addLineNumbers(data.text)
+		}
+		if (ext === ".docx") {
+			const result = await mammoth.extractRawText({ buffer })
+			return addLineNumbers(result.value)
+		}
+		if (ext === ".xlsx") {
+			const workbook = new ExcelJS.Workbook()
+			await workbook.xlsx.load(buffer as any)
+			return await extractTextFromXLSX(workbook)
+		}
+		if (ext === ".ipynb") {
+			const notebook = JSON.parse(buffer.toString("utf8"))
+			let extractedText = ""
+			for (const cell of notebook.cells || []) {
+				if ((cell.cell_type === "markdown" || cell.cell_type === "code") && cell.source) {
+					extractedText += (Array.isArray(cell.source) ? cell.source.join("\n") : cell.source) + "\n"
+				}
+			}
+			return addLineNumbers(extractedText)
+		}
+
+		const isBinary = await isBinaryFile(buffer, buffer.length).catch(() => false)
+		if (!isBinary) {
+			const result = readWithSlice(buffer.toString("utf8"), 0, DEFAULT_LINE_LIMIT)
+			return result.content
+		}
+	} catch (error) {
+		const msg = error instanceof Error ? error.message : String(error)
+		return `[File: ${path.basename(fileName)} (${formatByteSize(buffer.length)}) — failed to extract text: ${msg}]`
+	}
+
+	return `[Binary file: ${path.basename(fileName)} (${formatByteSize(buffer.length)}) — binary content omitted]`
 }
 
 export function addLineNumbers(content: string, startLine: number = 1): string {

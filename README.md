@@ -1,26 +1,29 @@
 # Ladiz
 
-> Tim Pengembang AI di Editor Anda
+> Your autonomous AI engineering team, right inside your editor.
+
+Ladiz is an AI-powered coding agent for VS Code designed to help you plan, build, refactor, debug, and document software directly within your workspace.
 
 ---
 
-## Fitur Utama Ladiz
+## Key Features
 
-- **Generate Code**: Membuat kode dari instruksi bahasa natural
-- **Multi-Mode**: Code, Architect, Ask, Debug, dan Custom Modes
-- **Refactor & Debug**: Analisis dan perbaiki error secara otomatis
-- **Dokumentasi**: Menulis dan memperbarui dokumentasi kode
-- **MCP Server Support**: Terintegrasi penuh dengan ekosistem Model Context Protocol
+- **Code Generation**: Turn natural-language instructions into clean, production-ready code across your project.
+- **Multi-Mode Workflows**: Switch seamlessly between specialized modes (`Code`, `Architect`, `Ask`, `Debug`) or create custom modes tailored to your workflow.
+- **Automated Refactoring & Debugging**: Analyze errors, diagnose root causes, and apply targeted fixes directly in your codebase.
+- **Documentation**: Generate and maintain clear, accurate technical and inline code documentation.
+- **MCP Server Support**: Extend agent capabilities with full Model Context Protocol (MCP) integration.
+- **Flexible Provider Support**: Connect your preferred LLM providers or local models with full control over configuration and approvals.
 
-## Mode Kerja
+## Modes
 
-- **Code Mode**: Penulisan kode, refactoring, dan edit file langsung
-- **Architect Mode**: Perencanaan arsitektur, spesifikasi, dan migrasi
-- **Ask Mode**: Tanya jawab, analisis logika kode, dan penjelasan konsep
-- **Debug Mode**: Pelacakan bug, penambahan logging, dan isolasi root cause
+- **Code Mode**: Implement features, refactor code, and apply direct file edits.
+- **Architect Mode**: Design system architecture, draft technical specifications, and plan migrations.
+- **Ask Mode**: Explore codebases, analyze logic, and get clear answers without modifying files.
+- **Debug Mode**: Trace defects, add structured logging, and systematically isolate root causes.
 
 ---
 
-## Lisensi
+## License
 
 [Apache 2.0 © 2026 Ladiz](./LICENSE)

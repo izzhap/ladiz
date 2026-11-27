@@ -9,8 +9,9 @@ import { useDebounceEffect } from "@src/utils/useDebounceEffect"
 import { appendImages } from "@src/utils/imageUtils"
 import { getCostBreakdownIfNeeded } from "@src/utils/costFormatting"
 import { batchConsecutive } from "@src/utils/batchConsecutive"
+import { formatMessageWithAttachedFiles } from "@src/utils/attachedFiles"
 
-import type { ClineAsk, ClineSayTool, ClineMessage, ExtensionMessage, AudioType } from "@ladiz/types"
+import type { AttachedFile, ClineAsk, ClineSayTool, ClineMessage, ExtensionMessage, AudioType } from "@ladiz/types"
 import { isRetiredProvider } from "@ladiz/types"
 
 import { findLast } from "@roo/array"
@@ -136,6 +137,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 	const textAreaRef = useRef<HTMLTextAreaElement>(null)
 	const [sendingDisabled, setSendingDisabled] = useState(false)
 	const [selectedImages, setSelectedImages] = useState<string[]>([])
+	const [selectedFiles, setSelectedFiles] = useState<AttachedFile[]>([])
 
 	// We need to hold on to the ask because useEffect > lastMessage will always
 	// let us know when an ask comes in and handle it, but by the time
@@ -578,6 +580,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 		setInputValue("")
 		setSendingDisabled(true)
 		setSelectedImages([])
+		setSelectedFiles([])
 		setClineAsk(undefined)
 		setEnableButtons(false)
 		// Do not reset mode here as it should persist.
@@ -704,7 +707,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 
 	// Handle enqueue button click from textarea
 	const handleEnqueueCurrentMessage = useCallback(() => {
-		const text = inputValue.trim()
+		const text = formatMessageWithAttachedFiles(inputValue, selectedFiles)
 		if (text || selectedImages.length > 0) {
 			vscode.postMessage({
 				type: "queueMessage",
@@ -713,8 +716,9 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			})
 			setInputValue("")
 			setSelectedImages([])
+			setSelectedFiles([])
 		}
-	}, [inputValue, selectedImages])
+	}, [inputValue, selectedFiles, selectedImages])
 
 	// This logic depends on the useEffect[messages] above to set clineAsk,
 	// after which buttons are shown and we then send an askResponse to the
@@ -743,6 +747,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 						// Clear input state after sending
 						setInputValue("")
 						setSelectedImages([])
+						setSelectedFiles([])
 					} else {
 						vscode.postMessage({ type: "askResponse", askResponse: "yesButtonClicked" })
 					}
@@ -769,6 +774,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							// Clear input state after sending
 							setInputValue("")
 							setSelectedImages([])
+							setSelectedFiles([])
 						} else {
 							vscode.postMessage({ type: "askResponse", askResponse: "yesButtonClicked" })
 						}
@@ -826,6 +832,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 						// Clear input state after sending
 						setInputValue("")
 						setSelectedImages([])
+						setSelectedFiles([])
 					} else {
 						// Responds to the API with a "This operation failed" and lets it try again
 						vscode.postMessage({ type: "askResponse", askResponse: "noButtonClicked" })
@@ -869,9 +876,14 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 					// Only handle selectedImages if it's not for editing context
 					// When context is "edit", ChatRow will handle the images
 					if (message.context !== "edit") {
-						setSelectedImages((prevImages: string[]) =>
-							appendImages(prevImages, message.images, MAX_IMAGES_PER_MESSAGE),
-						)
+						if (message.images && message.images.length > 0) {
+							setSelectedImages((prevImages: string[]) =>
+								appendImages(prevImages, message.images, MAX_IMAGES_PER_MESSAGE),
+							)
+						}
+						if (message.files && message.files.length > 0) {
+							setSelectedFiles((prevFiles) => [...prevFiles, ...message.files!])
+						}
 					}
 					break
 				case "invoke":
@@ -1629,21 +1641,23 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 
 	useImperativeHandle(ref, () => ({
 		acceptInput: () => {
-			const hasInput = inputValue.trim() || selectedImages.length > 0
+			const formattedText = formatMessageWithAttachedFiles(inputValue, selectedFiles)
+			const hasInput = formattedText || selectedImages.length > 0
 
 			// Special case: during command_output, queue the message instead of
 			// triggering the primary button action (which would lose the message)
 			if (clineAskRef.current === "command_output" && hasInput) {
-				vscode.postMessage({ type: "queueMessage", text: inputValue.trim(), images: selectedImages })
+				vscode.postMessage({ type: "queueMessage", text: formattedText, images: selectedImages })
 				setInputValue("")
 				setSelectedImages([])
+				setSelectedFiles([])
 				return
 			}
 
 			if (enableButtons && visiblePrimaryButtonText) {
-				handlePrimaryButtonClick(inputValue, selectedImages)
+				handlePrimaryButtonClick(formattedText, selectedImages)
 			} else if (!sendingDisabled && !isProfileDisabled && hasInput) {
-				handleSendMessage(inputValue, selectedImages)
+				handleSendMessage(formattedText, selectedImages)
 			}
 		},
 	}))
@@ -1810,7 +1824,12 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 													visibleSecondaryButtonText ? "flex-1" : "flex-[2]",
 													getPrimaryButtonClass(visiblePrimaryButtonText),
 												)}
-												onClick={() => handlePrimaryButtonClick(inputValue, selectedImages)}>
+												onClick={() =>
+													handlePrimaryButtonClick(
+														formatMessageWithAttachedFiles(inputValue, selectedFiles),
+														selectedImages,
+													)
+												}>
 												{getPrimaryButtonIcon(visiblePrimaryButtonText)}
 												<span>{visiblePrimaryButtonText}</span>
 											</button>
@@ -1836,7 +1855,12 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 													"flex items-center justify-center gap-2 rounded-xl text-xs font-semibold h-9 px-4 transition-all duration-200 cursor-pointer select-none active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none flex-1",
 													getSecondaryButtonClass(visibleSecondaryButtonText),
 												)}
-												onClick={() => handleSecondaryButtonClick(inputValue, selectedImages)}>
+												onClick={() =>
+													handleSecondaryButtonClick(
+														formatMessageWithAttachedFiles(inputValue, selectedFiles),
+														selectedImages,
+													)
+												}>
 												{getSecondaryButtonIcon(visibleSecondaryButtonText)}
 												<span>{visibleSecondaryButtonText}</span>
 											</button>
@@ -1893,7 +1917,11 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				placeholderText={placeholderText}
 				selectedImages={selectedImages}
 				setSelectedImages={setSelectedImages}
-				onSend={() => handleSendMessage(inputValue, selectedImages)}
+				selectedFiles={selectedFiles}
+				setSelectedFiles={setSelectedFiles}
+				onSend={() =>
+					handleSendMessage(formatMessageWithAttachedFiles(inputValue, selectedFiles), selectedImages)
+				}
 				onSelectImages={selectImages}
 				shouldDisableImages={shouldDisableImages}
 				onHeightChange={() => {

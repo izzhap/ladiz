@@ -1,9 +1,9 @@
 import React, { forwardRef, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { useEvent } from "react-use"
 import DynamicTextArea from "react-textarea-autosize"
-import { VolumeX, Image, PenLine, SendHorizontal, X, ListEnd, Square } from "lucide-react"
+import { VolumeX, Paperclip, FileText, PenLine, SendHorizontal, X, ListEnd, Square } from "lucide-react"
 
-import type { ExtensionMessage } from "@ladiz/types"
+import type { AttachedFile, ExtensionMessage } from "@ladiz/types"
 
 import { mentionRegex, mentionRegexGlobal, commandRegexGlobal, unescapeSpaces } from "@roo/context-mentions"
 import { WebviewMessage } from "@roo/WebviewMessage"
@@ -40,6 +40,8 @@ interface ChatTextAreaProps {
 	placeholderText: string
 	selectedImages: string[]
 	setSelectedImages: React.Dispatch<React.SetStateAction<string[]>>
+	selectedFiles?: AttachedFile[]
+	setSelectedFiles?: React.Dispatch<React.SetStateAction<AttachedFile[]>>
 	onSend: () => void
 	onSelectImages: () => void
 	shouldDisableImages: boolean
@@ -56,6 +58,24 @@ interface ChatTextAreaProps {
 	onEnqueueMessage?: () => void
 }
 
+const BINARY_EXTRACTION_EXTENSIONS = [".pdf", ".docx", ".xlsx"]
+const MIN_MODEL_INLINE_WIDTH = 72
+
+function formatAttachmentBytes(bytes: number): string {
+	if (bytes < 1024) return `${bytes} B`
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function readBlobAsDataUrl(blob: Blob): Promise<string | null> {
+	return new Promise((resolve) => {
+		const reader = new FileReader()
+		reader.onloadend = () => resolve(typeof reader.result === "string" ? reader.result : null)
+		reader.onerror = () => resolve(null)
+		reader.readAsDataURL(blob)
+	})
+}
+
 export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 	(
 		{
@@ -65,6 +85,8 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			placeholderText,
 			selectedImages,
 			setSelectedImages,
+			selectedFiles = [],
+			setSelectedFiles,
 			onSend,
 			onSelectImages,
 			shouldDisableImages,
@@ -206,6 +228,38 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		const contextMenuContainerRef = useRef<HTMLDivElement>(null)
 		const [isEnhancingPrompt, setIsEnhancingPrompt] = useState(false)
 		const [isFocused, setIsFocused] = useState(false)
+		const toolbarRef = useRef<HTMLDivElement>(null)
+		const modeContainerRef = useRef<HTMLDivElement>(null)
+		const rightControlsRef = useRef<HTMLDivElement>(null)
+		const [wrapModelToBottom, setWrapModelToBottom] = useState(false)
+
+		// Memoized check for whether the input has content (text, images, or files)
+		const hasInputContent = useMemo(() => {
+			return inputValue.trim().length > 0 || selectedImages.length > 0 || selectedFiles.length > 0
+		}, [inputValue, selectedImages, selectedFiles])
+
+		useLayoutEffect(() => {
+			const toolbar = toolbarRef.current
+			const modeEl = modeContainerRef.current
+			const rightEl = rightControlsRef.current
+			if (!toolbar || !modeEl || !rightEl) return
+
+			const checkWrap = () => {
+				const toolbarWidth = toolbar.clientWidth
+				if (toolbarWidth <= 0) return
+				const availableForModel = toolbarWidth - 16 - modeEl.offsetWidth - rightEl.offsetWidth - 16
+				setWrapModelToBottom(availableForModel < MIN_MODEL_INLINE_WIDTH)
+			}
+
+			checkWrap()
+
+			if (typeof ResizeObserver === "undefined") return
+			const observer = new ResizeObserver(checkWrap)
+			observer.observe(toolbar)
+			observer.observe(modeEl)
+			observer.observe(rightEl)
+			return () => observer.disconnect()
+		}, [isEditMode, isStreaming, hasInputContent])
 
 		// Use custom hook for prompt history navigation
 		const { handleHistoryNavigation, resetHistoryNavigation, resetOnInputChange } = usePromptHistory({
@@ -239,11 +293,6 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		}, [inputValue, setInputValue, t])
 
 		const allModes = useMemo(() => getAllModes(customModes), [customModes])
-
-		// Memoized check for whether the input has content (text or images)
-		const hasInputContent = useMemo(() => {
-			return inputValue.trim().length > 0 || selectedImages.length > 0
-		}, [inputValue, selectedImages])
 
 		// Compute the key combination text for the send button tooltip based on enterBehavior
 		const sendKeyCombination = useMemo(() => {
@@ -664,6 +713,73 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 			setIsFocused(false)
 		}, [isMouseDownOnMenu])
 
+		const attachDroppedFiles = useCallback(
+			async (files: File[]) => {
+				if (files.length === 0) return
+
+				const filesForBackend: Array<{ name: string; dataBase64: string }> = []
+				const localTextFiles: AttachedFile[] = []
+
+				for (const file of files) {
+					const lowerName = file.name.toLowerCase()
+					const needsBackendExtraction = BINARY_EXTRACTION_EXTENSIONS.some((ext) => lowerName.endsWith(ext))
+
+					if (needsBackendExtraction) {
+						const dataUrl = await readBlobAsDataUrl(file)
+						const commaIndex = dataUrl?.indexOf(",") ?? -1
+						if (dataUrl && commaIndex !== -1) {
+							filesForBackend.push({
+								name: file.name,
+								dataBase64: dataUrl.slice(commaIndex + 1),
+							})
+						}
+						continue
+					}
+
+					try {
+						const buffer = await file.arrayBuffer()
+						const bytes = new Uint8Array(buffer)
+						const sampleLen = Math.min(bytes.length, 8192)
+						let isBinary = false
+						for (let i = 0; i < sampleLen; i++) {
+							if (bytes[i] === 0) {
+								isBinary = true
+								break
+							}
+						}
+
+						if (isBinary) {
+							localTextFiles.push({
+								name: file.name,
+								content: `[Binary file: ${file.name} (${formatAttachmentBytes(file.size)}) — binary content omitted]`,
+							})
+						} else {
+							const decoded = new TextDecoder().decode(bytes)
+							localTextFiles.push({ name: file.name, content: decoded })
+						}
+					} catch {
+						localTextFiles.push({
+							name: file.name,
+							content: `[File: ${file.name} (${formatAttachmentBytes(file.size)}) — could not read content]`,
+						})
+					}
+				}
+
+				if (localTextFiles.length > 0 && setSelectedFiles) {
+					setSelectedFiles((prev) => [...prev, ...localTextFiles])
+				}
+
+				if (filesForBackend.length > 0 && typeof vscode !== "undefined") {
+					vscode.postMessage({
+						type: "processAttachedFiles",
+						attachedFiles: filesForBackend,
+						context: isEditMode ? "edit" : undefined,
+					})
+				}
+			},
+			[isEditMode, setSelectedFiles],
+		)
+
 		const handlePaste = useCallback(
 			async (e: React.ClipboardEvent) => {
 				const items = e.clipboardData.items
@@ -695,51 +811,46 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				}
 
 				const acceptedTypes = ["png", "jpeg", "webp"]
-
-				const imageItems = Array.from(items).filter((item) => {
+				const fileItems = Array.from(items).filter((item) => item.kind === "file")
+				const imageItems = fileItems.filter((item) => {
 					const [type, subtype] = item.type.split("/")
 					return type === "image" && acceptedTypes.includes(subtype)
 				})
+				const nonImageFiles = fileItems
+					.filter((item) => {
+						const [type, subtype] = item.type.split("/")
+						return !(type === "image" && acceptedTypes.includes(subtype))
+					})
+					.map((item) => item.getAsFile())
+					.filter((file): file is File => file !== null)
 
-				if (!shouldDisableImages && imageItems.length > 0) {
+				if ((!shouldDisableImages && imageItems.length > 0) || nonImageFiles.length > 0) {
 					e.preventDefault()
 
-					const imagePromises = imageItems.map((item) => {
-						return new Promise<string | null>((resolve) => {
-							const blob = item.getAsFile()
+					if (!shouldDisableImages && imageItems.length > 0) {
+						const imageDataArray = await Promise.all(
+							imageItems.map((item) => {
+								const blob = item.getAsFile()
+								return blob ? readBlobAsDataUrl(blob) : Promise.resolve(null)
+							}),
+						)
+						const dataUrls = imageDataArray.filter((dataUrl): dataUrl is string => dataUrl !== null)
 
-							if (!blob) {
-								resolve(null)
-								return
-							}
+						if (dataUrls.length > 0) {
+							setSelectedImages((prevImages) =>
+								[...prevImages, ...dataUrls].slice(0, MAX_IMAGES_PER_MESSAGE),
+							)
+						} else {
+							console.warn(t("chat:noValidImages"))
+						}
+					}
 
-							const reader = new FileReader()
-
-							reader.onloadend = () => {
-								if (reader.error) {
-									console.error(t("chat:errorReadingFile"), reader.error)
-									resolve(null)
-								} else {
-									const result = reader.result
-									resolve(typeof result === "string" ? result : null)
-								}
-							}
-
-							reader.readAsDataURL(blob)
-						})
-					})
-
-					const imageDataArray = await Promise.all(imagePromises)
-					const dataUrls = imageDataArray.filter((dataUrl): dataUrl is string => dataUrl !== null)
-
-					if (dataUrls.length > 0) {
-						setSelectedImages((prevImages) => [...prevImages, ...dataUrls].slice(0, MAX_IMAGES_PER_MESSAGE))
-					} else {
-						console.warn(t("chat:noValidImages"))
+					if (nonImageFiles.length > 0) {
+						await attachDroppedFiles(nonImageFiles)
 					}
 				}
 			},
-			[shouldDisableImages, setSelectedImages, cursorPosition, setInputValue, inputValue, t],
+			[shouldDisableImages, setSelectedImages, cursorPosition, setInputValue, inputValue, attachDroppedFiles, t],
 		)
 
 		const handleMenuMouseDown = useCallback(() => {
@@ -861,27 +972,13 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						const [type, subtype] = file.type.split("/")
 						return type === "image" && acceptedTypes.includes(subtype)
 					})
+					const nonImageFiles = files.filter((file) => {
+						const [type, subtype] = file.type.split("/")
+						return !(type === "image" && acceptedTypes.includes(subtype))
+					})
 
 					if (!shouldDisableImages && imageFiles.length > 0) {
-						const imagePromises = imageFiles.map((file) => {
-							return new Promise<string | null>((resolve) => {
-								const reader = new FileReader()
-
-								reader.onloadend = () => {
-									if (reader.error) {
-										console.error(t("chat:errorReadingFile"), reader.error)
-										resolve(null)
-									} else {
-										const result = reader.result
-										resolve(typeof result === "string" ? result : null)
-									}
-								}
-
-								reader.readAsDataURL(file)
-							})
-						})
-
-						const imageDataArray = await Promise.all(imagePromises)
+						const imageDataArray = await Promise.all(imageFiles.map((file) => readBlobAsDataUrl(file)))
 						const dataUrls = imageDataArray.filter((dataUrl): dataUrl is string => dataUrl !== null)
 
 						if (dataUrls.length > 0) {
@@ -896,6 +993,10 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							console.warn(t("chat:noValidImages"))
 						}
 					}
+
+					if (nonImageFiles.length > 0) {
+						await attachDroppedFiles(nonImageFiles)
+					}
 				}
 			},
 			[
@@ -907,6 +1008,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				setIntendedCursorPosition,
 				shouldDisableImages,
 				setSelectedImages,
+				attachDroppedFiles,
 				t,
 			],
 		)
@@ -1097,46 +1199,82 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 						/>
 					</div>
 
-					{selectedImages.length > 0 && (
-						<div className="px-3 pb-2">
-							<Thumbnails
-								images={selectedImages}
-								setImages={setSelectedImages}
-								style={{
-									zIndex: 2,
-									marginBottom: 0,
-								}}
-							/>
+					{(selectedImages.length > 0 || selectedFiles.length > 0) && (
+						<div className="px-3 pb-2 flex flex-col gap-1.5">
+							{selectedFiles.length > 0 && (
+								<div className="flex flex-wrap gap-1.5" data-testid="attached-files-list">
+									{selectedFiles.map((file, index) => (
+										<span
+											key={`${file.name}-${index}`}
+											className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-vscode-panel-border bg-vscode-sideBar-background text-[11px] text-vscode-foreground max-w-[200px]">
+											<FileText
+												className="size-3 shrink-0 text-vscode-descriptionForeground"
+												aria-hidden="true"
+											/>
+											<span className="truncate font-mono">{file.name}</span>
+											{setSelectedFiles && (
+												<button
+													type="button"
+													aria-label={`Remove ${file.name}`}
+													onClick={() =>
+														setSelectedFiles((prev) => prev.filter((_, i) => i !== index))
+													}
+													className="p-0.5 rounded hover:bg-vscode-list-hoverBackground text-vscode-descriptionForeground hover:text-vscode-foreground cursor-pointer border-none bg-transparent inline-flex items-center justify-center">
+													<X className="size-3" />
+												</button>
+											)}
+										</span>
+									))}
+								</div>
+							)}
+							{selectedImages.length > 0 && (
+								<Thumbnails
+									images={selectedImages}
+									setImages={setSelectedImages}
+									style={{
+										zIndex: 2,
+										marginBottom: 0,
+									}}
+								/>
+							)}
 						</div>
 					)}
 
 					{/* Integrated Bottom Toolbar inside the Card */}
-					<div className="flex flex-wrap items-center justify-between gap-1.5 px-2 py-1.5 border-t border-vscode-panel-border/60 bg-vscode-sideBar-background/50 rounded-b-lg">
-						{/* Left: Mode and Model selector chips */}
-						<div className="flex items-center gap-1 min-w-0 flex-1">
-							<ModeSelector
-								value={mode}
-								title={t("chat:selectMode")}
-								onChange={handleModeChange}
-								triggerClassName="shrink-0"
-								modeShortcutText={modeShortcutText}
-								customModes={customModes}
-								customModePrompts={customModePrompts}
-							/>
-							<ModelSelector disabled={selectApiConfigDisabled} triggerClassName="min-w-0 max-w-full" />
-						</div>
+					<div
+						ref={toolbarRef}
+						className="flex flex-col gap-1 px-2 py-1.5 border-t border-vscode-panel-border/60 bg-vscode-sideBar-background/50 rounded-b-lg">
+						<div className="flex items-center justify-between gap-1.5 w-full min-w-0">
+							{/* Left: Mode and inline Model selector chips */}
+							<div className="flex items-center gap-1 min-w-0 flex-1">
+								<div ref={modeContainerRef} className="shrink-0">
+									<ModeSelector
+										value={mode}
+										title={t("chat:selectMode")}
+										onChange={handleModeChange}
+										triggerClassName="shrink-0"
+										modeShortcutText={modeShortcutText}
+										customModes={customModes}
+										customModePrompts={customModePrompts}
+									/>
+								</div>
+								{!wrapModelToBottom && (
+									<ModelSelector
+										disabled={selectApiConfigDisabled}
+										triggerClassName="min-w-0 max-w-full"
+									/>
+								)}
+							</div>
 
-						{/* Right: Auto-approve toggle, Attach image, Enhance prompt, Queue, Cancel, Send/Stop */}
-						<div className="flex items-center gap-1 shrink-0">
-							{!isEditMode && <AutoApproveDropdown triggerClassName="shrink-0" />}
+							{/* Right: Auto-approve toggle, Attach files/images, Enhance prompt, Queue, Cancel, Send/Stop */}
+							<div ref={rightControlsRef} className="flex items-center gap-1 shrink-0">
+								{!isEditMode && <AutoApproveDropdown triggerClassName="shrink-0" />}
 
-							{!shouldDisableImages && (
-								<StandardTooltip content={t("chat:addImages")}>
+								<StandardTooltip content={t("chat:addAttachments")}>
 									<button
 										type="button"
-										aria-label={t("chat:addImages")}
-										disabled={shouldDisableImages}
-										onClick={!shouldDisableImages ? onSelectImages : undefined}
+										aria-label={t("chat:addAttachments")}
+										onClick={onSelectImages}
 										className={cn(
 											"relative inline-flex items-center justify-center",
 											"bg-transparent border-none size-6.5 rounded",
@@ -1145,130 +1283,140 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 											"hover:bg-vscode-list-hoverBackground",
 											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
 										)}>
-										<Image className="size-3.5" aria-hidden="true" />
+										<Paperclip className="size-3.5" aria-hidden="true" />
 									</button>
 								</StandardTooltip>
-							)}
 
-							{isEditMode ? (
-								<StandardTooltip content={t("chat:cancel.title")}>
-									<button
-										type="button"
-										aria-label={t("chat:cancel.title")}
-										disabled={false}
-										onClick={onCancel}
-										className={cn(
-											"relative inline-flex items-center justify-center",
-											"bg-transparent border-none size-6.5 rounded",
-											"text-vscode-descriptionForeground hover:text-vscode-foreground",
-											"transition-colors duration-150 cursor-pointer",
-											"hover:bg-vscode-list-hoverBackground",
-											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
-										)}>
-										<X className="size-3.5" aria-hidden="true" />
-									</button>
-								</StandardTooltip>
-							) : (
-								<StandardTooltip content={t("chat:enhancePrompt")}>
-									<button
-										type="button"
-										aria-label={t("chat:enhancePrompt")}
-										disabled={false}
-										onClick={handleEnhancePrompt}
-										className={cn(
-											"relative inline-flex items-center justify-center",
-											"bg-transparent border-none size-6.5 rounded",
-											"text-vscode-descriptionForeground hover:text-vscode-foreground",
-											"transition-colors duration-150 cursor-pointer",
-											hasInputContent
-												? "opacity-100 hover:bg-vscode-list-hoverBackground pointer-events-auto"
-												: "opacity-0 pointer-events-none w-0 h-0 p-0 m-0 min-w-0 min-h-0 overflow-hidden",
-											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
-										)}>
-										<PenLine
-											className={cn("size-3.5", isEnhancingPrompt && "animate-spin")}
-											aria-hidden="true"
-										/>
-									</button>
-								</StandardTooltip>
-							)}
+								{isEditMode ? (
+									<StandardTooltip content={t("chat:cancel.title")}>
+										<button
+											type="button"
+											aria-label={t("chat:cancel.title")}
+											disabled={false}
+											onClick={onCancel}
+											className={cn(
+												"relative inline-flex items-center justify-center",
+												"bg-transparent border-none size-6.5 rounded",
+												"text-vscode-descriptionForeground hover:text-vscode-foreground",
+												"transition-colors duration-150 cursor-pointer",
+												"hover:bg-vscode-list-hoverBackground",
+												"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+											)}>
+											<X className="size-3.5" aria-hidden="true" />
+										</button>
+									</StandardTooltip>
+								) : (
+									<StandardTooltip content={t("chat:enhancePrompt")}>
+										<button
+											type="button"
+											aria-label={t("chat:enhancePrompt")}
+											disabled={false}
+											onClick={handleEnhancePrompt}
+											className={cn(
+												"relative inline-flex items-center justify-center",
+												"bg-transparent border-none size-6.5 rounded",
+												"text-vscode-descriptionForeground hover:text-vscode-foreground",
+												"transition-colors duration-150 cursor-pointer",
+												hasInputContent
+													? "opacity-100 hover:bg-vscode-list-hoverBackground pointer-events-auto"
+													: "opacity-0 pointer-events-none w-0 h-0 p-0 m-0 min-w-0 min-h-0 overflow-hidden",
+												"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+											)}>
+											<PenLine
+												className={cn("size-3.5", isEnhancingPrompt && "animate-spin")}
+												aria-hidden="true"
+											/>
+										</button>
+									</StandardTooltip>
+								)}
 
-							{!isEditMode && isStreaming && hasInputContent && onEnqueueMessage && (
-								<StandardTooltip content={t("chat:enqueueMessage")}>
-									<button
-										type="button"
-										aria-label={t("chat:enqueueMessage")}
-										disabled={false}
-										onClick={onEnqueueMessage}
-										className={cn(
-											"relative inline-flex items-center justify-center",
-											"bg-transparent border-none size-6.5 rounded",
-											"text-vscode-descriptionForeground hover:text-vscode-foreground",
-											"transition-colors duration-150 cursor-pointer",
-											"hover:bg-vscode-list-hoverBackground",
-											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
-										)}>
-										<ListEnd className="size-3.5" aria-hidden="true" />
-									</button>
-								</StandardTooltip>
-							)}
+								{!isEditMode && isStreaming && hasInputContent && onEnqueueMessage && (
+									<StandardTooltip content={t("chat:enqueueMessage")}>
+										<button
+											type="button"
+											aria-label={t("chat:enqueueMessage")}
+											disabled={false}
+											onClick={onEnqueueMessage}
+											className={cn(
+												"relative inline-flex items-center justify-center",
+												"bg-transparent border-none size-6.5 rounded",
+												"text-vscode-descriptionForeground hover:text-vscode-foreground",
+												"transition-colors duration-150 cursor-pointer",
+												"hover:bg-vscode-list-hoverBackground",
+												"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+											)}>
+											<ListEnd className="size-3.5" aria-hidden="true" />
+										</button>
+									</StandardTooltip>
+								)}
 
-							{/* Send/Stop button */}
-							<StandardTooltip
-								content={
-									isEditMode
-										? t("chat:pressToSend", { keyCombination: sendKeyCombination })
-										: isStreaming
-											? t("chat:stop.title")
-											: t("chat:pressToSend", { keyCombination: sendKeyCombination })
-								}>
-								<button
-									type="button"
-									aria-label={
+								{/* Send/Stop button */}
+								<StandardTooltip
+									content={
 										isEditMode
 											? t("chat:pressToSend", { keyCombination: sendKeyCombination })
 											: isStreaming
 												? t("chat:stop.title")
 												: t("chat:pressToSend", { keyCombination: sendKeyCombination })
-									}
-									disabled={false}
-									onClick={isStreaming ? onStop : onSend}
-									className={cn(
-										"relative inline-flex items-center justify-center",
-										"size-6.5 rounded transition-colors duration-150",
-										"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
-										isStreaming
-											? "bg-vscode-errorForeground/15 hover:bg-vscode-errorForeground/25 text-vscode-errorForeground border border-vscode-errorForeground/40"
-											: "bg-vscode-button-background hover:bg-vscode-button-hoverBackground text-vscode-button-foreground",
-										isEditMode || isStreaming || hasInputContent
-											? "opacity-100 pointer-events-auto cursor-pointer"
-											: "opacity-25 pointer-events-none bg-vscode-list-hoverBackground text-vscode-descriptionForeground",
-									)}>
-									{isStreaming ? (
-										<Square className="size-3 stroke-none fill-current" aria-hidden="true" />
-									) : (
-										<SendHorizontal className="size-3.5" aria-hidden="true" />
-									)}
-								</button>
-							</StandardTooltip>
-
-							{isTtsPlaying && (
-								<StandardTooltip content={t("chat:stopTts")}>
+									}>
 									<button
 										type="button"
-										aria-label={t("chat:stopTts")}
-										onClick={() => vscode.postMessage({ type: "stopTts" })}
+										aria-label={
+											isEditMode
+												? t("chat:pressToSend", { keyCombination: sendKeyCombination })
+												: isStreaming
+													? t("chat:stop.title")
+													: t("chat:pressToSend", { keyCombination: sendKeyCombination })
+										}
+										disabled={false}
+										onClick={isStreaming ? onStop : onSend}
 										className={cn(
-											"inline-flex items-center justify-center size-6.5 rounded",
-											"text-vscode-descriptionForeground hover:text-vscode-foreground hover:bg-vscode-list-hoverBackground",
-											"transition-colors duration-150 cursor-pointer",
+											"relative inline-flex items-center justify-center",
+											"size-6.5 rounded transition-colors duration-150",
 											"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+											isStreaming
+												? "bg-vscode-errorForeground/15 hover:bg-vscode-errorForeground/25 text-vscode-errorForeground border border-vscode-errorForeground/40"
+												: "bg-vscode-button-background hover:bg-vscode-button-hoverBackground text-vscode-button-foreground",
+											isEditMode || isStreaming || hasInputContent
+												? "opacity-100 pointer-events-auto cursor-pointer"
+												: "opacity-25 pointer-events-none bg-vscode-list-hoverBackground text-vscode-descriptionForeground",
 										)}>
-										<VolumeX className="size-3.5" aria-hidden="true" />
+										{isStreaming ? (
+											<Square className="size-3 stroke-none fill-current" aria-hidden="true" />
+										) : (
+											<SendHorizontal className="size-3.5" aria-hidden="true" />
+										)}
 									</button>
 								</StandardTooltip>
-							)}
+
+								{isTtsPlaying && (
+									<StandardTooltip content={t("chat:stopTts")}>
+										<button
+											type="button"
+											aria-label={t("chat:stopTts")}
+											onClick={() => vscode.postMessage({ type: "stopTts" })}
+											className={cn(
+												"inline-flex items-center justify-center size-6.5 rounded",
+												"text-vscode-descriptionForeground hover:text-vscode-foreground hover:bg-vscode-list-hoverBackground",
+												"transition-colors duration-150 cursor-pointer",
+												"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+											)}>
+											<VolumeX className="size-3.5" aria-hidden="true" />
+										</button>
+									</StandardTooltip>
+								)}
+							</div>
 						</div>
+						{wrapModelToBottom && (
+							<div
+								className="flex items-center w-full pt-1 border-t border-vscode-panel-border/40"
+								data-testid="wrapped-model-row">
+								<ModelSelector
+									disabled={selectApiConfigDisabled}
+									triggerClassName="min-w-0 max-w-full"
+								/>
+							</div>
+						)}
 					</div>
 				</div>
 

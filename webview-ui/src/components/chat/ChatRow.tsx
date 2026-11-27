@@ -1,4 +1,6 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import type { AttachedFile } from "@ladiz/types"
+import { extractAttachedFilesFromText, formatMessageWithAttachedFiles } from "@src/utils/attachedFiles"
 import { useSize } from "react-use"
 import { useTranslation } from "react-i18next"
 import deepEqual from "fast-deep-equal"
@@ -213,13 +215,19 @@ export const ChatRowContent = ({
 	const [editedContent, setEditedContent] = useState("")
 	const [editMode, setEditMode] = useState<Mode>(mode || "code")
 	const [editImages, setEditImages] = useState<string[]>([])
+	const [editFiles, setEditFiles] = useState<AttachedFile[]>([])
 
-	// Handle message events for image selection during edit mode
+	// Handle message events for image/file selection during edit mode
 	useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
 			const msg = event.data
 			if (msg.type === "selectedImages" && msg.context === "edit" && msg.messageTs === message.ts && isEditing) {
-				setEditImages((prevImages) => appendImages(prevImages, msg.images, MAX_IMAGES_PER_MESSAGE))
+				if (msg.images && msg.images.length > 0) {
+					setEditImages((prevImages) => appendImages(prevImages, msg.images, MAX_IMAGES_PER_MESSAGE))
+				}
+				if (msg.files && msg.files.length > 0) {
+					setEditFiles((prevFiles) => [...prevFiles, ...msg.files])
+				}
 			}
 		}
 
@@ -234,8 +242,10 @@ export const ChatRowContent = ({
 
 	// Handle edit button click
 	const handleEditClick = useCallback(() => {
+		const { cleanText, files } = extractAttachedFilesFromText(message.text || "")
 		setIsEditing(true)
-		setEditedContent(message.text || "")
+		setEditedContent(cleanText)
+		setEditFiles(files)
 		setEditImages(message.images || [])
 		setEditMode(mode || "code")
 		// Edit mode is now handled entirely in the frontend
@@ -244,8 +254,10 @@ export const ChatRowContent = ({
 
 	// Handle cancel edit
 	const handleCancelEdit = useCallback(() => {
+		const { cleanText, files } = extractAttachedFilesFromText(message.text || "")
 		setIsEditing(false)
-		setEditedContent(message.text || "")
+		setEditedContent(cleanText)
+		setEditFiles(files)
 		setEditImages(message.images || [])
 		setEditMode(mode || "code")
 	}, [message.text, message.images, mode])
@@ -257,10 +269,10 @@ export const ChatRowContent = ({
 		vscode.postMessage({
 			type: "submitEditedMessage",
 			value: message.ts,
-			editedMessageContent: editedContent,
+			editedMessageContent: formatMessageWithAttachedFiles(editedContent, editFiles),
 			images: editImages,
 		})
-	}, [message.ts, editedContent, editImages])
+	}, [message.ts, editedContent, editFiles, editImages])
 
 	// Handle image selection for editing
 	const handleSelectImages = useCallback(() => {
@@ -1063,6 +1075,8 @@ export const ChatRowContent = ({
 											placeholderText={t("chat:editMessage.placeholder")}
 											selectedImages={editImages}
 											setSelectedImages={setEditImages}
+											selectedFiles={editFiles}
+											setSelectedFiles={setEditFiles}
 											onSend={handleSaveEdit}
 											onSelectImages={handleSelectImages}
 											shouldDisableImages={!model?.supportsImages}
