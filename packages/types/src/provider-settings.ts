@@ -181,11 +181,12 @@ const baseProviderSettingsSchema = z.object({
 	rateLimitSeconds: z.number().optional(),
 	consecutiveMistakeLimit: z.number().min(0).optional(),
 
-	// Model reasoning.
+	// Model reasoning & context window override.
 	enableReasoningEffort: z.boolean().optional(),
 	reasoningEffort: reasoningEffortSettingSchema.optional(),
 	modelMaxTokens: z.number().optional(),
 	modelMaxThinkingTokens: z.number().optional(),
+	modelContextWindow: z.number().int().positive().optional(),
 
 	// Model verbosity.
 	verbosity: verbosityLevelsSchema.optional(),

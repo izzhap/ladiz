@@ -110,6 +110,27 @@ export interface ApiHandler {
 }
 
 export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
+	const handler = createApiHandler(configuration)
+
+	if (configuration.modelContextWindow && configuration.modelContextWindow > 0) {
+		const customContextWindow = configuration.modelContextWindow
+		const origGetModel = handler.getModel.bind(handler)
+		handler.getModel = () => {
+			const model = origGetModel()
+			return {
+				...model,
+				info: {
+					...model.info,
+					contextWindow: customContextWindow,
+				},
+			}
+		}
+	}
+
+	return handler
+}
+
+function createApiHandler(configuration: ProviderSettings): ApiHandler {
 	const { apiProvider, ...options } = configuration
 
 	if (apiProvider && isRetiredProvider(apiProvider)) {

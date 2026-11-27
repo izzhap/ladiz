@@ -1223,4 +1223,107 @@ describe("ChatTextArea", () => {
 			expect(screen.queryByText("chat:hintSend")).not.toBeInTheDocument()
 		})
 	})
+
+	describe("universal attachments & responsive model row", () => {
+		it("keeps attach button visible when shouldDisableImages is true", () => {
+			render(<ChatTextArea {...defaultProps} shouldDisableImages={true} />)
+
+			const attachBtn = screen.getByRole("button", { name: "chat:addAttachments" })
+			expect(attachBtn).toBeInTheDocument()
+			fireEvent.click(attachBtn)
+			expect(defaultProps.onSelectImages).toHaveBeenCalled()
+		})
+
+		it("renders attached non-image file chips and enables send button", () => {
+			const setSelectedFiles = vi.fn()
+			const { container } = render(
+				<ChatTextArea
+					{...defaultProps}
+					inputValue=""
+					selectedImages={[]}
+					selectedFiles={[{ name: "notes.txt", content: "hello" }]}
+					setSelectedFiles={setSelectedFiles}
+				/>,
+			)
+
+			expect(screen.getByTestId("attached-files-list")).toBeInTheDocument()
+			expect(screen.getByText("notes.txt")).toBeInTheDocument()
+
+			const sendButton = Array.from(container.querySelectorAll("button")).find(
+				(button) => button.querySelector(".lucide-send-horizontal") !== null,
+			)
+			expect(sendButton).toHaveClass("opacity-100")
+
+			fireEvent.click(screen.getByRole("button", { name: "Remove notes.txt" }))
+			expect(setSelectedFiles).toHaveBeenCalled()
+		})
+
+		it("attaches dropped non-image text files via handleDrop", async () => {
+			const setSelectedFiles = vi.fn()
+			const { container } = render(
+				<ChatTextArea {...defaultProps} selectedFiles={[]} setSelectedFiles={setSelectedFiles} />,
+			)
+
+			const fileContent = new TextEncoder().encode("console.log('hi')")
+			const textFile = new File([fileContent], "script.ts", { type: "text/typescript" })
+			Object.defineProperty(textFile, "arrayBuffer", {
+				value: async () => fileContent.buffer,
+			})
+
+			const dataTransfer = {
+				getData: () => "",
+				files: [textFile],
+			}
+
+			fireEvent.drop(container.querySelector(".chat-text-area")!, { dataTransfer })
+
+			await vi.waitFor(() => {
+				expect(setSelectedFiles).toHaveBeenCalled()
+			})
+			const updater = setSelectedFiles.mock.calls[0][0]
+			expect(updater([])).toEqual([{ name: "script.ts", content: "console.log('hi')" }])
+		})
+
+		it("moves ModelSelector to a bottom row when toolbar width is too narrow", () => {
+			let resizeCallback: (() => void) | undefined
+			const originalResizeObserver = globalThis.ResizeObserver
+			globalThis.ResizeObserver = class {
+				constructor(cb: () => void) {
+					resizeCallback = cb
+				}
+				observe() {}
+				disconnect() {}
+			} as any
+
+			const originalClientWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "clientWidth")
+			const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "offsetWidth")
+
+			Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+				configurable: true,
+				get() {
+					return 220
+				},
+			})
+			Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+				configurable: true,
+				get() {
+					return 100
+				},
+			})
+
+			try {
+				render(<ChatTextArea {...defaultProps} />)
+				resizeCallback?.()
+				expect(screen.getByTestId("wrapped-model-row")).toBeInTheDocument()
+			} finally {
+				globalThis.ResizeObserver = originalResizeObserver
+				if (originalClientWidth) {
+					Object.defineProperty(HTMLElement.prototype, "clientWidth", originalClientWidth)
+				}
+				if (originalOffsetWidth) {
+					Object.defineProperty(HTMLElement.prototype, "offsetWidth", originalOffsetWidth)
+				}
+			}
+		})
+	})
 })
