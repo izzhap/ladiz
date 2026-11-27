@@ -1325,5 +1325,14 @@ describe("ChatTextArea", () => {
 				}
 			}
 		})
+
+		it("allows toolbar controls to wrap without overlapping in narrow sidebars", () => {
+			render(<ChatTextArea {...defaultProps} />)
+			const toolbarRow = screen.getByTestId("chat-toolbar-row")
+			const rightControls = screen.getByTestId("chat-toolbar-right-controls")
+
+			expect(toolbarRow).toHaveClass("flex-wrap")
+			expect(rightControls).toHaveClass("flex-wrap", "ml-auto")
+		})
 	})
 })

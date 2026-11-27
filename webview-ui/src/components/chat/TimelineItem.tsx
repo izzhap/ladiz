@@ -70,8 +70,8 @@ export const TimelineItem: React.FC<TimelineItemProps> = memo(
 				{/* Continuous vertical timeline connector line */}
 				<div
 					className={cn(
-						"absolute left-[9px] w-[1.5px] bg-vscode-panel-border/40 pointer-events-none transition-colors group-hover/timeline:bg-vscode-panel-border/70",
-						isFirst ? "top-3 bottom-0" : isLast ? "top-0 h-3" : "top-0 bottom-0",
+						"absolute left-[10px] -translate-x-1/2 w-[1.5px] bg-vscode-panel-border/40 pointer-events-none transition-colors group-hover/timeline:bg-vscode-panel-border/70",
+						isFirst ? "top-4 bottom-0" : isLast ? "top-0 h-4" : "top-0 bottom-0",
 					)}
 				/>
 
@@ -83,7 +83,7 @@ export const TimelineItem: React.FC<TimelineItemProps> = memo(
 					)}
 					onClick={onClick}>
 					{/* Status Dot / Node */}
-					<div className="flex items-center justify-center size-[19px] shrink-0 mt-0.5">
+					<div className="flex items-center justify-center size-5 shrink-0">
 						{customDot ? (
 							customDot
 						) : (
@@ -99,7 +99,7 @@ export const TimelineItem: React.FC<TimelineItemProps> = memo(
 
 					{/* Action + Target + Subtext */}
 					<div className="flex flex-col min-w-0 flex-1 leading-snug">
-						<div className="flex items-center gap-2 min-w-0 w-full">
+						<div className="flex items-center gap-2 min-w-0 w-full min-h-5">
 							{action && (
 								<div
 									className={cn(
@@ -129,7 +129,7 @@ export const TimelineItem: React.FC<TimelineItemProps> = memo(
 				</div>
 
 				{/* Body Content (Collapsible details, CodeBlock, DiffView, etc.) */}
-				{children && <div className="ml-[19px] pl-2.5 mt-1.5 min-w-0 z-[1]">{children}</div>}
+				{children && <div className="ml-5 pl-2.5 mt-1.5 min-w-0 z-[1]">{children}</div>}
 			</div>
 		)
 	},
