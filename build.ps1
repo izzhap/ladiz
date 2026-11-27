@@ -93,6 +93,16 @@ if ($targetVsix) {
     } else {
         Write-Warning "[WARN] Perintah antigravity-ide atau antigravity tidak ditemukan di PATH."
     }
+
+    if (Get-Command code -ErrorAction SilentlyContinue) {
+        Write-Host "[INSTALL] Menginstall $($targetVsix.Name) ke VS Code..." -ForegroundColor Cyan
+        & code --install-extension $targetVsix.FullName --force
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "[SUCCESS] Berhasil install $($targetVsix.Name) ke VS Code!" -ForegroundColor Green
+        } else {
+            Write-Warning "[WARN] Gagal install ekstensi ke VS Code."
+        }
+    }
 }
 
 Write-Host "[SUCCESS] Build selesai! Membuka folder output di Explorer..." -ForegroundColor Green

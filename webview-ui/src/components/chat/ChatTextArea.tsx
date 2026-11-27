@@ -1244,15 +1244,17 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 					<div
 						ref={toolbarRef}
 						className="flex flex-col gap-1 px-2 py-1.5 border-t border-vscode-panel-border/60 bg-vscode-sideBar-background/50 rounded-b-lg">
-						<div className="flex items-center justify-between gap-1.5 w-full min-w-0">
+						<div
+							className="flex flex-wrap items-center justify-between gap-1.5 w-full min-w-0"
+							data-testid="chat-toolbar-row">
 							{/* Left: Mode and inline Model selector chips */}
-							<div className="flex items-center gap-1 min-w-0 flex-1">
-								<div ref={modeContainerRef} className="shrink-0">
+							<div className="flex items-center gap-1 min-w-0 max-w-full">
+								<div ref={modeContainerRef} className="min-w-0 max-w-full">
 									<ModeSelector
 										value={mode}
 										title={t("chat:selectMode")}
 										onChange={handleModeChange}
-										triggerClassName="shrink-0"
+										triggerClassName="max-w-full"
 										modeShortcutText={modeShortcutText}
 										customModes={customModes}
 										customModePrompts={customModePrompts}
@@ -1267,8 +1269,11 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 							</div>
 
 							{/* Right: Auto-approve toggle, Attach files/images, Enhance prompt, Queue, Cancel, Send/Stop */}
-							<div ref={rightControlsRef} className="flex items-center gap-1 shrink-0">
-								{!isEditMode && <AutoApproveDropdown triggerClassName="shrink-0" />}
+							<div
+								ref={rightControlsRef}
+								data-testid="chat-toolbar-right-controls"
+								className="flex flex-wrap items-center justify-end gap-1 ml-auto max-w-full">
+								{!isEditMode && <AutoApproveDropdown triggerClassName="max-w-full" />}
 
 								<StandardTooltip content={t("chat:addAttachments")}>
 									<button

@@ -70,6 +70,13 @@ else
 fi
 
 if [ -n "$LATEST_VSIX" ] && [ -f "$LATEST_VSIX" ]; then
+    INSTALL_PATH="$LATEST_VSIX"
+    if command -v wslpath >/dev/null 2>&1; then
+        INSTALL_PATH="$(wslpath -w "$LATEST_VSIX" 2>/dev/null || echo "$LATEST_VSIX")"
+    elif command -v cygpath >/dev/null 2>&1; then
+        INSTALL_PATH="$(cygpath -w "$LATEST_VSIX" 2>/dev/null || echo "$LATEST_VSIX")"
+    fi
+
     echo "[INSTALL] Menginstall $(basename "$LATEST_VSIX") ke Antigravity IDE..."
     IDE_CMD=""
     if command -v antigravity-ide >/dev/null 2>&1; then
@@ -79,15 +86,14 @@ if [ -n "$LATEST_VSIX" ] && [ -f "$LATEST_VSIX" ]; then
     fi
 
     if [ -n "$IDE_CMD" ]; then
-        INSTALL_PATH="$LATEST_VSIX"
-        if command -v wslpath >/dev/null 2>&1; then
-            INSTALL_PATH="$(wslpath -w "$LATEST_VSIX" 2>/dev/null || echo "$LATEST_VSIX")"
-        elif command -v cygpath >/dev/null 2>&1; then
-            INSTALL_PATH="$(cygpath -w "$LATEST_VSIX" 2>/dev/null || echo "$LATEST_VSIX")"
-        fi
         "$IDE_CMD" --install-extension "$INSTALL_PATH" --force || echo "[WARN] Gagal install ekstensi ke Antigravity IDE."
     else
         echo "[WARN] Perintah antigravity-ide atau antigravity tidak ditemukan di PATH."
+    fi
+
+    if command -v code >/dev/null 2>&1; then
+        echo "[INSTALL] Menginstall $(basename "$LATEST_VSIX") ke VS Code..."
+        code --install-extension "$INSTALL_PATH" --force || echo "[WARN] Gagal install ekstensi ke VS Code."
     fi
 fi
 

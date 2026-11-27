@@ -62,14 +62,16 @@ export const ReasoningBlock = ({ content, ts, isStreaming, isLast }: ReasoningBl
 		<TimelineItem
 			status={isThinkingStreaming ? "running" : "info"}
 			customDot={
-				<div
-					className={cn(
-						"flex items-center justify-center size-3.5 rounded-full border transition-colors",
-						isThinkingStreaming
-							? "bg-purple-500/20 text-purple-400 border-purple-500/40 animate-pulse shadow-sm shadow-purple-500/20"
-							: "bg-purple-500/10 text-purple-300 border-purple-500/20",
-					)}>
-					<Brain className="size-2.5" strokeWidth={2} />
+				<div className="flex items-center justify-center size-4 rounded-full bg-vscode-editor-background ring-2 ring-vscode-editor-background">
+					<div
+						className={cn(
+							"flex items-center justify-center size-full rounded-full border transition-colors",
+							isThinkingStreaming
+								? "bg-purple-500/20 text-purple-400 border-purple-500/40 animate-pulse shadow-sm shadow-purple-500/20"
+								: "bg-purple-500/10 text-purple-300 border-purple-500/20",
+						)}>
+						<Brain className="size-2.5" strokeWidth={2} />
+					</div>
 				</div>
 			}
 			action={<span>{thinkingTitle}</span>}
