@@ -59,7 +59,7 @@ import {
 	Trash2,
 	MessageCircleQuestionMark,
 	SquareArrowOutUpRight,
-	TerminalSquare,
+	Terminal,
 	Repeat2,
 	ArrowRight,
 	ChevronDown,
@@ -318,7 +318,9 @@ export const ChatRowContent = ({
 					isCommandExecuting ? (
 						<ProgressIndicator />
 					) : (
-						<TerminalSquare className="size-4" aria-label="Terminal icon" />
+						<div className="flex items-center justify-center size-3.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/25">
+							<Terminal className="size-2.5" />
+						</div>
 					),
 					<span style={{ color: normalColor, fontWeight: "bold" }}>
 						{t("chat:commandExecution.running")}
