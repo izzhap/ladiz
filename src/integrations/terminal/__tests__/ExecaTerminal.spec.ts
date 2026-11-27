@@ -35,48 +35,62 @@ describe("ExecaTerminal", () => {
 
 	it("should abort a running process tree including grandchild processes holding stdout open", async () => {
 		const os = await import("os")
-		const terminal = new ExecaTerminal(2, os.tmpdir())
-		let completed = false
-		let exitDetails: any
+		const originalPath = process.env.PATH
+		if (process.platform === "win32" && originalPath) {
+			// Simulate Windows 11 24H2+ / Server 2025 where wmic.exe is absent.
+			process.env.PATH = originalPath
+				.split(";")
+				.filter((entry) => !/\\wbem\\?$/i.test(entry))
+				.join(";")
+		}
 
-		const childScript =
-			"const { spawn } = require('child_process'); " +
-			"spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'inherit' }); " +
-			"console.log('READY'); " +
-			"setInterval(() => {}, 1000);"
+		try {
+			const terminal = new ExecaTerminal(2, os.tmpdir())
+			let completed = false
+			let exitDetails: any
 
-		const command = `"${process.execPath}" -e "${childScript}"`
+			const childScript =
+				"const { spawn } = require('child_process'); " +
+				"spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'inherit' }); " +
+				"console.log('READY'); " +
+				"setInterval(() => {}, 1000);"
 
-		let proc!: ReturnType<typeof terminal.runCommand>
-		const readyPromise = new Promise<void>((resolve) => {
-			const callbacks: RooTerminalCallbacks = {
-				onLine: (line) => {
-					if (line.includes("READY")) {
-						resolve()
-					}
-				},
-				onCompleted: () => {
-					completed = true
-				},
-				onShellExecutionStarted: vi.fn(),
-				onShellExecutionComplete: (details) => {
-					exitDetails = details
-				},
+			const command = `"${process.execPath}" -e "${childScript}"`
+
+			let proc!: ReturnType<typeof terminal.runCommand>
+			const readyPromise = new Promise<void>((resolve) => {
+				const callbacks: RooTerminalCallbacks = {
+					onLine: (line) => {
+						if (line.includes("READY")) {
+							resolve()
+						}
+					},
+					onCompleted: () => {
+						completed = true
+					},
+					onShellExecutionStarted: vi.fn(),
+					onShellExecutionComplete: (details) => {
+						exitDetails = details
+					},
+				}
+
+				proc = terminal.runCommand(command, callbacks)
+			})
+
+			await readyPromise
+			await new Promise((resolve) => setTimeout(resolve, 250))
+
+			proc.abort()
+
+			await proc
+
+			expect(completed).toBe(true)
+			expect(exitDetails).toBeDefined()
+			expect(exitDetails.exitCode).not.toBe(0)
+		} finally {
+			if (originalPath !== undefined) {
+				process.env.PATH = originalPath
 			}
-
-			proc = terminal.runCommand(command, callbacks)
-		})
-
-		await readyPromise
-		// Wait past the 100ms pidUpdatePromise window so this.pid is updated
-		await new Promise((resolve) => setTimeout(resolve, 250))
-
-		proc.abort()
-
-		await proc
-
-		expect(completed).toBe(true)
-		expect(exitDetails).toBeDefined()
-		expect(exitDetails.exitCode).not.toBe(0)
+		}
 	}, 10_000)
 })
