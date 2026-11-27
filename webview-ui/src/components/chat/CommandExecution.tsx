@@ -162,12 +162,12 @@ export const CommandExecution = ({
 				) : (
 					<div
 						className={cn(
-							"flex items-center justify-center size-3.5 rounded-full",
+							"flex items-center justify-center size-3.5 rounded-full border transition-colors",
 							isRunning
 								? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 animate-pulse"
 								: isExited && !isExitOk
 									? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
-									: "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30",
+									: "bg-cyan-500/15 text-cyan-300 border border-cyan-500/25",
 						)}>
 						<Terminal className="size-2.5" />
 					</div>

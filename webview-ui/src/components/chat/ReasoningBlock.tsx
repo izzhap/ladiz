@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { useExtensionState } from "@src/context/ExtensionStateContext"
 
 import MarkdownBlock from "../common/MarkdownBlock"
-import { ChevronDown, Sparkles } from "lucide-react"
+import { Brain, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { TimelineItem } from "./TimelineItem"
 
@@ -66,10 +66,10 @@ export const ReasoningBlock = ({ content, ts, isStreaming, isLast }: ReasoningBl
 					className={cn(
 						"flex items-center justify-center size-3.5 rounded-full border transition-colors",
 						isThinkingStreaming
-							? "bg-indigo-500/20 text-indigo-400 border-indigo-500/40 animate-pulse"
-							: "bg-indigo-500/10 text-indigo-300 border-indigo-500/20",
+							? "bg-purple-500/20 text-purple-400 border-purple-500/40 animate-pulse shadow-sm shadow-purple-500/20"
+							: "bg-purple-500/10 text-purple-300 border-purple-500/20",
 					)}>
-					<Sparkles className="size-2.5" />
+					<Brain className="size-2.5" strokeWidth={2} />
 				</div>
 			}
 			action={<span>{thinkingTitle}</span>}
