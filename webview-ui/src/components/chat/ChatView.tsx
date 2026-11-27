@@ -32,7 +32,6 @@ import { Plus, Check, Play, RotateCw, X, ArrowDown, History } from "lucide-react
 import { cn } from "@/lib/utils"
 import RooHero from "@src/components/welcome/RooHero"
 import { StandardTooltip } from "@src/components/ui"
-import PromptSuggestions from "./PromptSuggestions"
 import Announcement from "./Announcement"
 import ChatRow from "./ChatRow"
 import WarningRow from "./WarningRow"
@@ -1719,15 +1718,9 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 					)}
 				</>
 			) : (
-				<div className="flex flex-col h-full min-h-0 overflow-y-auto px-4 py-6">
-					<div className="w-full max-w-[500px] mx-auto my-auto flex flex-col items-center justify-center gap-6">
+				<div className="flex flex-col flex-1 min-h-0 overflow-y-auto px-4 py-8">
+					<div className="w-full max-w-[380px] mx-auto my-auto flex flex-col items-center justify-center">
 						<RooHero centered onVersionClick={() => setShowAnnouncementModal(true)} />
-						<PromptSuggestions
-							onSelectPrompt={(prompt) => {
-								setInputValue(prompt)
-								textAreaRef.current?.focus()
-							}}
-						/>
 					</div>
 				</div>
 			)}

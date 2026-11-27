@@ -18,4 +18,13 @@ describe("RooHero", () => {
 		expect(screen.getByText("Ladiz AI")).toBeInTheDocument()
 		expect(screen.getByText("Autonomous coding & engineering assistant")).toBeInTheDocument()
 	})
+
+	it("renders version indicator when onVersionClick is provided", () => {
+		const onVersionClick = vi.fn()
+		render(<RooHero centered={true} onVersionClick={onVersionClick} />)
+		const versionBtn = screen.getByText("v3.53.6")
+		expect(versionBtn).toBeInTheDocument()
+		versionBtn.click()
+		expect(onVersionClick).toHaveBeenCalledTimes(1)
+	})
 })

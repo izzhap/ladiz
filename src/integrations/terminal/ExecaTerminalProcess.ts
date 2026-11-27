@@ -11,9 +11,7 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 	private terminalRef: WeakRef<RooTerminal>
 	private aborted = false
 	private pid?: number
-	private rootPid?: number
 	private subprocess?: ReturnType<typeof execa>
-	private pidUpdatePromise?: Promise<void>
 	private flushTimer?: NodeJS.Timeout
 
 	constructor(terminal: RooTerminal) {
@@ -57,26 +55,6 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 			})`${command}`
 
 			this.pid = this.subprocess.pid
-			this.rootPid = this.subprocess.pid
-
-			// When using shell: true, the PID is for the shell, not the actual command
-			// Find the actual command PID after a small delay
-			if (this.pid) {
-				this.pidUpdatePromise = new Promise<void>((resolve) => {
-					setTimeout(() => {
-						psTree(this.pid!, (err, children) => {
-							if (!err && children.length > 0) {
-								// Update PID to the first child (the actual command)
-								const actualPid = parseInt(children[0].PID)
-								if (!isNaN(actualPid)) {
-									this.pid = actualPid
-								}
-							}
-							resolve()
-						})
-					}, 100)
-				})
-			}
 
 			const rawStream = this.subprocess.iterable({ from: "all", preserveNewlines: true })
 
@@ -184,9 +162,9 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 	public override abort() {
 		this.aborted = true
 
-		const targetPids = Array.from(new Set([this.rootPid, this.pid].filter((pid): pid is number => Boolean(pid))))
+		const pid = this.pid
 
-		const killSubprocessAndRoots = () => {
+		const killSubprocessAndRoot = () => {
 			if (this.subprocess) {
 				try {
 					this.subprocess.kill("SIGKILL")
@@ -197,7 +175,7 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 				}
 			}
 
-			for (const pid of targetPids) {
+			if (pid) {
 				try {
 					process.kill(pid, "SIGKILL")
 				} catch (e) {
@@ -208,51 +186,28 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 			}
 		}
 
+		if (!pid) {
+			killSubprocessAndRoot()
+			return
+		}
+
 		if (process.platform === "win32") {
-			if (targetPids.length === 0) {
-				killSubprocessAndRoots()
-				return
-			}
-
 			// Kill the full process tree atomically on Windows (avoids wmic dependency in ps-tree).
-			for (const pid of targetPids) {
-				execFile("taskkill", ["/pid", String(pid), "/T", "/F"], (err) => {
-					if (err) {
-						killSubprocessAndRoots()
-					}
-				})
-			}
-
-			return
-		}
-
-		if (targetPids.length === 0) {
-			killSubprocessAndRoots()
-			return
-		}
-
-		// Collect descendants via psTree before killing parents so children are not orphaned.
-		let pending = targetPids.length
-		const childPids = new Set<number>()
-
-		for (const pid of targetPids) {
-			psTree(pid, (err, children) => {
-				if (!err) {
-					for (const child of children) {
-						const childPid = parseInt(child.PID)
-						if (!isNaN(childPid)) {
-							childPids.add(childPid)
-						}
-					}
-				} else {
-					console.error(
-						`[ExecaTerminalProcess#abort] Failed to get process tree for PID ${pid}: ${err.message}`,
-					)
+			execFile("taskkill", ["/pid", String(pid), "/T", "/F"], (err) => {
+				if (err) {
+					killSubprocessAndRoot()
 				}
+			})
 
-				pending--
-				if (pending === 0) {
-					for (const childPid of childPids) {
+			return
+		}
+
+		// Collect descendants via psTree before killing parent so children are not orphaned.
+		psTree(pid, (err, children) => {
+			if (!err) {
+				for (const child of children) {
+					const childPid = parseInt(child.PID)
+					if (!isNaN(childPid)) {
 						try {
 							process.kill(childPid, "SIGKILL")
 						} catch (e) {
@@ -261,11 +216,13 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 							)
 						}
 					}
-
-					killSubprocessAndRoots()
 				}
-			})
-		}
+			} else {
+				console.error(`[ExecaTerminalProcess#abort] Failed to get process tree for PID ${pid}: ${err.message}`)
+			}
+
+			killSubprocessAndRoot()
+		})
 	}
 
 	public override hasUnretrievedOutput() {

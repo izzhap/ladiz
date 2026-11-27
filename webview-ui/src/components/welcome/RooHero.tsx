@@ -25,7 +25,7 @@ const RooHero = ({ onVersionClick, className = "", centered = false }: RooHeroPr
 				y="2"
 				width="3"
 				height="3"
-				className="fill-vscode-focusBorder animate-[pulse_1.6s_steps(2,end)_infinite]"
+				className="fill-vscode-focusBorder animate-[pulse_1.6s_steps(2,end)_infinite] motion-reduce:animate-none"
 			/>
 		</svg>
 	)
@@ -35,18 +35,18 @@ const RooHero = ({ onVersionClick, className = "", centered = false }: RooHeroPr
 			<div
 				className={`relative group flex flex-col items-center justify-center text-center select-none ${className}`}>
 				{/* Minimal Pixel Mark */}
-				<div className="flex items-center justify-center size-11 rounded-md border border-vscode-panel-border bg-vscode-sideBar-background text-vscode-foreground mb-3.5 transition-colors duration-150 group-hover:border-vscode-focusBorder/60">
-					{pixelMark(24)}
+				<div className="flex items-center justify-center size-12 rounded-lg border border-vscode-panel-border bg-vscode-editor-background/70 text-vscode-foreground mb-4 transition-colors duration-150 group-hover:border-vscode-focusBorder/60">
+					{pixelMark(26)}
 				</div>
 
 				{/* Brand Typography & Version Badge */}
-				<div className="flex items-center justify-center gap-2 mb-1">
-					<h1 className="text-lg font-semibold tracking-tight text-vscode-foreground m-0 leading-tight">
+				<div className="flex items-center justify-center gap-2 mb-1.5">
+					<h1 className="text-[18px] font-semibold tracking-[-0.02em] text-vscode-foreground m-0 leading-tight">
 						Ladiz AI
 					</h1>
 					{onVersionClick && <VersionIndicator onClick={onVersionClick} className="shrink-0" />}
 				</div>
-				<p className="text-xs text-vscode-descriptionForeground m-0 max-w-[300px] leading-relaxed">
+				<p className="text-xs text-vscode-descriptionForeground m-0 max-w-[280px] leading-relaxed">
 					Autonomous coding & engineering assistant
 				</p>
 			</div>
@@ -57,14 +57,14 @@ const RooHero = ({ onVersionClick, className = "", centered = false }: RooHeroPr
 		<div className={`relative group flex items-center justify-between w-full pt-1 pb-1 select-none ${className}`}>
 			<div className="flex items-center gap-3 min-w-0">
 				{/* Minimal Pixel Mark */}
-				<div className="flex items-center justify-center size-9 rounded-md border border-vscode-panel-border bg-vscode-sideBar-background text-vscode-foreground shrink-0 transition-colors duration-150 group-hover:border-vscode-focusBorder/60">
+				<div className="flex items-center justify-center size-9 rounded-md border border-vscode-panel-border bg-vscode-editor-background/70 text-vscode-foreground shrink-0 transition-colors duration-150 group-hover:border-vscode-focusBorder/60">
 					{pixelMark(20)}
 				</div>
 
 				{/* Brand Typography */}
 				<div className="flex flex-col min-w-0 justify-center">
 					<div className="flex items-center gap-2">
-						<h1 className="text-sm font-semibold tracking-tight text-vscode-foreground m-0 leading-tight">
+						<h1 className="text-sm font-semibold tracking-[-0.01em] text-vscode-foreground m-0 leading-tight">
 							Ladiz AI
 						</h1>
 					</div>
