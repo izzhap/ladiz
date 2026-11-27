@@ -1,3 +1,4 @@
+import { execFile } from "child_process"
 import { execa, ExecaError } from "execa"
 import psTree from "ps-tree"
 import process from "process"
@@ -10,8 +11,10 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 	private terminalRef: WeakRef<RooTerminal>
 	private aborted = false
 	private pid?: number
+	private rootPid?: number
 	private subprocess?: ReturnType<typeof execa>
 	private pidUpdatePromise?: Promise<void>
+	private flushTimer?: NodeJS.Timeout
 
 	constructor(terminal: RooTerminal) {
 		super()
@@ -54,6 +57,7 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 			})`${command}`
 
 			this.pid = this.subprocess.pid
+			this.rootPid = this.subprocess.pid
 
 			// When using shell: true, the PID is for the shell, not the actual command
 			// Find the actual command PID after a small delay
@@ -94,9 +98,19 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 
 				const now = Date.now()
 
-				if (this.isListening && (now - this.lastEmitTime_ms > 500 || this.lastEmitTime_ms === 0)) {
-					this.emitRemainingBufferIfListening()
-					this.lastEmitTime_ms = now
+				if (this.isListening) {
+					const elapsed = now - this.lastEmitTime_ms
+					if (elapsed > 500 || this.lastEmitTime_ms === 0) {
+						this.clearFlushTimer()
+						this.emitRemainingBufferIfListening()
+						this.lastEmitTime_ms = now
+					} else if (!this.flushTimer) {
+						this.flushTimer = setTimeout(() => {
+							this.flushTimer = undefined
+							this.emitRemainingBufferIfListening()
+							this.lastEmitTime_ms = Date.now()
+						}, 500 - elapsed)
+					}
 				}
 
 				this.startHotTimer(line)
@@ -130,11 +144,17 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 				}
 			}
 
-			this.emit("shell_execution_complete", { exitCode: 0 })
+			this.emit(
+				"shell_execution_complete",
+				this.aborted ? { exitCode: undefined, signalName: "SIGKILL" } : { exitCode: 0 },
+			)
 		} catch (error) {
 			if (error instanceof ExecaError) {
 				console.error(`[ExecaTerminalProcess#run] shell execution error: ${error.message}`)
-				this.emit("shell_execution_complete", { exitCode: error.exitCode ?? 0, signalName: error.signal })
+				this.emit("shell_execution_complete", {
+					exitCode: this.aborted || error.signal ? error.exitCode : (error.exitCode ?? 1),
+					signalName: error.signal ?? (this.aborted ? "SIGKILL" : undefined),
+				})
 			} else {
 				console.error(
 					`[ExecaTerminalProcess#run] shell execution error: ${error instanceof Error ? error.message : String(error)}`,
@@ -145,6 +165,7 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 			this.subprocess = undefined
 		}
 
+		this.clearFlushTimer()
 		this.terminal.setActiveStream(undefined)
 		this.emitRemainingBufferIfListening()
 		this.stopHotTimer()
@@ -154,6 +175,7 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 	}
 
 	public override continue() {
+		this.clearFlushTimer()
 		this.isListening = false
 		this.removeAllListeners("line")
 		this.emit("continue")
@@ -162,9 +184,9 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 	public override abort() {
 		this.aborted = true
 
-		// Function to perform the kill operations
-		const performKill = () => {
-			// Try to kill using the subprocess object
+		const targetPids = Array.from(new Set([this.rootPid, this.pid].filter((pid): pid is number => Boolean(pid))))
+
+		const killSubprocessAndRoots = () => {
 			if (this.subprocess) {
 				try {
 					this.subprocess.kill("SIGKILL")
@@ -175,45 +197,72 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 				}
 			}
 
-			// Kill the stored PID (which should be the actual command after our update)
-			if (this.pid) {
+			for (const pid of targetPids) {
 				try {
-					process.kill(this.pid, "SIGKILL")
+					process.kill(pid, "SIGKILL")
 				} catch (e) {
 					console.warn(
-						`[ExecaTerminalProcess#abort] Failed to kill process ${this.pid}: ${e instanceof Error ? e.message : String(e)}`,
+						`[ExecaTerminalProcess#abort] Failed to kill process ${pid}: ${e instanceof Error ? e.message : String(e)}`,
 					)
 				}
 			}
 		}
 
-		// If PID update is in progress, wait for it before killing
-		if (this.pidUpdatePromise) {
-			this.pidUpdatePromise.then(performKill).catch(() => performKill())
-		} else {
-			performKill()
+		if (process.platform === "win32") {
+			if (targetPids.length === 0) {
+				killSubprocessAndRoots()
+				return
+			}
+
+			// Kill the full process tree atomically on Windows (avoids wmic dependency in ps-tree).
+			for (const pid of targetPids) {
+				execFile("taskkill", ["/pid", String(pid), "/T", "/F"], (err) => {
+					if (err) {
+						killSubprocessAndRoots()
+					}
+				})
+			}
+
+			return
 		}
 
-		// Continue with the rest of the abort logic
-		if (this.pid) {
-			// Also check for any child processes
-			psTree(this.pid, async (err, children) => {
-				if (!err) {
-					const pids = children.map((p) => parseInt(p.PID))
+		if (targetPids.length === 0) {
+			killSubprocessAndRoots()
+			return
+		}
 
-					for (const pid of pids) {
-						try {
-							process.kill(pid, "SIGKILL")
-						} catch (e) {
-							console.warn(
-								`[ExecaTerminalProcess#abort] Failed to send SIGKILL to child PID ${pid}: ${e instanceof Error ? e.message : String(e)}`,
-							)
+		// Collect descendants via psTree before killing parents so children are not orphaned.
+		let pending = targetPids.length
+		const childPids = new Set<number>()
+
+		for (const pid of targetPids) {
+			psTree(pid, (err, children) => {
+				if (!err) {
+					for (const child of children) {
+						const childPid = parseInt(child.PID)
+						if (!isNaN(childPid)) {
+							childPids.add(childPid)
 						}
 					}
 				} else {
 					console.error(
-						`[ExecaTerminalProcess#abort] Failed to get process tree for PID ${this.pid}: ${err.message}`,
+						`[ExecaTerminalProcess#abort] Failed to get process tree for PID ${pid}: ${err.message}`,
 					)
+				}
+
+				pending--
+				if (pending === 0) {
+					for (const childPid of childPids) {
+						try {
+							process.kill(childPid, "SIGKILL")
+						} catch (e) {
+							console.warn(
+								`[ExecaTerminalProcess#abort] Failed to send SIGKILL to child PID ${childPid}: ${e instanceof Error ? e.message : String(e)}`,
+							)
+						}
+					}
+
+					killSubprocessAndRoots()
 				}
 			})
 		}
@@ -240,6 +289,13 @@ export class ExecaTerminalProcess extends BaseTerminalProcess {
 		// )
 
 		return output.slice(0, index)
+	}
+
+	private clearFlushTimer() {
+		if (this.flushTimer) {
+			clearTimeout(this.flushTimer)
+			this.flushTimer = undefined
+		}
 	}
 
 	private emitRemainingBufferIfListening() {

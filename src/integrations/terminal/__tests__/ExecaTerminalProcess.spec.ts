@@ -187,4 +187,63 @@ describe("ExecaTerminalProcess", () => {
 			expect(terminalProcess["lastRetrievedIndex"]).toBe(0)
 		})
 	})
+
+	describe("abort", () => {
+		it("emits non-zero/signal shell_execution_complete when aborted", async () => {
+			const completeSpy = vitest.fn()
+			terminalProcess.on("shell_execution_complete", completeSpy)
+			terminalProcess.on("line", () => {
+				terminalProcess.abort()
+			})
+
+			await terminalProcess.run("echo test")
+
+			expect(completeSpy).toHaveBeenCalledWith(
+				expect.objectContaining({
+					signalName: "SIGKILL",
+				}),
+			)
+			expect(completeSpy).not.toHaveBeenCalledWith({ exitCode: 0 })
+		})
+	})
+
+	describe("throttled line flushing", () => {
+		it("flushes lines buffered inside the 500ms window even if the stream stalls", async () => {
+			vitest.useFakeTimers()
+			try {
+				let releaseStream!: () => void
+				const streamDone = new Promise<void>((resolve) => {
+					releaseStream = resolve
+				})
+
+				vitest.mocked(execa).mockImplementationOnce((() => {
+					return () => ({
+						pid: mockPid,
+						iterable: () =>
+							(async function* () {
+								yield "line 1\n"
+								yield "line 2\n"
+								await streamDone
+							})(),
+						kill: vitest.fn(),
+					})
+				}) as any)
+
+				const emitted: string[] = []
+				terminalProcess.on("line", (line) => emitted.push(line))
+
+				const runPromise = terminalProcess.run("stalled cmd")
+				await vitest.advanceTimersByTimeAsync(10)
+				expect(emitted).toEqual(["line 1\n"])
+
+				await vitest.advanceTimersByTimeAsync(500)
+				expect(emitted).toEqual(["line 1\n", "line 2\n"])
+
+				releaseStream()
+				await runPromise
+			} finally {
+				vitest.useRealTimers()
+			}
+		})
+	})
 })

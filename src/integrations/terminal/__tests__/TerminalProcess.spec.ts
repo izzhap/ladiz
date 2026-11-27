@@ -186,6 +186,23 @@ describe("TerminalProcess", () => {
 		})
 	})
 
+	describe("abort", () => {
+		it("sends Ctrl+C even after continue() was called", () => {
+			terminalProcess.continue()
+			terminalProcess.abort()
+
+			expect(mockTerminal.sendText).toHaveBeenCalledWith("\x03")
+		})
+
+		it("does not send Ctrl+C after command has completed", () => {
+			const freshProcess = new TestTerminalProcess(mockTerminalInfo)
+			freshProcess.emit("completed", "done")
+			freshProcess.abort()
+
+			expect(mockTerminal.sendText).not.toHaveBeenCalled()
+		})
+	})
+
 	describe("getUnretrievedOutput", () => {
 		it("returns and clears unretrieved output", () => {
 			terminalProcess["fullOutput"] = `\x1b]633;C\x07previous\nnew output\x1b]633;D\x07`

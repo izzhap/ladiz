@@ -575,6 +575,7 @@ export interface WebviewMessage {
 	requestId?: string
 	ids?: string[]
 	terminalOperation?: "continue" | "abort"
+	executionId?: string
 	messageTs?: number
 	restoreCheckpoint?: boolean
 	historyPreviewCollapsed?: boolean

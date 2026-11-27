@@ -438,4 +438,39 @@ describe("executeCommand", () => {
 			expect(mockTerminalInstance.getCurrentWorkingDirectory).toHaveBeenCalled()
 		})
 	})
+
+	describe("Abort and Pending Ask Cleanup", () => {
+		it("supersedes pending command_output ask when command completes before user responds", async () => {
+			mockTask.ask = vitest.fn().mockImplementation(() => new Promise(() => {}))
+			mockTask.supersedePendingAsk = vitest.fn()
+
+			let resolveProcess!: () => void
+			const pendingProcess: any = new Promise<void>((resolve) => {
+				resolveProcess = resolve
+			})
+			pendingProcess.continue = vitest.fn()
+
+			mockTerminal.runCommand.mockImplementation((_command: string, callbacks: RooTerminalCallbacks) => {
+				setTimeout(async () => {
+					void callbacks.onLine("line 1\n", pendingProcess)
+					await new Promise((resolve) => setTimeout(resolve, 10))
+					await callbacks.onCompleted("line 1\n", pendingProcess)
+					callbacks.onShellExecutionComplete({ exitCode: undefined, signalName: "SIGKILL" }, pendingProcess)
+					resolveProcess()
+				}, 0)
+				return pendingProcess
+			})
+
+			const options: ExecuteCommandOptions = {
+				executionId: "exec-abort-1",
+				command: "long-cmd",
+				terminalShellIntegrationDisabled: true,
+			}
+
+			await executeCommandInTerminal(mockTask, options)
+
+			expect(pendingProcess.executionId).toBe("exec-abort-1")
+			expect(mockTask.supersedePendingAsk).toHaveBeenCalled()
+		})
+	})
 })

@@ -30,6 +30,7 @@ export interface RooTerminalCallbacks {
 
 export interface RooTerminalProcess extends EventEmitter<RooTerminalProcessEvents> {
 	command: string
+	executionId?: string
 	isHot: boolean
 	run: (command: string) => Promise<void>
 	continue: () => void
